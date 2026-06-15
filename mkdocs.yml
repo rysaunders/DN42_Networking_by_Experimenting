@@ -32,6 +32,9 @@ theme:
 plugins:
   - search
 
+extra_javascript:
+  - https://unpkg.com/mermaid@11/dist/mermaid.min.js
+
 markdown_extensions:
   - admonition
   - attr_list
@@ -43,19 +46,20 @@ markdown_extensions:
       permalink: true
   - pymdownx.details
   - pymdownx.highlight
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
 
 nav:
-  - Start:
-      - Home: index.md
-      - Start Here: start-here.md
-      - Toy DN42: toy-dn42.md
-      - Safety: safety.md
-      - Glossary: glossary.md
+  - Home: index.md
+  - Start Here: start-here.md
+  - Toy DN42: toy-dn42.md
   - Part 1 - First Principles:
       - Overview: part-01-first-principles/index.md
       - Linux as a Router: part-01-first-principles/01-linux-networking.md
@@ -71,10 +75,13 @@ nav:
       - Kernel Routes: part-02-first-dn42-node/04-kernel-routes.md
       - DN42 DNS: part-02-first-dn42-node/05-dn42-dns.md
       - First Service: part-02-first-dn42-node/06-first-service.md
+  - Reference:
+      - Safety: safety.md
+      - Glossary: glossary.md
   - Appendices:
       - Lab Environment: appendices/lab-environment.md
       - Citation Index: appendices/citation-index.md
-  - Authoring Templates:
+  - Project:
       - Chapter Template: authoring-templates/chapter-template.md
       - Experiment Template: authoring-templates/experiment-template.md
       - Research Note Template: authoring-templates/research-note-template.md
