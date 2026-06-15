@@ -80,6 +80,9 @@ run ip -n "${NS_ROUTER}" link set rtr-right0 up
 run ip -n "${NS_RIGHT}" link set lo up
 run ip -n "${NS_RIGHT}" link set right0 up
 
+section "Start with forwarding disabled"
+run ip netns exec "${NS_ROUTER}" sysctl -w net.ipv4.ip_forward=0
+
 section "Show directly connected routes"
 run ip -n "${NS_LEFT}" route
 run ip -n "${NS_ROUTER}" route
@@ -93,12 +96,16 @@ section "Add routes through the router namespace"
 run ip -n "${NS_LEFT}" route add 10.10.2.0/30 via 10.10.1.1 dev left0
 run ip -n "${NS_RIGHT}" route add 10.10.1.0/30 via 10.10.2.1 dev right0
 
-section "Enable forwarding inside the router namespace"
-run ip netns exec "${NS_ROUTER}" sysctl -w net.ipv4.ip_forward=1
-
 section "Route lookup after static routes"
 run ip -n "${NS_LEFT}" route get 10.10.2.2
 run ip -n "${NS_RIGHT}" route get 10.10.1.2
+
+section "Ping still fails before forwarding is enabled"
+run ip netns exec "${NS_ROUTER}" sysctl net.ipv4.ip_forward
+run ip netns exec "${NS_LEFT}" ping -c 1 -W 1 10.10.2.2 || true
+
+section "Enable forwarding inside the router namespace"
+run ip netns exec "${NS_ROUTER}" sysctl -w net.ipv4.ip_forward=1
 
 section "Forward traffic through the router namespace"
 run ip netns exec "${NS_LEFT}" ping -c 2 -W 1 10.10.2.2

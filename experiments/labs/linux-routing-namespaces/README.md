@@ -10,6 +10,7 @@ The middle namespace forwards traffic between the two edge namespaces. The lab d
 
 - isolated namespace setup,
 - route lookup before packet forwarding,
+- the difference between having a route and having forwarding enabled,
 - forwarding through a Linux router namespace,
 - rollback that removes namespaces and veth state.
 

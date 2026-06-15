@@ -40,6 +40,8 @@ Reader has seen:
 - interface: a place where packets enter or leave a network stack,
 - veth pair: a virtual Ethernet cable with two ends,
 - IP address: a label assigned to an interface,
+- prefix: a group of addresses written as a starting address plus a length,
+- local link: a network segment directly reachable through one interface,
 - route: an instruction that tells Linux where to send packets for a destination,
 - next hop: the next router a packet should be sent to,
 - route lookup: asking Linux which route it would use for a packet,
@@ -50,8 +52,6 @@ Reader has seen:
 
 Reader has only been lightly introduced to:
 
-- prefix lengths such as `/30`,
-- local-link delivery versus routed delivery,
 - packet path reasoning across one router.
 
 Reader has not yet been taught:

@@ -16,25 +16,74 @@ DN42 will later add WireGuard tunnels, BIRD (a routing daemon), registry objects
 | Namespace | An isolated copy of a Linux network stack. | `dn42lab-left` cannot see interfaces inside `dn42lab-right`. |
 | Interface | A place where packets enter or leave a network stack. | `left0` is the interface inside the left namespace. |
 | veth pair | A virtual Ethernet cable with two ends. A packet sent into one end comes out the other. | `left0` connects to `rtr-left0`. |
-| Address | A label assigned to an interface so packets can name a source or destination. | `10.10.1.2/30` belongs to `left0`. |
+| Address | A label assigned to an interface so packets can name a source or destination. | `10.10.1.2` belongs to `left0`. |
+| Prefix | A group of addresses written as a starting address plus a length. | `10.10.1.0/30` is the left-side link prefix. |
+| Local link | A network segment that can be reached directly through one interface. | `left0` can directly reach `rtr-left0`. |
 | Route | An instruction that tells Linux where to send packets for a destination. | `10.10.2.0/30 via 10.10.1.1`. |
 | Next hop | The next router a packet should be sent to. | `10.10.1.1` is left's next hop toward right. |
 | Route lookup | Asking Linux which route it would use for a packet. | `ip route get 10.10.2.2`. |
 | Forwarding | Receiving a packet that is not for this machine and sending it onward. | The router namespace forwards left-to-right pings. |
-| TTL | Time To Live, a hop counter that decreases each time a packet crosses a router. | Ping replies show `ttl=63`, meaning one router hop happened. |
+| TTL | Time To Live, a hop counter that decreases each time a packet crosses a router. | Ping replies show `ttl=63`, which is consistent with one router hop in this lab. |
 
 ## Mental Model
 
 Think of a network namespace as a tiny Linux machine living inside the real Linux host. It has its own interfaces and route table.
 
+Linux makes two different decisions that are easy to blur together:
+
+- Local-link delivery: "This destination is on a network directly attached to one of my interfaces."
+- IP routing: "This destination is somewhere else, so I need to send the packet to a next-hop router."
+
+The local link carries the packet across one cable. The route lookup decides which cable to use and, when needed, which next-hop router should receive the packet.
+
 This lab creates three tiny machines:
 
 ```mermaid
 flowchart LR
-  left["dn42lab-left<br/>left0: 10.10.1.2/30"] --- router_left["rtr-left0: 10.10.1.1/30<br/>dn42lab-router<br/>rtr-right0: 10.10.2.1/30"] --- right["dn42lab-right<br/>right0: 10.10.2.2/30"]
+  left["dn42lab-left<br/>left0: 10.10.1.2/30"]
+  router["dn42lab-router<br/>rtr-left0: 10.10.1.1/30<br/>rtr-right0: 10.10.2.1/30"]
+  right["dn42lab-right<br/>right0: 10.10.2.2/30"]
+
+  left -- "left link<br/>10.10.1.0/30" --> router
+  router -- "right link<br/>10.10.2.0/30" --> right
 ```
 
 The left and right namespaces are not directly connected. They can only reach each other if the router namespace forwards packets between its two interfaces.
+
+The two `/30` prefixes are two separate links. `10.10.1.0/30` exists only on the left-to-router cable. `10.10.2.0/30` exists only on the router-to-right cable.
+
+## Address and Prefix Primer
+
+An IPv4 address names one interface. In this lab, `10.10.1.2` names `left0`.
+
+A prefix names a group of addresses. The `/30` part says how large the group is. You do not need the binary math yet; for this lab, remember that each `/30` gives us a tiny point-to-point link with two usable interface addresses:
+
+| Prefix | Used by | Interface addresses in this lab |
+| --- | --- | --- |
+| `10.10.1.0/30` | left link | `10.10.1.1` on `rtr-left0`, `10.10.1.2` on `left0` |
+| `10.10.2.0/30` | right link | `10.10.2.1` on `rtr-right0`, `10.10.2.2` on `right0` |
+
+When Linux sees a route like `10.10.1.0/30 dev left0`, it means: "addresses in this prefix are directly reachable through `left0`."
+
+When Linux sees a route like `10.10.2.0/30 via 10.10.1.1 dev left0`, it means: "addresses in this prefix are not directly attached here; send them to the next-hop router `10.10.1.1` through `left0`."
+
+## Two Ways to Run Commands in a Namespace
+
+This chapter uses two command forms:
+
+```sh
+ip -n dn42lab-left route
+```
+
+and:
+
+```sh
+ip netns exec dn42lab-left ping -c 1 10.10.2.2
+```
+
+`ip -n NAME ...` is a shortcut built into the `ip` command. It means "run this `ip` operation against namespace `NAME`."
+
+`ip netns exec NAME ...` runs any command inside namespace `NAME`. Use it when the command is not an `ip` subcommand, such as `ping` or `sysctl`.
 
 ## Why It Matters
 
@@ -60,7 +109,7 @@ experiments/labs/linux-routing-namespaces/run.sh
 The transcript used for this chapter is:
 
 ```text
-experiments/transcripts/linux-routing-namespaces-20260615T205343Z.txt
+experiments/transcripts/linux-routing-namespaces-20260615T223330Z.txt
 ```
 
 Run it from the repository root on Linux or inside the OrbStack Linux machine:
@@ -128,8 +177,6 @@ ip -n dn42lab-router addr add 10.10.2.1/30 dev rtr-right0
 ip -n dn42lab-right addr add 10.10.2.2/30 dev right0
 ```
 
-The `-n dn42lab-left` part means "run this `ip` operation inside the `dn42lab-left` namespace."
-
 The `/30` prefix creates a tiny subnet with two usable interface addresses. That is enough for a point-to-point link:
 
 - `10.10.1.2` talks to `10.10.1.1`.
@@ -150,6 +197,12 @@ ip -n dn42lab-right link set right0 up
 ```
 
 Once addresses are configured and links are up, Linux automatically creates connected routes.
+
+The lab also starts with forwarding disabled so the forwarding step is visible and deterministic:
+
+```sh
+ip netns exec dn42lab-router sysctl -w net.ipv4.ip_forward=0
+```
 
 The left namespace route table contains only its local link:
 
@@ -236,24 +289,6 @@ Read that as:
 
 The return route matters. Ping is not one packet. It is a request and a reply. If left can send a request to right but right cannot send the reply back, the ping still fails.
 
-## Step 6: Enable Forwarding
-
-Routes on the edge namespaces are necessary, but they are not enough.
-
-The middle namespace must be willing to forward packets that are not addressed to itself. Linux controls this with:
-
-```sh
-ip netns exec dn42lab-router sysctl -w net.ipv4.ip_forward=1
-```
-
-The transcript shows:
-
-```text
-net.ipv4.ip_forward = 1
-```
-
-Without this setting, the router namespace can talk to both connected networks itself, but it will not behave as a router for traffic passing through it.
-
 ## Predict Before Running: What Should Route Lookup Say Now?
 
 Left now has a route for `10.10.2.0/30`. Predict the selected route for `10.10.2.2`.
@@ -289,7 +324,75 @@ ip -n dn42lab-right route get 10.10.1.2
 
 Route lookup predicts packet path before a packet is sent. Use it often.
 
-## Step 7: Prove Forwarding with Ping
+## Step 6: Prove Routes Are Not Forwarding
+
+Routes on the edge namespaces are necessary, but they are not enough.
+
+The lab checks forwarding before trying ping:
+
+```sh
+ip netns exec dn42lab-router sysctl net.ipv4.ip_forward
+```
+
+The transcript shows:
+
+```text
+net.ipv4.ip_forward = 0
+```
+
+Now left has a route to right, but the router namespace is not willing to forward packets that are not addressed to itself:
+
+```sh
+ip netns exec dn42lab-left ping -c 1 -W 1 10.10.2.2
+```
+
+The transcript shows:
+
+```text
+1 packets transmitted, 0 received, 100% packet loss
+```
+
+This is the second useful failure in the lab:
+
+- before static routes, left did not know where to send the packet;
+- after static routes but before forwarding, left knows where to send it, but the middle namespace drops transit traffic.
+
+## Step 7: Enable Forwarding
+
+The middle namespace must be willing to forward packets that are not addressed to itself. Linux controls this with:
+
+```sh
+ip netns exec dn42lab-router sysctl -w net.ipv4.ip_forward=1
+```
+
+The transcript shows:
+
+```text
+net.ipv4.ip_forward = 1
+```
+
+Without this setting, the router namespace can talk to both connected networks itself, but it will not behave as a router for traffic passing through it.
+
+## Step 8: One Ping Packet's Path
+
+After routes and forwarding are in place, a ping from left to right has a concrete path:
+
+1. `dn42lab-left` creates an ICMP echo request from `10.10.1.2` to `10.10.2.2`.
+2. Left looks up `10.10.2.2` in its route table.
+3. Left matches `10.10.2.0/30 via 10.10.1.1 dev left0`.
+4. Left sends the packet out `left0` to the next hop `10.10.1.1`.
+5. The veth pair carries the packet across the left local link to `rtr-left0`.
+6. `dn42lab-router` receives the packet. The destination is not one of the router's own addresses.
+7. Because `net.ipv4.ip_forward=1`, the router does its own route lookup for `10.10.2.2`.
+8. The router matches its connected route `10.10.2.0/30 dev rtr-right0`.
+9. The router sends the packet out `rtr-right0`.
+10. The second veth pair carries the packet across the right local link to `right0`.
+11. `dn42lab-right` receives a packet addressed to its own `10.10.2.2` address and sends an echo reply back.
+12. The reply follows the mirror-image route through `10.10.2.1`, the router namespace, `10.10.1.1`, and finally `left0`.
+
+The important split is this: veth links move packets across one local link, while IP route lookups decide the next link to use.
+
+## Step 9: Prove Forwarding with Ping
 
 Now left can ping right:
 
@@ -300,8 +403,8 @@ ip netns exec dn42lab-left ping -c 2 -W 1 10.10.2.2
 The transcript shows two replies:
 
 ```text
-64 bytes from 10.10.2.2: icmp_seq=1 ttl=63 time=0.041 ms
-64 bytes from 10.10.2.2: icmp_seq=2 ttl=63 time=0.056 ms
+64 bytes from 10.10.2.2: icmp_seq=1 ttl=63 time=0.069 ms
+64 bytes from 10.10.2.2: icmp_seq=2 ttl=63 time=0.104 ms
 ```
 
 Right can ping left:
@@ -313,13 +416,13 @@ ip netns exec dn42lab-right ping -c 2 -W 1 10.10.1.2
 The transcript shows two replies again:
 
 ```text
-64 bytes from 10.10.1.2: icmp_seq=1 ttl=63 time=0.043 ms
-64 bytes from 10.10.1.2: icmp_seq=2 ttl=63 time=0.096 ms
+64 bytes from 10.10.1.2: icmp_seq=1 ttl=63 time=0.046 ms
+64 bytes from 10.10.1.2: icmp_seq=2 ttl=63 time=0.080 ms
 ```
 
-The `ttl=63` is a clue. Linux commonly starts IPv4 ping packets with TTL 64. Crossing one router decrements the TTL to 63. That is evidence that the packet crossed the router namespace.
+The `ttl=63` is supporting evidence in this lab. Linux commonly starts IPv4 ping packets with TTL 64, and crossing one router decrements the TTL by one. That makes `ttl=63` consistent with one router hop here. Do not treat a single TTL value as universal proof on every operating system or every network.
 
-## Step 8: Inspect the Router
+## Step 10: Inspect the Router
 
 The router namespace saw packets on both veth interfaces:
 
@@ -390,7 +493,7 @@ After rollback:
 ## Troubleshooting Notes
 
 - If `ip route get` says `Network is unreachable`, the namespace has no selected route for that destination.
-- If `ip route get` is correct but ping fails, check forwarding on the middle namespace.
+- If `ip route get` is correct but ping fails through a middle namespace, check forwarding on the middle namespace.
 - If one direction works but the other does not, check the return route.
 - If connected routes are missing, check interface addresses and whether the link is up.
 - If the router can ping both sides but the sides cannot ping through it, check `net.ipv4.ip_forward`.
@@ -422,13 +525,14 @@ DN42 adds new control-plane tools, but packets still cross Linux interfaces beca
 ## Verify Before Proceeding
 
 - [ ] You can explain why the first `route get` failed.
+- [ ] You can explain why the second `route get` succeeded before ping worked.
 - [ ] You can explain why both edge namespaces need routes.
 - [ ] You can explain why the router namespace needs forwarding enabled.
 - [ ] You can identify the next hop and outgoing interface in `ip route get` output.
-- [ ] You can explain why `ttl=63` suggests one router hop.
+- [ ] You can explain why `ttl=63` supports, but does not universally prove, the one-hop explanation in this lab.
 
 ## References
 
-- `linux-ip-route`: route lookup and route table behavior.
-- `dn42-network-settings`: forwarding and asymmetric routing warnings for later DN42 labs.
-- Transcript: `experiments/transcripts/linux-routing-namespaces-20260615T205343Z.txt`.
+- `linux-ip-route`: use this later when you want the exact Linux meanings of route fields such as `via`, `dev`, `src`, and `scope link`.
+- `dn42-network-settings`: use this later when forwarding, reverse-path filtering, or asymmetric routing becomes relevant on a real DN42 node.
+- Transcript: `experiments/transcripts/linux-routing-namespaces-20260615T223330Z.txt`.
