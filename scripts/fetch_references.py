@@ -14,6 +14,7 @@ import json
 import pathlib
 import re
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 
@@ -87,9 +88,14 @@ def fetch_source(source: dict[str, str]) -> dict[str, object]:
             content_type = response.headers.get("content-type", "application/octet-stream")
             status = response.status
     except urllib.error.HTTPError as error:
-        body = error.read()
-        content_type = error.headers.get("content-type", "text/plain")
-        status = error.code
+        return {
+            "id": source_id,
+            "url": url,
+            "fetched_at": fetched_at,
+            "ok": False,
+            "status": error.code,
+            "error": error.reason,
+        }
     except urllib.error.URLError as error:
         return {
             "id": source_id,
@@ -99,22 +105,50 @@ def fetch_source(source: dict[str, str]) -> dict[str, object]:
             "error": str(error),
         }
 
+    if not 200 <= status < 400:
+        return {
+            "id": source_id,
+            "url": url,
+            "fetched_at": fetched_at,
+            "ok": False,
+            "status": status,
+            "error": f"unexpected HTTP status {status}",
+        }
+
     digest = hashlib.sha256(body).hexdigest()
     filename = safe_filename(source_id, content_type)
     output_path = CACHE_DIR / filename
-    output_path.write_bytes(body)
+    write_bytes_atomically(output_path, body)
 
     return {
         "id": source_id,
         "url": url,
         "fetched_at": fetched_at,
-        "ok": 200 <= status < 400,
+        "ok": True,
         "status": status,
         "content_type": content_type,
         "bytes": len(body),
         "sha256": digest,
         "cache_path": str(output_path.relative_to(ROOT)),
     }
+
+
+def write_bytes_atomically(output_path: pathlib.Path, body: bytes) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "wb",
+        delete=False,
+        dir=output_path.parent,
+        prefix=f".{output_path.name}.",
+        suffix=".tmp",
+    ) as temporary_file:
+        temporary_file.write(body)
+        temporary_path = pathlib.Path(temporary_file.name)
+    temporary_path.replace(output_path)
+
+
+def write_text_atomically(output_path: pathlib.Path, text: str) -> None:
+    write_bytes_atomically(output_path, text.encode("utf-8"))
 
 
 def main() -> int:
@@ -141,7 +175,7 @@ def main() -> int:
         "source_registry": str(SOURCES_FILE.relative_to(ROOT)),
         "results": results,
     }
-    MANIFEST_FILE.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_text_atomically(MANIFEST_FILE, json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
     failed = [result for result in results if not result.get("ok")]
     print(f"fetched {len(results) - len(failed)} of {len(results)} sources")

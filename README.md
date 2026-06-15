@@ -42,6 +42,8 @@ Fetch local reference cache files:
 python3 scripts/fetch_references.py
 ```
 
+The raw cache and `research/cache/manifest.json` are ignored by Git. The source of truth remains `research/sources.yml` plus tracked research notes.
+
 Show the planned first issues:
 
 ```sh
