@@ -24,6 +24,12 @@ Build the site strictly:
 uv run mkdocs build --strict
 ```
 
+Validate the source registry:
+
+```sh
+python3 scripts/validate_sources.py
+```
+
 Preview the site locally:
 
 ```sh

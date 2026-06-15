@@ -37,7 +37,9 @@ jobs:
           python-version-file: .python-version
 
       - name: Build site
-        run: uv run mkdocs build --strict
+        run: |
+          python scripts/validate_sources.py
+          uv run mkdocs build --strict
 
       - name: Configure GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
