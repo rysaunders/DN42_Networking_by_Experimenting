@@ -12,6 +12,27 @@ body:
     validations:
       required: true
   - type: textarea
+    id: reader_starting_point
+    attributes:
+      label: Reader Starting Point
+      description: What can the reader be assumed to know, and what must be introduced from first principles?
+    validations:
+      required: true
+  - type: textarea
+    id: new_terms
+    attributes:
+      label: New Terms and Diagrams
+      description: Which terms need definitions, and what diagrams or illustrations are needed?
+    validations:
+      required: true
+  - type: textarea
+    id: guided_learning
+    attributes:
+      label: Guided Learning Checks
+      description: What should the reader predict, observe, and explain before moving on?
+    validations:
+      required: true
+  - type: textarea
     id: research
     attributes:
       label: Required Sources

@@ -13,6 +13,20 @@ body:
     validations:
       required: true
   - type: textarea
+    id: reader_starting_point
+    attributes:
+      label: Reader Starting Point
+      description: What terms, commands, or mental models must be explained before the reader runs this lab?
+    validations:
+      required: true
+  - type: textarea
+    id: guided_learning
+    attributes:
+      label: Predict and Observe
+      description: What should the reader predict before running commands, and what observations should be explained afterward?
+    validations:
+      required: true
+  - type: textarea
     id: safety
     attributes:
       label: Safety Boundaries
