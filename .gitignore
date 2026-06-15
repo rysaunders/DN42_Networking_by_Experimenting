@@ -1,0 +1,17 @@
+# MkDocs build output
+site/
+
+# Python local state
+.venv/
+.ruff_cache/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Local reference cache. Keep source metadata and curated notes tracked;
+# keep bulky downloaded material local by default.
+research/cache/*
+!research/cache/README.md
+
+# Local operating-system/editor files
+.DS_Store

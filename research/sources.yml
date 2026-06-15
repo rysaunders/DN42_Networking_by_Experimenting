@@ -1,0 +1,154 @@
+sources:
+  - id: mdbook-docs
+    title: mdBook Documentation
+    url: https://rust-lang.github.io/mdBook/
+    category: publishing
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for publishing stack comparison."
+
+  - id: mkdocs-material
+    title: Material for MkDocs
+    url: https://squidfunk.github.io/mkdocs-material/
+    category: publishing
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: recommended-stack
+    notes: "Primary publishing stack."
+
+  - id: mkdocs-deploy
+    title: MkDocs Deploying Your Docs
+    url: https://www.mkdocs.org/user-guide/deploying-your-docs/
+    category: publishing
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for GitHub Pages deployment background."
+
+  - id: docusaurus-deploy
+    title: Docusaurus Deployment
+    url: https://docusaurus.io/docs/deployment
+    category: publishing
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for publishing stack comparison only unless the project changes stack."
+
+  - id: gitbook-docs
+    title: GitBook Documentation
+    url: https://gitbook.com/docs/
+    category: publishing
+    authority: official
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for hosted documentation alternative comparison."
+
+  - id: dn42-getting-started
+    title: DN42 Getting Started
+    url: https://dn42.cc/wiki/howto/getting-started/
+    category: dn42
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: tracked-small-snapshot-allowed
+    status: research-required
+    notes: "Use for registry object overview and workflow questions; revalidate before publishing commands."
+
+  - id: bird-docs
+    title: BIRD Internet Routing Daemon
+    url: https://bird.network.cz/
+    category: routing
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for BIRD 2 syntax, protocols, filters, and kernel export behavior."
+
+  - id: wireguard-quickstart
+    title: WireGuard Quick Start
+    url: https://www.wireguard.com/quickstart/
+    category: tunnel
+    authority: official
+    volatility: low
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for WireGuard interface, key, peer, and keepalive concepts."
+
+  - id: linux-ip-route
+    title: Linux ip-route(8)
+    url: https://man7.org/linux/man-pages/man8/ip-route.8.html
+    category: linux-networking
+    authority: manual
+    volatility: medium
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for Linux route table and route lookup behavior."
+
+  - id: rfc-4271
+    title: "RFC 4271: A Border Gateway Protocol 4"
+    url: https://www.rfc-editor.org/rfc/rfc4271
+    category: bgp
+    authority: standards
+    volatility: low
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for BGP conceptual grounding and decision process references."
+
+  - id: rfc-6811
+    title: "RFC 6811: BGP Prefix Origin Validation"
+    url: https://www.rfc-editor.org/rfc/rfc6811
+    category: rpki
+    authority: standards
+    volatility: low
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for public-Internet origin validation concepts; compare carefully with DN42 registry-derived validation."
+
+  - id: rfc-4193
+    title: "RFC 4193: Unique Local IPv6 Unicast Addresses"
+    url: https://www.rfc-editor.org/rfc/rfc4193
+    category: addressing
+    authority: standards
+    volatility: low
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for ULA background."
+
+  - id: rfc-3258
+    title: "RFC 3258: Distributing Authoritative Name Servers via Shared Unicast Addresses"
+    url: https://www.rfc-editor.org/rfc/rfc3258
+    category: anycast
+    authority: standards
+    volatility: low
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for anycast DNS background."
+
+  - id: ripe-roa
+    title: RIPE NCC Route Origin Authorisation
+    url: https://www.ripe.net/manage-ips-and-asns/resource-management/certification/route-origin-authorisation/
+    category: rpki
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for ROA explanations; distinguish public RPKI from DN42 practice."
