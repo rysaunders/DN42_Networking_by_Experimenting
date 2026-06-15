@@ -87,6 +87,50 @@ sources:
     status: research-required
     notes: "Use for maintainer auth methods, signed commits, and PR authentication workflow."
 
+  - id: dn42-bird2
+    title: DN42 Bird 2
+    url: https://dn42.cc/wiki/howto/routing-daemons/bird2/
+    category: routing
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for DN42-specific BIRD 2 import/export filters, ROA table setup, peer templates, and stale example warnings."
+
+  - id: dn42-rpki
+    title: DN42 RPKI
+    url: https://dn42.cc/wiki/services/rpki/
+    category: rpki
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for DN42 RPKI/RTR service guidance and validator options."
+
+  - id: dn42-network-settings
+    title: DN42 Network Settings
+    url: https://dn42.cc/wiki/howto/network-settings/
+    category: linux-networking
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for router forwarding, reverse path filtering, and asymmetric routing warnings."
+
+  - id: dn42-historical-bird
+    title: DN42 Historical Bird
+    url: https://dn42.cc/wiki/historical/bird/
+    category: routing
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use only as a stale-example contrast for Bird 1.x material; do not use as the primary BIRD 2 source."
+
   - id: bird-docs
     title: BIRD Internet Routing Daemon
     url: https://bird.network.cz/

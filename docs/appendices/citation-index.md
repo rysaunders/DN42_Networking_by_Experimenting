@@ -7,8 +7,8 @@ Published chapters should refer to source IDs from that registry rather than inv
 Initial source groups:
 
 - Publishing: `mkdocs-material`, `mkdocs-deploy`, `mdbook-docs`, `docusaurus-deploy`, `gitbook-docs`.
-- DN42: `dn42-getting-started`, `dn42-registry`, `dn42-registry-authentication`.
-- Routing: `bird-docs`, `rfc-4271`, `linux-ip-route`.
+- DN42: `dn42-getting-started`, `dn42-registry`, `dn42-registry-authentication`, `dn42-bird2`, `dn42-rpki`.
+- Routing: `bird-docs`, `rfc-4271`, `linux-ip-route`, `dn42-historical-bird`.
 - Tunnels: `wireguard-quickstart`.
-- Addressing and validation: `rfc-4193`, `rfc-6811`, `ripe-roa`.
+- Addressing and validation: `rfc-4193`, `rfc-6811`, `ripe-roa`, `dn42-network-settings`.
 - Anycast: `rfc-3258`.
