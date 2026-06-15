@@ -12,13 +12,15 @@ The first version of the site focuses on:
 
 - Linux networking fundamentals.
 - Addressing and route lookup.
-- WireGuard as an overlay link.
-- BGP concepts before public DN42 configuration.
+- Toy DN42: a local small Internet built from namespaces, veth links, loopbacks, BIRD, and controlled failures.
+- WireGuard as a replacement for one local link.
+- BGP concepts inside the local topology before public DN42 configuration.
 - DN42 registry objects, first peer setup, BIRD, kernel routes, DNS, and first service access.
 
 ## Project Rules
 
 - Prefer tested local labs before public DN42 commands.
+- Teach through Toy DN42 before asking the reader to touch real DN42 peers.
 - Mark current DN42 practice as source-dependent.
 - Keep safety checks and rollback steps visible.
 - Preserve source metadata and research notes.

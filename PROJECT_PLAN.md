@@ -4,6 +4,8 @@ This is a planning document for a Git-based book/site that teaches networking by
 
 The project should not become a command cookbook. Every chapter should connect an observable lab result to a networking concept, then show how DN42 practice and the public Internet differ.
 
+Toy DN42 is the central learning spine. Before readers touch public DN42, they should build a small local Internet on one Linux machine. Namespaces act as routers, veth pairs act as links, loopbacks act as advertised service addresses, BIRD acts as the routing speaker, and WireGuard later replaces one local link with an encrypted tunnel.
+
 ## 1. Recommended Publishing Stack
 
 ### Options Compared
@@ -178,23 +180,29 @@ Chapters:
    - Real Internet: BGP advertises prefixes; forwarding uses the best installed route.
    - References: RFC 4193 for IPv6 ULA. Source: [RFC 4193](https://www.rfc-editor.org/rfc/rfc4193).
 
-3. **Routing Tables and Policy Routing**
+3. **Toy DN42 with Static Routes**
+   - Concept: a small local Internet, AS-shaped namespaces, point-to-point links, loopback service addresses, and explicit routes.
+   - Lab: build a four-namespace topology and make loopback services reachable with static routes.
+   - Expected observations: pings follow expected paths; link failure breaks reachability until routes are changed.
+   - Real Internet: static routing does not scale, but it makes reachability, return paths, and failure behavior visible before BGP.
+
+4. **Routing Tables and Policy Routing**
    - Concept: main table, local table, custom tables, rules.
    - Lab: send traffic through different tables using `ip rule`.
    - Expected observations: `ip route get` changes when rules change.
    - Real Internet: routers use multiple RIB/FIB concepts and policy; Linux exposes a simplified but useful model.
    - References: `ip-route(8)`.
 
-4. **WireGuard as a Link**
+5. **WireGuard as a Link**
    - Concept: encrypted point-to-point-ish tunnel over an underlay.
-   - Lab: two namespaces connected with WireGuard.
+   - Lab: replace one Toy DN42 veth link with WireGuard.
    - Expected observations: handshake timestamp, encrypted packets on underlay, clear packets inside tunnel.
    - Real Internet: many DN42 peers use tunnels because they do not share physical links.
    - References: [WireGuard Quick Start](https://www.wireguard.com/quickstart/).
 
-5. **BGP Before DN42**
+6. **BGP Before DN42**
    - Concept: autonomous systems, sessions, prefixes, AS_PATH, route attributes.
-   - Lab: local BIRD-to-BIRD session between namespaces.
+   - Lab: add BIRD to the Toy DN42 topology and replace static routes with learned routes.
    - Expected observations: routes appear in BIRD, then in Linux kernel if exported.
    - Real Internet: BGP exchanges reachability and AS-path information for inter-domain routing. Source: [RFC 4271](https://www.rfc-editor.org/rfc/rfc4271).
 

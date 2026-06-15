@@ -95,28 +95,51 @@ issues:
       - Rollback removes namespaces and temporary state.
       - Transcript is saved under `experiments/transcripts/`.
 
-  - title: "Build local WireGuard namespace lab"
+  - title: "Build Toy DN42 static routing topology"
+    labels: ["experiment", "conceptual", "needs-lab-test", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Build the first reusable Toy DN42 topology: four AS-shaped namespaces connected with veth links, loopback service addresses, and static routes.
+
+      Acceptance criteria:
+      - Lab creates at least four namespaces named as local ASes.
+      - Lab uses veth pairs as point-to-point links between AS namespaces.
+      - Lab assigns loopback service addresses that represent advertised prefixes.
+      - Static routes make loopback service addresses reachable end to end.
+      - Lab demonstrates a link failure or route removal and explains the resulting loss of reachability.
+      - Lab records route lookup, ping, and packet-observation evidence.
+      - Rollback removes namespaces and temporary state.
+      - Transcript is saved under `experiments/transcripts/`.
+      - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
+
+  - title: "Replace one Toy DN42 link with WireGuard"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"
     body: |
-      Build a local WireGuard lab between namespaces before using public DN42 peers.
+      Replace one veth link in the Toy DN42 topology with WireGuard before using public DN42 peers.
 
       Acceptance criteria:
+      - Lab starts from the Toy DN42 topology instead of a standalone two-node demo.
       - Lab shows key generation, interface setup, handshake, and packet flow.
       - Lab explains underlay vs overlay.
+      - Existing routing behavior still works after the link is replaced.
       - Rollback removes interfaces, namespaces, and generated keys.
+      - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
-  - title: "Build local BIRD-to-BIRD lab"
+  - title: "Add BIRD and BGP to Toy DN42"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"
     body: |
-      Build a local BIRD-to-BIRD BGP lab that does not depend on public DN42 state.
+      Add BIRD and BGP to the Toy DN42 topology so reachability is learned instead of statically configured.
 
       Acceptance criteria:
-      - Lab establishes a BGP session.
-      - Lab imports a test prefix.
+      - Lab starts from the Toy DN42 topology.
+      - Lab establishes BGP sessions between local AS namespaces.
+      - Lab advertises loopback service prefixes.
       - Lab demonstrates kernel route export.
+      - Lab demonstrates route withdrawal or link failure and observes convergence.
       - Lab includes troubleshooting branches for session and route-install failures.
+      - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
   - title: "Draft safety page"
     labels: ["chapter", "safety", "v0.1"]

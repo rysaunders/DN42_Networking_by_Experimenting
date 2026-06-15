@@ -53,6 +53,7 @@ nav:
   - Start:
       - Home: index.md
       - Start Here: start-here.md
+      - Toy DN42: toy-dn42.md
       - Safety: safety.md
       - Glossary: glossary.md
   - Part 1 - First Principles:
