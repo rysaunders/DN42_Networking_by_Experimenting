@@ -143,12 +143,12 @@ sources:
     notes: "Use for anycast DNS background."
 
   - id: ripe-roa
-    title: RIPE NCC Route Origin Authorisation
-    url: https://www.ripe.net/manage-ips-and-asns/resource-management/certification/route-origin-authorisation/
+    title: RIPE NCC RPKI ROA Management
+    url: https://www.ripe.net/manage-ips-and-asns/resource-management/rpki/resource-certification-roa-management/
     category: rpki
     authority: official
     volatility: medium
     reviewed_on: 2026-06-15
     cache_policy: ignored-raw-cache
     status: research-required
-    notes: "Use for ROA explanations; distinguish public RPKI from DN42 practice."
+    notes: "Use for ROA management explanations; distinguish public RPKI from DN42 practice."

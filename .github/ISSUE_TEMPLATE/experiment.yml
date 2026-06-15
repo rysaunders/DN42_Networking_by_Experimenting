@@ -1,0 +1,28 @@
+name: Experiment
+description: Build or validate a hands-on lab.
+title: "Experiment: "
+labels:
+  - experiment
+  - needs-lab-test
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What will this experiment prove or disprove?
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety Boundaries
+      description: What must not happen during this lab?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence to Capture
+      description: List command outputs, transcripts, diagrams, or service checks.
+    validations:
+      required: true

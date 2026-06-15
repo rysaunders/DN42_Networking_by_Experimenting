@@ -1,0 +1,46 @@
+labels:
+  - name: chapter
+    color: "1f77b4"
+    description: Chapter planning, drafting, or revision.
+  - name: experiment
+    color: "2ca02c"
+    description: Hands-on lab design, implementation, or validation.
+  - name: research
+    color: "9467bd"
+    description: Source review, source notes, or reference updates.
+  - name: dn42-current
+    color: "d62728"
+    description: Depends on current DN42 practice and must be refreshed before release.
+  - name: conceptual
+    color: "17becf"
+    description: Stable networking principle or explanation.
+  - name: tooling
+    color: "7f7f7f"
+    description: Project automation, scripts, CI, or publishing tooling.
+  - name: safety
+    color: "ff7f0e"
+    description: Route leaks, firewalling, rollback, or operational safety.
+  - name: needs-lab-test
+    color: "f2c744"
+    description: Requires hands-on experiment validation.
+  - name: needs-source-review
+    color: "f2c744"
+    description: Requires authoritative source review before publication.
+  - name: broken-link
+    color: "8c564b"
+    description: Link target changed, failed, or needs replacement.
+  - name: github-pages
+    color: "0366d6"
+    description: GitHub Pages publishing workflow.
+  - name: reference-cache
+    color: "0052cc"
+    description: Local source cache and research material handling.
+  - name: source-refresh
+    color: "5319e7"
+    description: Refresh volatile source notes or snapshots.
+  - name: good-first-lab
+    color: "7057ff"
+    description: Small, self-contained lab suitable for early contribution.
+  - name: v0.1
+    color: "0e8a16"
+    description: Required or likely for the first release milestone.

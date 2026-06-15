@@ -953,4 +953,4 @@ Excluded from v0.1:
 - [RFC 6811: BGP Prefix Origin Validation](https://www.rfc-editor.org/rfc/rfc6811)
 - [RFC 4193: Unique Local IPv6 Unicast Addresses](https://www.rfc-editor.org/rfc/rfc4193)
 - [RFC 3258: Shared Unicast Authoritative DNS](https://www.rfc-editor.org/rfc/rfc3258)
-- [RIPE NCC Route Origin Authorisation](https://www.ripe.net/manage-ips-and-asns/resource-management/certification/route-origin-authorisation/)
+- [RIPE NCC RPKI ROA Management](https://www.ripe.net/manage-ips-and-asns/resource-management/rpki/resource-certification-roa-management/)

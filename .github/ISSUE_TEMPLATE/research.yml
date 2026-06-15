@@ -1,0 +1,28 @@
+name: Research
+description: Review a source or update source-dependent project guidance.
+title: "Research: "
+labels:
+  - research
+  - needs-source-review
+body:
+  - type: input
+    id: source_id
+    attributes:
+      label: Source ID
+      description: Source ID from research/sources.yml, or proposed new source ID.
+    validations:
+      required: true
+  - type: textarea
+    id: questions
+    attributes:
+      label: Questions to Answer
+      description: What decisions depend on this source?
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Expected Output
+      description: Research note, source registry update, chapter edits, or refreshed snapshot.
+    validations:
+      required: true

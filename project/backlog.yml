@@ -1,0 +1,174 @@
+milestones:
+  - title: v0.1
+    description: Zero to one safe DN42 peer, split DNS, and first service access.
+
+issues:
+  - title: "Scaffold MkDocs Material with uv"
+    labels: ["tooling", "github-pages", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Create the initial MkDocs Material site using uv-managed Python dependencies.
+
+      Acceptance criteria:
+      - `pyproject.toml` declares MkDocs Material and project tooling.
+      - `uv.lock` is committed.
+      - `mkdocs.yml` builds the initial navigation.
+      - `uv run mkdocs build --strict` succeeds.
+
+  - title: "Add GitHub Pages deployment workflow"
+    labels: ["tooling", "github-pages", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Add a GitHub Actions workflow that builds MkDocs and deploys the site to GitHub Pages from main.
+
+      Acceptance criteria:
+      - Pull requests run a strict docs build without deploying.
+      - Pushes to main deploy through GitHub Pages.
+      - Generated `site/` output remains uncommitted.
+
+  - title: "Add source registry validation"
+    labels: ["tooling", "research", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Add a script that validates `research/sources.yml` for required fields, duplicate IDs, valid URLs, and accepted status/cache_policy values.
+
+      Acceptance criteria:
+      - Validation runs locally.
+      - Validation runs in CI.
+      - Failure messages identify the broken source ID.
+
+  - title: "Fetch local reference cache from research/sources.yml"
+    labels: ["tooling", "reference-cache", "research", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Use `scripts/fetch_references.py` to populate ignored cache files under `research/cache/`.
+
+      Acceptance criteria:
+      - Each fetched source records URL, retrieval time, status code, and SHA-256.
+      - Raw cache files are ignored by Git.
+      - Failures are explicit and do not corrupt existing cache files.
+
+  - title: "Review DN42 registry README and schema"
+    labels: ["research", "dn42-current", "needs-source-review", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Review the current DN42 registry README, schema, and validation scripts.
+
+      Acceptance criteria:
+      - Add a research note under `research/notes/`.
+      - Identify required objects for a first node.
+      - Identify required validation commands.
+      - Mark privacy and authentication warnings.
+
+  - title: "Review current DN42 BIRD 2 examples"
+    labels: ["research", "dn42-current", "needs-source-review", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Review current DN42 BIRD 2 guidance and examples.
+
+      Acceptance criteria:
+      - Add a research note under `research/notes/`.
+      - Identify safe import/export defaults.
+      - Identify ROA table guidance.
+      - Flag stale or conflicting examples.
+
+  - title: "Review current DN42 WireGuard examples"
+    labels: ["research", "dn42-current", "needs-source-review", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Review current DN42 WireGuard guidance and peer expectations.
+
+      Acceptance criteria:
+      - Add a research note under `research/notes/`.
+      - Identify key, endpoint, allowed IPs, keepalive, and MTU guidance.
+      - Document where examples differ by distro or network manager.
+
+  - title: "Build local namespace routing lab"
+    labels: ["experiment", "conceptual", "needs-lab-test", "good-first-lab", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Build the first-principles Linux routing lab using network namespaces.
+
+      Acceptance criteria:
+      - Lab creates isolated namespaces and routes between them.
+      - Lab demonstrates route lookup and forwarding.
+      - Rollback removes namespaces and temporary state.
+      - Transcript is saved under `experiments/transcripts/`.
+
+  - title: "Build local WireGuard namespace lab"
+    labels: ["experiment", "needs-lab-test", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Build a local WireGuard lab between namespaces before using public DN42 peers.
+
+      Acceptance criteria:
+      - Lab shows key generation, interface setup, handshake, and packet flow.
+      - Lab explains underlay vs overlay.
+      - Rollback removes interfaces, namespaces, and generated keys.
+
+  - title: "Build local BIRD-to-BIRD lab"
+    labels: ["experiment", "needs-lab-test", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Build a local BIRD-to-BIRD BGP lab that does not depend on public DN42 state.
+
+      Acceptance criteria:
+      - Lab establishes a BGP session.
+      - Lab imports a test prefix.
+      - Lab demonstrates kernel route export.
+      - Lab includes troubleshooting branches for session and route-install failures.
+
+  - title: "Draft safety page"
+    labels: ["chapter", "safety", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Draft the recurring safety page for route leaks, public egress, forwarding, firewalls, and rollback.
+
+      Acceptance criteria:
+      - Safety checklist is reusable by each lab.
+      - Rollback pattern is explicit.
+      - Default-route and export-policy warnings are prominent.
+
+  - title: "Draft registry objects chapter"
+    labels: ["chapter", "research", "dn42-current", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Draft the chapter that explains DN42 maintainer, person, ASN, prefix, route, and optional DNS objects.
+
+      Acceptance criteria:
+      - Current-practice claims cite research notes.
+      - No untested command is presented as verified.
+      - Privacy and authentication warnings are included.
+
+  - title: "Draft first WireGuard peer chapter"
+    labels: ["chapter", "dn42-current", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Draft the first public DN42 WireGuard peer chapter.
+
+      Acceptance criteria:
+      - Separates conceptual WireGuard behavior from DN42 peer conventions.
+      - Includes verification and rollback.
+      - Warns against accidental default-route behavior.
+
+  - title: "Draft first BIRD session chapter"
+    labels: ["chapter", "dn42-current", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Draft the first BIRD session chapter.
+
+      Acceptance criteria:
+      - Shows safe import/export policy.
+      - Explains session states and route visibility.
+      - Includes kernel-route troubleshooting.
+
+  - title: "Draft split DNS chapter"
+    labels: ["chapter", "dn42-current", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Draft the `.dn42` split DNS chapter.
+
+      Acceptance criteria:
+      - Public DNS remains unaffected.
+      - Resolver-specific behavior is marked by implementation.
+      - Current DN42 resolver recommendations are source-reviewed.

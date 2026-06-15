@@ -1,0 +1,27 @@
+name: Chapter
+description: Plan, draft, or revise a book chapter.
+title: "Chapter: "
+labels:
+  - chapter
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What concept, lab, and reader outcome should this chapter cover?
+    validations:
+      required: true
+  - type: textarea
+    id: research
+    attributes:
+      label: Required Sources
+      description: List source IDs from research/sources.yml and mark any DN42-current claims.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      description: What commands, transcript, screenshots, or review evidence will prove this chapter is ready?
+    validations:
+      required: true
