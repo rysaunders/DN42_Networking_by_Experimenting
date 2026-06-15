@@ -4,6 +4,8 @@
 
 State what the reader is expected to know before this chapter. If a required idea has not already been introduced, introduce it here instead of assuming it.
 
+Use `docs/reader-knowledge.md` as the source of truth for what prior chapters have taught.
+
 ## Concept
 
 Explain the stable networking idea in plain language. Use concrete nouns before acronyms.
@@ -15,6 +17,8 @@ Define every new term before using it as if the reader already knows it.
 | Term | Plain-language meaning | Concrete example in this chapter |
 | --- | --- | --- |
 | `term` | Short explanation. | Command, packet, route, interface, or object. |
+
+Update `docs/reader-knowledge.md` for every term this chapter teaches for the first time.
 
 ## Why It Matters
 
@@ -89,6 +93,9 @@ Compare the lab to public Internet practice without pretending DN42 is identical
 - [ ] Route lookup matches the expected interface.
 - [ ] No unintended default route exists.
 - [ ] Export policy is explicit.
+- [ ] New concepts are added to `docs/reader-knowledge.md`.
+- [ ] Beginner review has been run, or deferral is recorded with a reason.
+- [ ] Accepted beginner-review findings are addressed.
 
 ## Rollback
 

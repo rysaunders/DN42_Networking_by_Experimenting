@@ -4,6 +4,8 @@
 
 What does the reader need to know before this experiment? List any idea that must be explained first.
 
+Use `docs/reader-knowledge.md` as the source of truth for what prior chapters and labs have taught.
+
 ## Question
 
 What will this experiment prove or disprove?
@@ -17,6 +19,8 @@ If the relevant network state is correct, what should happen?
 Define every new term introduced by the experiment.
 
 - `term`: plain-language definition and concrete example.
+
+Update `docs/reader-knowledge.md` for every term this experiment teaches for the first time.
 
 ## Mental Model
 
@@ -68,6 +72,13 @@ Map the lab result to later DN42 work. Identify what this experiment teaches tha
 - Exit codes.
 - Relevant stdout and stderr.
 - Environment metadata.
+
+## Beginner Review
+
+- [ ] Reviewer received this experiment, the relevant transcript, the authoring template, and `docs/reader-knowledge.md`.
+- [ ] Accepted findings are addressed.
+- [ ] Deferred findings have follow-up issues or notes.
+- [ ] Rejected findings include a reason.
 
 ## References
 
