@@ -65,6 +65,28 @@ sources:
     status: research-required
     notes: "Use for registry object overview and workflow questions; revalidate before publishing commands."
 
+  - id: dn42-registry
+    title: DN42 Registry
+    url: https://git.dn42.dev/dn42/registry
+    category: dn42
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for registry README, schema, validation scripts, and PR workflow. Reviewed checkout c88548aa5369fefcea8cc484567aa89575dad57f."
+
+  - id: dn42-registry-authentication
+    title: DN42 Registry Authentication
+    url: https://dn42.cc/wiki/howto/registry-authentication/
+    category: dn42
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-15
+    cache_policy: ignored-raw-cache
+    status: research-required
+    notes: "Use for maintainer auth methods, signed commits, and PR authentication workflow."
+
   - id: bird-docs
     title: BIRD Internet Routing Daemon
     url: https://bird.network.cz/
