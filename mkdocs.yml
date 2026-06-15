@@ -1,0 +1,79 @@
+site_name: "Building a Small Internet"
+site_description: "Networking by Experimenting with DN42"
+site_url: "https://rysaunders.github.io/DN42_Networking_by_Experimenting/"
+repo_url: "https://github.com/rysaunders/DN42_Networking_by_Experimenting"
+repo_name: "rysaunders/DN42_Networking_by_Experimenting"
+edit_uri: "edit/main/docs/"
+strict: true
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - Start:
+      - Home: index.md
+      - Start Here: start-here.md
+      - Safety: safety.md
+      - Glossary: glossary.md
+  - Part 1 - First Principles:
+      - Overview: part-01-first-principles/index.md
+      - Linux as a Router: part-01-first-principles/01-linux-networking.md
+      - Addresses and Subnets: part-01-first-principles/02-addressing-and-subnets.md
+      - Routing Tables: part-01-first-principles/03-routing-tables.md
+      - WireGuard as a Link: part-01-first-principles/04-wireguard-as-a-link.md
+      - BGP Before DN42: part-01-first-principles/05-bgp-before-dn42.md
+  - Part 2 - First DN42 Node:
+      - Overview: part-02-first-dn42-node/index.md
+      - Registry Objects: part-02-first-dn42-node/01-registry-objects.md
+      - First WireGuard Peer: part-02-first-dn42-node/02-first-wireguard-peer.md
+      - First BIRD Session: part-02-first-dn42-node/03-first-bird-session.md
+      - Kernel Routes: part-02-first-dn42-node/04-kernel-routes.md
+      - DN42 DNS: part-02-first-dn42-node/05-dn42-dns.md
+      - First Service: part-02-first-dn42-node/06-first-service.md
+  - Appendices:
+      - Lab Environment: appendices/lab-environment.md
+      - Citation Index: appendices/citation-index.md
+  - Authoring Templates:
+      - Chapter Template: authoring-templates/chapter-template.md
+      - Experiment Template: authoring-templates/experiment-template.md
+      - Research Note Template: authoring-templates/research-note-template.md

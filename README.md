@@ -18,6 +18,18 @@ This repository is in project setup. The first milestone is `v0.1`: zero to one 
 
 ## Immediate Commands
 
+Build the site strictly:
+
+```sh
+uv run mkdocs build --strict
+```
+
+Preview the site locally:
+
+```sh
+uv run mkdocs serve
+```
+
 Fetch local reference cache files:
 
 ```sh
