@@ -79,6 +79,50 @@ Here, `default` means the default route: the fallback route Linux uses when no m
 
 The `/30` routes in this lab are not the main lesson. They create small connected prefixes for the fake next-hop addresses. You do not need the full address math yet; notice only that assigning `10.0.0.1/30` to `broad0` creates a connected route for `10.0.0.0/30`.
 
+## Connected Routes and Local Neighborhoods
+
+A connected route is Linux saying:
+
+> I have an interface inside this prefix, so addresses in this prefix are on my local link.
+
+In a normal home or office network, this might look like:
+
+```text
+laptop:  192.168.1.23/24
+printer: 192.168.1.80
+router:  192.168.1.1
+```
+
+When the laptop has `192.168.1.23/24` on its Wi-Fi interface, Linux creates a connected route like:
+
+```text
+192.168.1.0/24 dev wlan0
+```
+
+Read that as:
+
+> Destinations inside `192.168.1.0/24` are reachable directly through `wlan0`.
+
+The laptop does not send printer traffic to the router first. Because `192.168.1.80` is inside the connected route, Linux treats the printer as local to that LAN. The packet still has to cross the Wi-Fi or switch, but it does not need an IP router hop.
+
+Traffic to something outside that local neighborhood, like `8.8.8.8`, needs a different route:
+
+```text
+default via 192.168.1.1 dev wlan0
+```
+
+That means:
+
+> If nothing more specific matches, send the packet to the router at `192.168.1.1`.
+
+This is the mental model for the lab:
+
+- `10.0.1.1/30 dev specific0` gives `specific0` one address.
+- The `/30` makes Linux create `10.0.1.0/30 dev specific0`.
+- Because `10.0.1.2` is inside that connected route, Linux accepts it as a plausible next hop.
+
+The dummy interface is not a real Wi-Fi network or switch. It is a controlled way to make Linux believe a tiny local neighborhood exists so we can study route selection.
+
 ## Lab
 
 Build this lab by typing the commands yourself. The repeated typing is part of the lesson: routes become easier to reason about when you have created the namespace, interfaces, addresses, and route entries by hand.
@@ -170,9 +214,11 @@ ip -n addrmatch link add host0 type dummy
 
 These names are deliberately plain:
 
-- `broad0` will carry broad routes,
-- `specific0` will carry more-specific routes,
-- `host0` will carry one exact host route.
+- `broad0` is the broad/default exit,
+- `specific0` is the more-specific exit,
+- `host0` is the exact-host exit.
+
+These are labels for route selection. They are not real routers.
 
 ## Step 4: Add Addresses
 
@@ -192,6 +238,8 @@ This syntax can look odd at first. `10.0.0.1/30` does two related things:
 So the interface does have one specific address: `10.0.0.1`. The `/30` does not mean "assign every address in the `/30` to this interface." It means "this address lives on a local link whose prefix is `/30`."
 
 Linux uses that prefix length to create a connected route. For example, assigning `10.0.0.1/30` to `broad0` creates a connected route for `10.0.0.0/30`.
+
+That connected route is what makes `10.0.0.2` look local to `broad0`. Linux will allow a route such as `default via 10.0.0.2 dev broad0` only if the next hop looks reachable through `broad0`.
 
 If you assigned `10.0.0.1/32` instead, Linux would treat only `10.0.0.1` as directly connected. That is useful for loopback service addresses, but it would not describe a small local link with a next-hop address like `10.0.0.2`.
 

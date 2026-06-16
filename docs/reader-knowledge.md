@@ -42,6 +42,7 @@ Reader has seen:
 - IP address: a label assigned to an interface,
 - prefix: a group of addresses written as a starting address plus a length,
 - local link: a network segment directly reachable through one interface,
+- connected route: a route Linux creates automatically when an interface has an address and prefix,
 - route: an instruction that tells Linux where to send packets for a destination,
 - next hop: the next router a packet should be sent to,
 - route lookup: asking Linux which route it would use for a packet,

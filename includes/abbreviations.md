@@ -12,6 +12,7 @@
 *[network namespace]: An isolated Linux network stack with its own interfaces, addresses, and routes.
 *[network stack]: The part of an operating system that owns interfaces, addresses, routes, and packet handling.
 *[next hop]: The next router a packet should be sent to.
+*[on-link]: Reachable through a local interface without first sending the packet to another IP router.
 *[prefix length]: The number after `/`; a larger number means a smaller, more-specific prefix.
 *[return path]: The route a reply packet uses to get back to the original sender.
 *[route advertisement]: Telling another router that you can carry traffic for a prefix.

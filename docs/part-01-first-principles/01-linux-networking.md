@@ -67,6 +67,28 @@ When Linux sees a route like `10.10.1.0/30 dev left0`, it means: "addresses in t
 
 When Linux sees a route like `10.10.2.0/30 via 10.10.1.1 dev left0`, it means: "addresses in this prefix are not directly attached here; send them to the next-hop router `10.10.1.1` through `left0`."
 
+Think about a laptop on a home Wi-Fi network:
+
+```text
+laptop: 192.168.1.23/24
+printer: 192.168.1.80
+router: 192.168.1.1
+```
+
+The laptop gets a connected route like:
+
+```text
+192.168.1.0/24 dev wlan0
+```
+
+That route means the laptop treats `192.168.1.80` and `192.168.1.1` as local-link neighbors. They are not inside the laptop, but they are in the same local neighborhood from the laptop's point of view. To reach them, the laptop sends directly on Wi-Fi instead of sending to another IP router first.
+
+This lab uses tiny `/30` neighborhoods instead of a home-sized `/24`, but the idea is the same. Assigning `10.10.1.2/30` to `left0` tells Linux:
+
+> `left0` has address `10.10.1.2`, and the local neighborhood on that link is `10.10.1.0/30`.
+
+That is why Linux creates the connected route automatically.
+
 ## Two Ways to Run Commands in a Namespace
 
 This chapter uses two command forms:
@@ -100,45 +122,35 @@ This lab teaches those checks before any DN42-specific tooling is involved.
 
 ## Lab
 
-The validated lab script lives at:
+Build this lab manually. The script is useful for validation and repeat runs, but the lesson is in creating each piece of network state yourself.
 
-```text
-experiments/labs/linux-routing-namespaces/run.sh
-```
+These commands require root privileges because creating network namespaces and veth interfaces changes Linux kernel networking state. If you see `Operation not permitted`, rerun the command with `sudo` or switch to a root shell inside the lab machine.
 
-The transcript used for this chapter is:
-
-```text
-experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt
-```
-
-Run it from the repository root on Linux or inside the OrbStack Linux machine:
+On macOS, use an OrbStack shell:
 
 ```sh
-bash experiments/labs/linux-routing-namespaces/run.sh
+orb
 ```
 
-On macOS with OrbStack:
-
-```sh
-orb bash experiments/labs/linux-routing-namespaces/run.sh
-```
-
-Before running, know why this lab may ask for a password: creating network namespaces and veth interfaces changes Linux kernel networking state, so Linux requires root privileges. The script checks whether it is already running as root. If not, it reruns itself with `sudo`.
-
-The script uses temporary namespaces named `dn42lab-left`, `dn42lab-router`, and `dn42lab-right`. It removes them at the end.
+Then run the commands from that Linux shell as root, or prefix them with `sudo`.
 
 ## Step 1: Create Three Isolated Network Stacks
 
-The lab starts by deleting any old lab namespaces, then creates three new ones:
+Start by deleting any old lab namespaces:
+
+```sh
+ip netns delete dn42lab-left 2>/dev/null || true
+ip netns delete dn42lab-router 2>/dev/null || true
+ip netns delete dn42lab-right 2>/dev/null || true
+```
+
+Then create three new ones:
 
 ```sh
 ip netns add dn42lab-left
 ip netns add dn42lab-router
 ip netns add dn42lab-right
 ```
-
-These commands require root privileges. If you ran the lab script normally, the script handles this by using `sudo` before it reaches this point. If you type the commands by hand and see `Operation not permitted`, rerun them with `sudo` or switch to a root shell inside the lab machine.
 
 After this, `ip netns list` shows:
 
@@ -508,6 +520,28 @@ ip netns delete dn42lab-right
 ```
 
 Deleting a namespace also removes the interfaces inside it. The transcript's final namespace check prints no lab namespace names, which confirms rollback.
+
+## Repeat With the Validation Script
+
+After you have built the lab manually, you can rerun the validated script when you want a clean repeat or transcript:
+
+```sh
+bash experiments/labs/linux-routing-namespaces/run.sh
+```
+
+On macOS with OrbStack:
+
+```sh
+orb bash experiments/labs/linux-routing-namespaces/run.sh
+```
+
+The transcript used to validate this chapter is:
+
+```text
+experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt
+```
+
+The script uses temporary namespaces named `dn42lab-left`, `dn42lab-router`, and `dn42lab-right`. It removes them at the end.
 
 ## What Changed
 
