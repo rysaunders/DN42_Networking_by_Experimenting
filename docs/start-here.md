@@ -5,14 +5,21 @@ This book assumes curiosity and basic command-line comfort, not professional net
 ## Reader Path
 
 1. Learn what Linux does with interfaces, addresses, routes, and forwarding.
-2. Build Toy DN42: a small local Internet made of Linux namespaces and veth links.
+2. Build Pocket Internet: a small local Internet made of Linux namespaces and veth links.
 3. Add loopback service addresses and static routes.
 4. Run BIRD and BGP locally before touching public DN42 peers.
 5. Replace one local link with WireGuard so tunnels become ordinary links in the reader's mental model.
-6. Register DN42 resources only after the registry workflow is understood.
-7. Add one public peer, one routing daemon, split DNS, and one reachable service.
+6. Build a clear border between Pocket Internet and DN42.
+7. Register DN42 resources only after prefixes, route advertisements, and return paths are understood.
+8. Add one public peer, one routing daemon, split DNS, and one reachable service.
 
-Toy DN42 is the spine of the book. Each early lab should add one new behavior to that local topology unless it is teaching a primitive the topology depends on.
+Pocket Internet is the lab, not the destination. DN42 is the bridge from that lab into a living routing ecosystem.
+
+The guiding question for every chapter is:
+
+> How does an Internet emerge from a collection of computers exchanging routes?
+
+Each early lab should add one new behavior to Pocket Internet unless it is teaching a primitive the topology depends on.
 
 ## How to Read Labs
 

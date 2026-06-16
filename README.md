@@ -6,7 +6,7 @@ The canonical planning document is [PROJECT_PLAN.md](PROJECT_PLAN.md).
 
 ## Current Project State
 
-This repository is in project setup. The first milestone is `v0.1`: zero to one safe DN42 peer, split DNS, and first service access.
+This repository is in project setup. The first milestone is `v0.1`: Pocket Internet foundation, route-selection labs, BIRD/BGP inside the lab, one WireGuard-replaced lab link, and a safe DN42 border design.
 
 ## Operating Model
 

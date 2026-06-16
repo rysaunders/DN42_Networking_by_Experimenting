@@ -1,10 +1,16 @@
 # Building a Small Internet: Networking by Experimenting with DN42
 
-This is a planning document for a Git-based book/site that teaches networking by building, breaking, observing, and explaining a small Internet using DN42.
+This is a planning document for a Git-based book/site that teaches networking by building, breaking, observing, and explaining how a small Internet emerges from computers exchanging routes.
 
 The project should not become a command cookbook. Every chapter should connect an observable lab result to a networking concept, then show how DN42 practice and the public Internet differ.
 
-Toy DN42 is the central learning spine. Before readers touch public DN42, they should build a small local Internet on one Linux machine. Namespaces act as routers, veth pairs act as links, loopbacks act as advertised service addresses, BIRD acts as the routing speaker, and WireGuard later replaces one local link with an encrypted tunnel.
+Pocket Internet is the laboratory, not the destination. Before readers touch public DN42, they build a small local Internet on one Linux machine. Namespaces act as routers, veth pairs act as links, loopbacks act as advertised service addresses, BIRD acts as the routing speaker, and WireGuard later replaces one local link with an encrypted tunnel.
+
+DN42 is the bridge from the laboratory to a living routing ecosystem. The advanced payoff is an explicit interconnect: selected Pocket Internet traffic can route toward DN42, and selected services can cross that boundary only when return path, authorization, filtering, and rollback are understood.
+
+Guiding question for every chapter:
+
+> How does an Internet emerge from a collection of computers exchanging routes?
 
 ## 1. Recommended Publishing Stack
 
@@ -51,7 +57,7 @@ networking-by-experimenting-with-dn42/
       index.md
       01-linux-networking.md
       02-addressing-and-subnets.md
-      03-toy-dn42-static-routing.md
+      03-pocket-internet-static-routing.md
       04-routing-tables.md
       05-wireguard-as-a-link.md
       06-bgp-before-dn42.md
@@ -154,7 +160,7 @@ Every chapter should use the same visible structure:
 - How the real Internet does this
 - References and research notes
 
-### Part 1: First Principles
+### Part 1: From Host to Router
 
 Reader outcome: the reader can explain what a Linux router is doing before DN42 enters the picture.
 
@@ -162,8 +168,7 @@ You know it works when:
 
 - The reader can predict which interface a packet will leave.
 - The reader can explain source address selection at a basic level.
-- The reader can distinguish a tunnel interface from the underlay Internet path.
-- The reader can read a route table and identify default, connected, blackhole, and BGP-learned routes.
+- The reader can read a route table and identify default, connected, and blackhole routes.
 
 Chapters:
 
@@ -181,7 +186,7 @@ Chapters:
    - Real Internet: BGP advertises prefixes; forwarding uses the best installed route.
    - References: RFC 4193 for IPv6 ULA. Source: [RFC 4193](https://www.rfc-editor.org/rfc/rfc4193).
 
-3. **Toy DN42 with Static Routes**
+3. **Pocket Internet with Static Routes**
    - Concept: a small local Internet, AS-shaped namespaces, point-to-point links, loopback service addresses, and explicit routes.
    - Lab: build a four-namespace topology and make loopback services reachable with static routes.
    - Expected observations: pings follow expected paths; link failure breaks reachability until routes are changed.
@@ -194,111 +199,101 @@ Chapters:
    - Real Internet: routers use multiple RIB/FIB concepts and policy; Linux exposes a simplified but useful model.
    - References: `ip-route(8)`.
 
-5. **WireGuard as a Link**
-   - Concept: encrypted point-to-point-ish tunnel over an underlay.
-   - Lab: replace one Toy DN42 veth link with WireGuard.
-   - Expected observations: handshake timestamp, encrypted packets on underlay, clear packets inside tunnel.
-   - Real Internet: many DN42 peers use tunnels because they do not share physical links.
-   - References: [WireGuard Quick Start](https://www.wireguard.com/quickstart/).
+### Part 2: Build the Pocket Internet
 
-6. **BGP Before DN42**
-   - Concept: autonomous systems, sessions, prefixes, AS_PATH, route attributes.
-   - Lab: add BIRD to the Toy DN42 topology and replace static routes with learned routes.
-   - Expected observations: routes appear in BIRD, then in Linux kernel if exported.
-   - Real Internet: BGP exchanges reachability and AS-path information for inter-domain routing. Source: [RFC 4271](https://www.rfc-editor.org/rfc/rfc4271).
+Reader outcome: the reader sees a tiny Internet emerge from linked routers and route tables.
 
-### Part 2: First DN42 Node
+Chapters:
 
-Reader outcome: the reader can join DN42 safely, with one peer, DNS resolution, and one reachable service.
+1. **Multiple Routers and Static Routes**
+   - Concept: multiple routers, loopback service addresses, forward path, return path.
+   - Lab: build the Pocket Internet static routing topology.
+   - Expected observations: service loopbacks are reachable only after explicit routes exist.
+
+2. **Route Selection and Static Routing Limits**
+   - Concept: static routes do not react to topology changes.
+   - Lab: break a selected link, observe failure, repair manually, then compare route lookups before and after the repair.
+   - Expected observations: an alternate physical path is not useful until routing points to it.
+
+### Part 3: Add a Routing Control Plane
+
+Reader outcome: the reader understands dynamic routing as route-table automation.
+
+Chapters:
+
+1. **BIRD as a Route Manager**
+   - Concept: routing daemon, route selection, kernel export.
+   - Lab: install routes through BIRD before BGP.
+
+2. **BGP Before DN42**
+   - Concept: neighbors exchange reachability.
+   - Lab: add BGP sessions to Pocket Internet and advertise loopback service prefixes.
+
+3. **Withdrawal, Convergence, and Path Choice**
+   - Concept: routes can disappear, alternatives can win, and policy can influence selection.
+   - Lab: break links, withdraw prefixes, and observe route changes.
+
+### Part 4: Replace Lab Links with Real Links
+
+Reader outcome: the reader understands that routing stays the same when a local cable becomes a tunnel.
+
+Chapters:
+
+1. **WireGuard as a Link**
+   - Concept: encrypted overlay link over an underlay.
+   - Lab: replace one Pocket Internet veth link with WireGuard.
+
+2. **Underlay, Overlay, and MTU**
+   - Concept: packets inside packets, endpoint reachability, and packet size limits.
+   - Lab: observe clear overlay traffic and encrypted underlay traffic.
+
+### Part 5: Connect Pocket Internet to DN42
+
+Reader outcome: the reader connects the lab-built network to a living routing ecosystem safely.
 
 Chapters:
 
 1. **DN42 Registry Objects**
    - Concept: maintainer, person, ASN, prefixes, route objects, DNS objects.
    - Lab: prepare registry changes locally; do not submit until validated.
-   - Expected observations: local validation scripts pass.
-   - Troubleshooting: object formatting, auth fields, route max-length, public contact data.
-   - Real Internet: DN42 registry approximates parts of RIR and routing registry practice.
-   - Research required: current registry workflow and required checks from the DN42 registry README.
-   - Starting source: [DN42 getting started](https://dn42.cc/wiki/howto/getting-started/).
 
-2. **First WireGuard Peer**
-   - Concept: tunnel endpoint, keys, allowed IPs, keepalive, underlay/overlay separation.
-   - Lab: configure a WireGuard interface for one peer.
-   - Expected observations: successful handshake, peer endpoint visible, no default route through DN42.
-   - Troubleshooting: NAT, firewall, wrong key, wrong endpoint, MTU.
-   - Real Internet: an overlay tunnel can behave like a link between routers.
-   - Research required: current DN42 WireGuard examples and peer expectations.
+2. **Pocket Internet to DN42 Border**
+   - Concept: border router, outbound reachability, return path, import/export filters.
+   - Lab: design the border before public peering.
 
-3. **First BIRD Session**
-   - Concept: BGP neighbor over tunnel, local ASN, peer ASN, import/export filters.
-   - Lab: configure BIRD 2 with one peer and safe filters.
-   - Expected observations: session `Established`, routes imported, only own prefix exported.
-   - Troubleshooting: BGP stuck in Active/Connect, wrong neighbor address, wrong ASN, TCP blocked.
-   - Real Internet: eBGP sessions require explicit policy; modern practice avoids accidental route propagation.
-   - References: [BIRD documentation](https://bird.network.cz/) and RFC 4271.
+3. **First Real Peer**
+   - Concept: WireGuard peer plus BGP neighbor on the DN42 side of the border.
+   - Lab: configure one real DN42 peer with conservative filters.
 
-4. **Routes Into the Linux Kernel**
-   - Concept: BIRD RIB vs kernel FIB.
-   - Lab: export selected routes from BIRD to kernel.
-   - Expected observations: `birdc show route` and `ip route` agree for accepted routes.
-   - Troubleshooting: route not selected, next-hop unreachable, kernel protocol disabled, filter rejected.
-   - Real Internet: routers separate control plane route selection from data plane forwarding.
+### Part 6: Operate Services Across the Interconnect
 
-5. **DN42 DNS**
-   - Concept: split DNS, `.dn42`, recursive resolver forwarding.
-   - Lab: configure `systemd-resolved` or another resolver to forward `.dn42`.
-   - Expected observations: public DNS still resolves normally; `.dn42` queries go to DN42 resolvers.
-   - Troubleshooting: search domains, DNSSEC behavior, resolver routing domain syntax, cache.
-   - Real Internet: DNS delegation and split-horizon DNS solve different problems.
-   - Research required: current DN42 DNS resolver recommendations.
-
-6. **First DN42 Service**
-   - Concept: services as proof that routing works end-to-end.
-   - Lab: reach a known DN42 service, then run a minimal HTTP service on the reader's prefix.
-   - Expected observations: service reachable from local node; optional peer confirms reachability.
-   - Troubleshooting: local firewall, wrong source address, route filtered by ROA, no return path.
-   - Real Internet: reachability requires forward path, return path, policy, and host firewall alignment.
-
-### Part 3: Routing Policy
-
-Reader outcome: the reader can explain why one BGP route wins over another and can intentionally change policy without leaking routes.
+Reader outcome: the reader operates services across a real/lab network boundary.
 
 Chapters:
 
-1. Add a second peer.
-2. Observe BGP route selection.
-3. Break a peer and observe convergence.
-4. Add local preference policy.
-5. Build import and export filters.
-6. Validate ROA-style filtering.
-7. Explore BGP communities.
+1. **DN42 DNS**
+   - Concept: split DNS and resolver routing.
 
-### Part 4: Services and Operations
+2. **First Reachable Service**
+   - Concept: service reachability requires forward path, return path, policy, and firewall alignment.
 
-Reader outcome: the reader can run a small, observable DN42 network that provides useful services.
+3. **Monitoring, Rollback, and Safety**
+   - Concept: route leaks, export policy, logs, counters, and rollback drills.
 
-Chapters:
+### Later DN42 and Operations Notes
 
-1. Run a DN42 web service.
-2. Run a looking glass.
-3. Run authoritative DNS.
-4. Monitor BGP sessions.
-5. Build dashboards and alerts.
-6. Document common failure modes.
+Keep the DN42 chapter issues open, but treat them as later-phase work until the Pocket Internet foundation and border model are clear.
 
-### Part 5: Advanced Topologies
+Later DN42 chapters still need to cover:
 
-Reader outcome: the reader understands multi-site behavior, anycast, traffic engineering, and the operational tradeoffs of acting like a small network.
-
-Chapters:
-
-1. Anycast service.
-2. Two-region / multi-POP topology.
-3. Transit behavior and route reflection alternatives.
-4. Traffic engineering with local-pref, prepending, and communities.
-5. Weird useful services.
-6. Operational review: what still differs from the public Internet.
+- registry objects: maintainer, person, ASN, prefixes, route objects, and DNS objects,
+- first real WireGuard peer: endpoint, keys, keepalive, underlay/overlay separation, and MTU,
+- first real BIRD session: BGP neighbor, local ASN, peer ASN, import filters, export filters, and kernel export,
+- DN42 DNS: split DNS, `.dn42` forwarding, resolver-specific behavior, and current resolver recommendations,
+- first DN42 service: source address selection, return path, firewall policy, peer filtering, and service reachability,
+- multi-peer policy: route selection, convergence, local preference, import/export filters, ROA-style validation, and communities,
+- operations: looking glass, monitoring, authoritative DNS, rollback drills, and route-leak prevention,
+- advanced topologies: anycast, multi-site behavior, traffic engineering, and operational tradeoffs.
 
 ## 3. Research Plan
 
@@ -385,18 +380,41 @@ Rules:
 7. Build a WireGuard tunnel between namespaces.
 8. Run local BIRD between two lab routers.
 
-### First DN42 Node Labs
+### Pocket Internet Labs
+
+1. Build the static Pocket Internet topology.
+2. Add overlapping routes and observe longest-prefix match.
+3. Break a selected link and repair static routes manually.
+4. Add BIRD as a route manager.
+5. Add BGP sessions between Pocket Internet routers.
+6. Advertise loopback service prefixes.
+7. Withdraw a prefix and observe convergence.
+8. Change route preference and observe path selection.
+9. Replace one veth link with WireGuard.
+10. Explain which routing behavior changed and which routing behavior stayed the same.
+
+### DN42 Interconnect Labs
+
+1. Design a dedicated Pocket Internet/DN42 border router.
+2. Separate lab links, WireGuard overlay links, and underlay Internet reachability.
+3. Route selected Pocket Internet traffic toward DN42.
+4. Prove the return path before expecting service reachability.
+5. Add explicit import and export filters.
+6. Verify that no default route or unauthorized prefix leaks across the border.
+7. Roll back the interconnect and prove lab routing still works.
+
+### First Real DN42 Labs
 
 1. Register ASN, prefix, maintainer, person, route, and optional DNS objects.
-2. Configure first WireGuard tunnel.
-3. Configure BIRD 2 with one peer.
-4. Validate ROA filtering.
+2. Configure first DN42 WireGuard tunnel on the border.
+3. Configure BIRD 2 with one DN42 peer.
+4. Validate ROA-style filtering.
 5. Install accepted routes into Linux kernel.
 6. Debug kernel route installation.
 7. Configure firewall safely.
 8. Prevent accidental public Internet egress through DN42.
 9. Configure split DNS for `.dn42`.
-10. Reach first DN42 service.
+10. Reach first DN42 service from the Pocket Internet side where policy allows.
 
 ### Multi-Peer and Policy Labs
 
@@ -482,7 +500,7 @@ Use exact rollback commands per lab after research confirms the target distro an
 
 ### After Part 1
 
-The reader understands packets, interfaces, routes, tunnels, and basic BGP vocabulary.
+The reader understands packets, interfaces, route lookup, connected routes, and forwarding.
 
 You know it works when:
 
@@ -498,60 +516,71 @@ You probably broke:
 
 ### After Part 2
 
-The reader has a working first DN42 node and can reach a DN42 service.
+The reader has built a Pocket Internet with multiple routers, service loopbacks, and static routes.
+
+You know it works when:
+
+- They can explain forward path and return path separately.
+- They can predict route lookup before sending packets.
+- They can explain why a backup link is not useful until routing points to it.
+- They can repair reachability by changing explicit static routes.
+
+You probably broke:
+
+- route tables, if `ip route get` says `Network is unreachable`,
+- forwarding, if the next hop receives packets but does not pass them on,
+- return path, if requests arrive but replies do not return.
+
+### After Part 3
+
+The reader can reason about dynamic routing inside Pocket Internet.
+
+You know it works when:
+
+- BIRD sessions exchange reachability.
+- Loopback service prefixes are advertised and withdrawn.
+- Kernel routes appear because the routing daemon selected them.
+- A failed link or withdrawn prefix causes observable convergence.
+
+You probably broke:
+
+- neighbor configuration, if BGP never establishes,
+- export policy, if service prefixes never leave their source router,
+- next-hop reachability, if BIRD selects a route Linux cannot install.
+
+### After Part 4
+
+The reader understands that a WireGuard tunnel can replace a local lab link without changing the larger routing model.
 
 You know it works when:
 
 - WireGuard has a current handshake.
-- BIRD session is established.
-- Own prefix is announced and accepted by the peer.
-- A DN42 service is reachable with the expected source address.
-- `.dn42` names resolve without hijacking public DNS.
-
-You probably broke:
-
-- WireGuard keys or endpoint if no handshake occurs.
-- BGP neighbor address or ASN if BIRD never establishes.
-- ROA/route objects if your prefix is filtered.
-- Source address selection if the forward path works but replies do not return.
-
-### After Part 3
-
-The reader can reason about multiple peers and policy.
-
-You know it works when:
-
-- Two routes to the same prefix can be compared.
-- Local preference changes the selected route.
-- Export filters prevent accidental transit when desired.
-- A failed peer causes route withdrawal and reconvergence.
-
-You probably broke:
-
-- Import policy if no alternate routes appear.
-- Export policy if a peer sees too many routes from you.
-- Next-hop reachability if BIRD selects a route that Linux cannot install.
-
-### After Part 4
-
-The reader can operate services and observe the network.
-
-You know it works when:
-
-- A service is reachable from outside the node.
-- Looking glass output matches local BIRD state.
-- Alerts fire on BGP session failure.
-- DNS authoritative and recursive roles are not confused.
+- The same prefixes remain reachable through the tunnel link.
+- The reader can identify underlay traffic and overlay traffic.
+- MTU and keepalive behavior are visible rather than mysterious.
 
 ### After Part 5
 
-The reader can build and explain multi-site behavior.
+The reader can connect Pocket Internet to DN42 through a controlled border.
 
 You know it works when:
 
-- Anycast reaches the nearest healthy instance according to routing policy.
-- A site failure withdraws or de-prefers the route.
-- Traffic engineering changes are visible in route attributes and path choice.
+- selected Pocket Internet traffic can route toward DN42,
+- no default route is accidentally accepted or exported,
+- authorized prefixes are explicit,
+- filters prevent route leaks,
+- rollback removes the interconnect without damaging the local lab.
+
+### After Part 6
+
+The reader can operate services across the lab/real-network boundary.
+
+You know it works when:
+
+- DN42 services are reachable from inside Pocket Internet where routing and policy allow,
+- selected Pocket Internet services are exposed only after authorization and filtering checks,
+- DNS, monitoring, firewall policy, and rollback are part of the service design,
+- service failures can be explained as forward-path, return-path, policy, firewall, or application failures.
 
 ## 7. Authoring Workflow
 
@@ -603,13 +632,16 @@ You know it works when:
 6. Review current DN42 BIRD 2 examples.
 7. Review current DN42 WireGuard examples.
 8. Build local namespace routing lab.
-9. Build local WireGuard namespace lab.
-10. Build local BIRD-to-BIRD lab.
-11. Draft safety page.
-12. Draft registry objects chapter.
-13. Draft first WireGuard peer chapter.
-14. Draft first BIRD session chapter.
-15. Draft split DNS chapter.
+9. Build Pocket Internet static routing topology.
+10. Add BIRD and BGP to Pocket Internet.
+11. Replace one Pocket Internet link with WireGuard.
+12. Draft addresses, prefixes, and longest match.
+13. Design Pocket Internet to DN42 interconnect.
+14. Draft safety page.
+15. Draft registry objects chapter.
+16. Draft first WireGuard peer chapter.
+17. Draft first BIRD session chapter.
+18. Draft split DNS chapter.
 
 ### Chapter Template
 
@@ -874,7 +906,7 @@ Agents should not silently update command examples from volatile DN42 sources. T
 
 ### v0.1 Scope
 
-Goal: take a reader from zero to one safe working DN42 peer, split DNS, and first service access.
+Goal: build the Pocket Internet foundation and prepare a safe DN42 border model before the first real peer.
 
 Included:
 
@@ -885,22 +917,27 @@ Included:
   - Linux as a Router.
   - Addresses and Prefixes.
   - Routing Tables.
-  - WireGuard as a Link.
-  - BGP Before DN42.
-- Part 2 minimum chapters:
-  - Registry Objects.
-  - First WireGuard Peer.
-  - First BIRD Session.
-  - Routes Into the Linux Kernel.
-  - DN42 DNS.
-  - First DN42 Service.
+  - Pocket Internet with Static Routes.
+- Pocket Internet foundation chapters:
+  - Addresses, Prefixes, and Longest Match.
+  - Route selection and static route repair.
+  - BIRD and BGP inside Pocket Internet.
+  - WireGuard as a replacement for one lab link.
+- Interconnect design:
+  - Pocket Internet to DN42 border.
+  - Outbound reachability.
+  - Return path.
+  - Import/export filtering.
+  - Rollback and route-leak checks.
 - Research source registry.
 - Chapter and experiment templates.
 - One tested local namespace lab.
-- One externally tested DN42 first-peer path, if a real peer is available.
 
 Excluded from v0.1:
 
+- Real DN42 registry submission.
+- Public DN42 peering.
+- Publicly reachable Pocket Internet services.
 - Anycast.
 - Multi-POP.
 - Looking glass.
@@ -923,29 +960,25 @@ Excluded from v0.1:
 10. Review DN42 registry README and schema docs.
 11. Review current DN42 BIRD 2 and WireGuard pages.
 12. Write and test local namespace routing lab.
-13. Write WireGuard namespace lab.
-14. Write local BIRD-to-BIRD lab.
-15. Draft registry objects chapter with all live-practice claims marked `research-required`.
-16. Draft first WireGuard peer chapter.
-17. Draft first BIRD session chapter.
-18. Draft kernel routes chapter.
-19. Draft split DNS chapter.
-20. Draft first service access chapter.
-21. Add link checker and strict docs build CI.
-22. Run a source freshness review before tagging v0.1.
-23. Tag `v0.1.0` only after all published command blocks are either tested or clearly marked research-required.
+13. Draft addresses, prefixes, and longest match.
+14. Write and test Pocket Internet static routing lab.
+15. Write and test Pocket Internet route-selection lab.
+16. Write and test local BIRD/BGP lab.
+17. Replace one Pocket Internet link with WireGuard.
+18. Design the Pocket Internet to DN42 interconnect.
+19. Add link checker and strict docs build CI.
+20. Run a source freshness review before tagging v0.1.
+21. Tag `v0.1.0` only after all published command blocks are either tested or clearly marked research-required.
 
 ## 10. Immediate Next Tasks
 
-1. Decide the canonical hosting target: GitHub Pages, Cloudflare Pages, or another static host.
-2. Configure the local repository remote for `rysaunders/DN42_Networking_by_Experimenting`.
-3. Scaffold MkDocs Material using `uv`.
-4. Create the GitHub Pages workflow.
-5. Create the first three docs pages: `index.md`, `start-here.md`, and `safety.md`.
-6. Create `research/sources.yml` with the initial source list.
-7. Add reference-cache scripts that populate ignored local cache files from `research/sources.yml`.
-8. Build the local namespace routing experiment before writing DN42-specific commands.
-9. Review current DN42 registry docs and BIRD 2 examples before drafting real DN42 config.
+1. Finish the Pocket Internet rename and reframe.
+2. Draft `Addresses, Prefixes, and Longest Match`.
+3. Build the route-selection and longest-prefix lab.
+4. Add BIRD and BGP to Pocket Internet.
+5. Replace one Pocket Internet link with WireGuard.
+6. Design the Pocket Internet to DN42 border.
+7. Then implement real DN42 registry and peer chapters.
 
 ## Initial Source List
 

@@ -1,11 +1,11 @@
-# Toy DN42 Static Routing Lab
+# Pocket Internet Static Routing Lab
 
-This lab builds a disposable four-AS Toy DN42 topology with Linux network namespaces:
+This lab builds a disposable four-AS Pocket Internet topology with Linux network namespaces:
 
-- `toy-as1`
-- `toy-as2`
-- `toy-as3`
-- `toy-as4`
+- `pocket-as1`
+- `pocket-as2`
+- `pocket-as3`
+- `pocket-as4`
 
 The namespaces form a square. Each namespace has point-to-point veth links, a loopback service address, forwarding enabled, and static routes for remote service addresses.
 
@@ -32,13 +32,13 @@ The lab demonstrates:
 Run from the repository root on a Linux host or OrbStack Linux machine:
 
 ```sh
-bash experiments/labs/toy-dn42-static-routing/run.sh
+bash experiments/labs/pocket-internet-static-routing/run.sh
 ```
 
 On macOS with OrbStack:
 
 ```sh
-orb bash experiments/labs/toy-dn42-static-routing/run.sh
+orb bash experiments/labs/pocket-internet-static-routing/run.sh
 ```
 
 The script uses `sudo` for namespace operations when it is not already running as root. It writes a transcript to `experiments/transcripts/`.

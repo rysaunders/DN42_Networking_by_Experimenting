@@ -10,6 +10,8 @@ Use `docs/reader-knowledge.md` as the source of truth for what prior chapters ha
 
 Explain the stable networking idea in plain language. Use concrete nouns before acronyms.
 
+State how this chapter helps answer the guiding question: how does an Internet emerge from a collection of computers exchanging routes?
+
 ## New Terms
 
 Define every new term before using it as if the reader already knows it.
@@ -78,7 +80,7 @@ Use branches:
 
 ## Connection to Later Chapters
 
-Map this chapter's small lab to later DN42 concepts.
+Map this chapter's small lab to later Pocket Internet, interconnect, or DN42 concepts.
 
 - What will WireGuard replace?
 - What will BIRD automate?

@@ -71,14 +71,14 @@ Introduced by `docs/part-01-first-principles/02-addressing-and-subnets.md`.
 
 This chapter is still a draft. Until it is expanded and reviewed, beginner reviews should assume it adds no concepts beyond the prefix and local-link basics already introduced in Chapter 1.
 
-## After Part 1, Toy DN42 with Static Routes
+## After Part 1, Pocket Internet with Static Routes
 
-Introduced by `docs/part-01-first-principles/03-toy-dn42-static-routing.md`.
+Introduced by `docs/part-01-first-principles/03-pocket-internet-static-routing.md`.
 
 Reader has seen:
 
 - autonomous system: for now, one independently controlled network boundary,
-- AS-shaped namespace: a namespace used as a toy autonomous system in the lab,
+- AS-shaped namespace: a namespace used as a local autonomous-system model in the lab,
 - loopback: the `lo` interface inside a namespace,
 - service loopback: a stable address on `lo` that represents a service or prefix an AS could advertise later,
 - point-to-point link: a link with one device on each end,

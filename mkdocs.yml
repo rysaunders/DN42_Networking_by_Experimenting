@@ -59,16 +59,15 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Start Here: start-here.md
-  - Toy DN42: toy-dn42.md
-  - Part 1 - First Principles:
+  - Pocket Internet: pocket-internet.md
+  - Pocket Internet Interconnect: pocket-internet-dn42-interconnect.md
+  - Part 1 - From Host to Router:
       - Overview: part-01-first-principles/index.md
       - Linux as a Router: part-01-first-principles/01-linux-networking.md
       - Addresses and Subnets: part-01-first-principles/02-addressing-and-subnets.md
-      - Toy DN42 Static Routing: part-01-first-principles/03-toy-dn42-static-routing.md
+      - Pocket Internet Static Routing: part-01-first-principles/03-pocket-internet-static-routing.md
       - Routing Tables: part-01-first-principles/04-routing-tables.md
-      - WireGuard as a Link: part-01-first-principles/05-wireguard-as-a-link.md
-      - BGP Before DN42: part-01-first-principles/06-bgp-before-dn42.md
-  - Part 2 - First DN42 Node:
+  - Later - DN42 Node:
       - Overview: part-02-first-dn42-node/index.md
       - Registry Objects: part-02-first-dn42-node/01-registry-objects.md
       - First WireGuard Peer: part-02-first-dn42-node/02-first-wireguard-peer.md
@@ -88,3 +87,6 @@ nav:
       - Research Note Template: authoring-templates/research-note-template.md
       - Beginner Review Loop: authoring-templates/review-loop.md
       - Reader Knowledge Ledger: reader-knowledge.md
+      - Future Lab Drafts:
+          - WireGuard as a Link: part-01-first-principles/05-wireguard-as-a-link.md
+          - BGP Before DN42: part-01-first-principles/06-bgp-before-dn42.md

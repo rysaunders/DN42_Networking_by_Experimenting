@@ -10,6 +10,8 @@ Use `docs/reader-knowledge.md` as the source of truth for what prior chapters an
 
 What will this experiment prove or disprove?
 
+State how this experiment helps answer the guiding question: how does an Internet emerge from a collection of computers exchanging routes?
+
 ## Hypothesis
 
 If the relevant network state is correct, what should happen?
@@ -64,7 +66,7 @@ Explain the before/after state in the kernel, daemon, registry, or service being
 
 ## Connection to Later Chapters
 
-Map the lab result to later DN42 work. Identify what this experiment teaches that WireGuard, BIRD, registry objects, or DNS will reuse.
+Map the lab result to later Pocket Internet, interconnect, or DN42 work. Identify what this experiment teaches that WireGuard, BIRD, registry objects, or DNS will reuse.
 
 ## Evidence to Capture
 

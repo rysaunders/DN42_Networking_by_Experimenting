@@ -1,9 +1,13 @@
-# Part 2: First DN42 Node
+# Later: First DN42 Node
 
-Part 2 moves from local concepts to one safe public DN42 peer.
+These chapters are later-phase drafts. They should follow the Pocket Internet foundation and the Pocket Internet to DN42 border design.
+
+The goal is still one safe public DN42 peer, but the reader should reach it after they can explain local route lookup, return path, WireGuard-as-link, BIRD, BGP, and export policy in the lab.
 
 By the end of this part, the reader should have:
 
+- Built the Pocket Internet foundation.
+- Designed the DN42 border.
 - Registered required DN42 objects.
 - Configured one WireGuard peer.
 - Established one BIRD session.

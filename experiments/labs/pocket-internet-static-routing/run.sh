@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LAB_NAME="toy-dn42-static-routing"
+LAB_NAME="pocket-internet-static-routing"
 
-AS1="toy-as1"
-AS2="toy-as2"
-AS3="toy-as3"
-AS4="toy-as4"
+AS1="pocket-as1"
+AS2="pocket-as2"
+AS3="pocket-as3"
+AS4="pocket-as4"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 TRANSCRIPT_DIR="${REPO_ROOT}/experiments/transcripts"

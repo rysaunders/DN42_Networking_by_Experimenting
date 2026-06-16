@@ -1,0 +1,94 @@
+# Pocket Internet
+
+Pocket Internet is the laboratory for this book. It is not the destination.
+
+The guiding question is:
+
+> How does an Internet emerge from a collection of computers exchanging routes?
+
+Pocket Internet answers that question in a controlled environment.
+
+The first version is simple: we fake several small computers and routers inside one Linux machine. They get links between them, addresses on those links, and route tables that decide where packets go.
+
+Later chapters add the pieces one at a time:
+
+- BIRD, so route tables can be updated by a routing program,
+- BGP, so routers can tell each other which addresses they can reach,
+- WireGuard, so one local lab link can become a tunnel,
+- DN42, so the lab can connect to a living network.
+
+DN42 is the bridge from this laboratory to a living network. The end game is not to build a small lab and stop. The end game is to understand every component well enough to connect the lab-built network to DN42, route across that boundary safely, and operate services on a real routed network.
+
+## Mental Model
+
+```mermaid
+flowchart LR
+  AS1["as1\nAS4242420001\nservice loopback"]
+  AS2["as2\nAS4242420002"]
+  AS3["as3\nAS4242420003\nservice loopback"]
+  AS4["as4\nAS4242420004"]
+
+  AS1 --- AS2
+  AS2 --- AS3
+  AS3 --- AS4
+  AS4 --- AS1
+```
+
+Each namespace owns:
+
+- its own interfaces,
+- its own addresses,
+- its own routing table,
+- its own loopback addresses,
+- its own BIRD instance when BGP is introduced,
+- its own services when service reachability is introduced.
+
+## Mapping
+
+| Pocket Internet piece | Real networking idea | Later DN42 equivalent |
+| --- | --- | --- |
+| Linux namespace | A separate Linux networking world | A VPS, router, home gateway, or lab machine |
+| veth pair | A fake cable with two ends | Physical link, virtual link, or tunnel |
+| WireGuard link | An encrypted tunnel used like a link | Common DN42 peer tunnel |
+| Loopback address | Stable address that stays inside one router | Address from an authorized DN42 prefix |
+| Static route | Manually configured reachability | Useful baseline before dynamic routing |
+| BIRD instance | Program that manages routes | DN42 BGP speaker |
+| BGP session | Conversation where routers exchange reachability | DN42 peer session |
+| tcpdump and logs | Visibility into packet and routing behavior | Operational troubleshooting tools |
+
+## Learning Progression
+
+1. Start with a host and one network stack.
+2. Add links, addresses, prefixes, connected routes, and forwarding.
+3. Expand into multiple routers.
+4. Add loopback service addresses and static routes.
+5. Break links and repair routing by hand.
+6. Add longest-prefix match and route-selection experiments.
+7. Add BIRD and BGP so routers exchange reachability.
+8. Withdraw routes and observe convergence.
+9. Replace one veth link with WireGuard and keep the same routing model.
+10. Build a border between Pocket Internet and DN42.
+11. Route selected Pocket Internet traffic toward DN42.
+12. Operate services across the lab-to-real-network boundary when routing and policy allow.
+
+## Design Rule
+
+New labs should reuse the Pocket Internet topology when possible. A one-off lab is acceptable only when it teaches a primitive that the topology depends on.
+
+This keeps the book from becoming a pile of unrelated recipes. Each chapter adds one new behavior to the same small Internet.
+
+## Validated Labs
+
+- [Pocket Internet with Static Routes](part-01-first-principles/03-pocket-internet-static-routing.md): four AS-shaped namespaces, service loopbacks, static routes, link failure, and manual route repair.
+
+## Interconnect
+
+Pocket Internet eventually gets a border to DN42. That border must be explicit and conservative:
+
+- no accidental default route into DN42,
+- no unauthorized route advertisement into DN42,
+- outbound reachability before inbound exposure,
+- return path treated as a first-class requirement,
+- rollback tested before any real peering change.
+
+See [Pocket Internet to DN42 Interconnect](pocket-internet-dn42-interconnect.md).

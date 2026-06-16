@@ -95,11 +95,11 @@ issues:
       - Rollback removes namespaces and temporary state.
       - Transcript is saved under `experiments/transcripts/`.
 
-  - title: "Build Toy DN42 static routing topology"
+  - title: "Build Pocket Internet static routing topology"
     labels: ["experiment", "conceptual", "needs-lab-test", "v0.1"]
     milestone: "v0.1"
     body: |
-      Build the first reusable Toy DN42 topology: four AS-shaped namespaces connected with veth links, loopback service addresses, and static routes.
+      Build the first reusable Pocket Internet topology: four AS-shaped namespaces connected with veth links, loopback service addresses, and static routes.
 
       Acceptance criteria:
       - Lab creates at least four namespaces named as local ASes.
@@ -112,33 +112,62 @@ issues:
       - Transcript is saved under `experiments/transcripts/`.
       - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
-  - title: "Replace one Toy DN42 link with WireGuard"
+  - title: "Draft addresses, prefixes, and longest match"
+    labels: ["chapter", "conceptual", "needs-lab-test", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Draft the first-principles chapter that explains addresses, prefixes, CIDR notation, route specificity, and longest-prefix match before BGP appears.
+
+      Acceptance criteria:
+      - Explains an address as one point and a prefix as a set of addresses.
+      - Explains `/30`, `/32`, IPv4 examples, and the route-table meaning of prefix length.
+      - Demonstrates longest-prefix match with observable `ip route get` output.
+      - Includes at least one predict-before-reveal exercise.
+      - Connects the concept to Pocket Internet route selection.
+      - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
+
+  - title: "Replace one Pocket Internet link with WireGuard"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"
     body: |
-      Replace one veth link in the Toy DN42 topology with WireGuard before using public DN42 peers.
+      Replace one veth link in the Pocket Internet topology with WireGuard before using public DN42 peers.
 
       Acceptance criteria:
-      - Lab starts from the Toy DN42 topology instead of a standalone two-node demo.
+      - Lab starts from the Pocket Internet topology instead of a standalone two-node demo.
       - Lab shows key generation, interface setup, handshake, and packet flow.
       - Lab explains underlay vs overlay.
       - Existing routing behavior still works after the link is replaced.
       - Rollback removes interfaces, namespaces, and generated keys.
       - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
-  - title: "Add BIRD and BGP to Toy DN42"
+  - title: "Add BIRD and BGP to Pocket Internet"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"
     body: |
-      Add BIRD and BGP to the Toy DN42 topology so reachability is learned instead of statically configured.
+      Add BIRD and BGP to the Pocket Internet topology so reachability is learned instead of statically configured.
 
       Acceptance criteria:
-      - Lab starts from the Toy DN42 topology.
+      - Lab starts from the Pocket Internet topology.
       - Lab establishes BGP sessions between local AS namespaces.
       - Lab advertises loopback service prefixes.
       - Lab demonstrates kernel route export.
       - Lab demonstrates route withdrawal or link failure and observes convergence.
       - Lab includes troubleshooting branches for session and route-install failures.
+      - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
+
+  - title: "Design Pocket Internet to DN42 interconnect"
+    labels: ["chapter", "conceptual", "safety", "dn42-current", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Design the conceptual border between Pocket Internet and DN42 before implementing real peering chapters.
+
+      Acceptance criteria:
+      - Explains Pocket Internet as the lab and DN42 as the bridge to a living routing ecosystem.
+      - Uses a dedicated border namespace/router in the design.
+      - Starts with outbound-only reachability from Pocket Internet toward DN42.
+      - Treats return path as a first-class requirement.
+      - Explains what route advertisements are authorized and what must be filtered.
+      - Includes rollback and "what could leak?" checks.
       - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
   - title: "Draft safety page"
