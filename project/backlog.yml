@@ -142,6 +142,92 @@ issues:
       - Validation script and transcript live under `experiments/`.
       - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
+  - title: "Rewrite Pocket Internet static routing as a manual-first lab"
+    labels: ["chapter", "experiment", "conceptual", "needs-lab-test", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Rewrite the Pocket Internet static routing chapter so the reader builds the topology manually instead of primarily reading a script procedure map.
+
+      Why:
+      This is the keystone Pocket Internet chapter. It should burn namespaces, veth links, loopbacks, static routes, return paths, link failure, and manual repair into memory before BGP automates the same behavior.
+
+      Acceptance criteria:
+      - Chapter remains validated by a script and transcript, but the primary teaching path is manual command entry.
+      - Procedure map is either removed or moved after the manual path as a summary.
+      - Reader creates namespaces, veth links, loopback service addresses, link addresses, forwarding, static routes, breakage, and repair by hand.
+      - Each major state change has an inspection command and expected observation.
+      - Forward path and return path are explained with route-table evidence.
+      - Rollback is explicit and tested.
+      - Beginner review is run and triaged before closing.
+
+  - title: "Rename early labs to Pocket Internet language"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Make early labs use Pocket Internet naming consistently before real DN42 appears.
+
+      Why:
+      The first Linux routing lab still uses dn42lab-* namespace names. That was reasonable originally, but the book has shifted: Pocket Internet is the lab and DN42 is the later bridge. Early DN42 naming now risks implying that the local namespaces are already DN42.
+
+      Acceptance criteria:
+      - Rename early lab namespaces, scripts, transcripts, and prose from dn42lab-* to Pocket Internet-oriented names where appropriate.
+      - Keep historical transcript references only if intentionally retained and clearly marked.
+      - Update scripts and regenerate transcripts after renaming.
+      - Update reader knowledge and nav text if affected.
+      - Verify no stale dn42lab naming remains in instructional prose before real DN42 chapters.
+      - Run normal validation and beginner review if explanatory content changes.
+
+  - title: "Add chapter transitions and reader checkpoints"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Add connective tissue between the early chapters so the book reads like a guided progression instead of a set of good standalone labs.
+
+      Why:
+      The individual chapters are improving, but a beginner needs explicit orientation: what they now know, what remains unresolved, and why the next chapter exists.
+
+      Acceptance criteria:
+      - Add short end-of-chapter checkpoints to early chapters.
+      - Each checkpoint distinguishes: now you can explain, still fuzzy is okay, and next we need to learn.
+      - Add opening transition language to Chapters 2, 3, and 4 tying each chapter to the previous one.
+      - Avoid introducing new technical concepts in checkpoint prose.
+      - Update docs/reader-knowledge.md if any recurring checkpoint vocabulary becomes part of the teaching pattern.
+      - Beginner review checks whether the progression feels coherent for a first-time networking learner.
+
+  - title: "Add a visual glossary for Linux networking objects"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Create an early visual glossary that explains the recurring Linux networking objects used throughout Pocket Internet.
+
+      Why:
+      A beginner sees namespace, interface, veth, address, prefix, connected route, next hop, loopback, route table, and forwarding very quickly. The chapters define these terms locally, but the book needs one reusable mental map.
+
+      Acceptance criteria:
+      - Add a concise visual glossary or concept-map page near Start Here or Part 1.
+      - Cover namespace, network stack, interface, veth pair, address, prefix, connected route, route table, next hop, loopback, forwarding, and service loopback.
+      - Use diagrams or simple ASCII/mermaid visuals, not only prose.
+      - Link early chapters to this page where it helps without interrupting the lab flow.
+      - Keep definitions consistent with docs/reader-knowledge.md and includes/abbreviations.md.
+      - Beginner review checks whether the glossary lowers cognitive load rather than becoming another wall of terms.
+
+  - title: "Clarify the roles of the two route-selection chapters"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Clarify why the book has both Addresses, Prefixes, and Longest Match and Pocket Internet Route Selection.
+
+      Why:
+      Chapter 2 teaches longest-prefix match in isolation. Chapter 4 applies a similar idea inside the Pocket Internet edge-router model. Both are useful, but the distinction must be explicit or the sequence may feel repetitive.
+
+      Acceptance criteria:
+      - Chapter 2 clearly frames itself as an isolated primitive: route lookup and specificity without packet delivery.
+      - Chapter 4 clearly frames itself as applying that primitive inside a Pocket Internet router role.
+      - Remove or revise duplicated explanation where it does not add new value.
+      - Add transition text from Chapter 2 to Chapter 4 and from Chapter 4 toward BGP.
+      - Keep both labs if they serve distinct learning jobs; merge or shorten if review shows they feel redundant.
+      - Beginner review specifically evaluates whether the two chapters feel complementary rather than repetitive.
+
   - title: "Replace one Pocket Internet link with WireGuard"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"
