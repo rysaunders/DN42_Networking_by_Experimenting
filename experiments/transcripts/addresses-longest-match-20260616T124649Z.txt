@@ -1,0 +1,118 @@
+
+## Environment
+
+$ uname -a
+Linux ubuntu 7.0.11-orbstack-00360-gc9bc4d96ac70 #1 SMP PREEMPT Thu Jun  4 16:40:25 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ ip -V
+ip utility, iproute2-6.14.0, libbpf 1.5.0
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+
+Transcript: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/addresses-longest-match-20260616T124649Z.txt
+
+## Rollback before setup
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^addrmatch\(\ \|\$\)\'\ \|\|\ true
+
+## Create namespace
+
+$ ip netns add addrmatch
+
+$ ip netns list
+addrmatch
+
+## Create local-only interfaces
+
+$ ip -n addrmatch link add broad0 type dummy
+
+$ ip -n addrmatch link add specific0 type dummy
+
+$ ip -n addrmatch link add host0 type dummy
+
+## Add interface addresses
+
+$ ip -n addrmatch addr add 10.0.0.1/30 dev broad0
+
+$ ip -n addrmatch addr add 10.0.1.1/30 dev specific0
+
+$ ip -n addrmatch addr add 10.0.2.1/30 dev host0
+
+## Bring interfaces up
+
+$ ip -n addrmatch link set lo up
+
+$ ip -n addrmatch link set broad0 up
+
+$ ip -n addrmatch link set specific0 up
+
+$ ip -n addrmatch link set host0 up
+
+## Show connected routes
+
+$ ip -n addrmatch route
+10.0.0.0/30 dev broad0 proto kernel scope link src 10.0.0.1 
+10.0.1.0/30 dev specific0 proto kernel scope link src 10.0.1.1 
+10.0.2.0/30 dev host0 proto kernel scope link src 10.0.2.1 
+
+## Install overlapping routes
+
+$ ip -n addrmatch route add default via 10.0.0.2 dev broad0
+
+$ ip -n addrmatch route add 172.20.0.0/16 via 10.0.0.2 dev broad0
+
+$ ip -n addrmatch route add 172.20.30.0/24 via 10.0.1.2 dev specific0
+
+$ ip -n addrmatch route add 172.20.30.42/32 via 10.0.2.2 dev host0
+
+$ ip -n addrmatch route
+default via 10.0.0.2 dev broad0 
+10.0.0.0/30 dev broad0 proto kernel scope link src 10.0.0.1 
+10.0.1.0/30 dev specific0 proto kernel scope link src 10.0.1.1 
+10.0.2.0/30 dev host0 proto kernel scope link src 10.0.2.1 
+172.20.0.0/16 via 10.0.0.2 dev broad0 
+172.20.30.0/24 via 10.0.1.2 dev specific0 
+172.20.30.42 via 10.0.2.2 dev host0 
+
+## Predict and inspect longest-prefix match
+
+$ ip -n addrmatch route get 172.20.30.42
+172.20.30.42 via 10.0.2.2 dev host0 src 10.0.2.1 uid 0 
+    cache 
+
+$ ip -n addrmatch route get 172.20.30.99
+172.20.30.99 via 10.0.1.2 dev specific0 src 10.0.1.1 uid 0 
+    cache 
+
+$ ip -n addrmatch route get 172.20.99.5
+172.20.99.5 via 10.0.0.2 dev broad0 src 10.0.0.1 uid 0 
+    cache 
+
+$ ip -n addrmatch route get 203.0.113.10
+203.0.113.10 via 10.0.0.2 dev broad0 src 10.0.0.1 uid 0 
+    cache 
+
+## Remove the host route
+
+$ ip -n addrmatch route delete 172.20.30.42/32
+
+$ ip -n addrmatch route get 172.20.30.42
+172.20.30.42 via 10.0.1.2 dev specific0 src 10.0.1.1 uid 0 
+    cache 
+
+## Remove the more-specific prefix
+
+$ ip -n addrmatch route delete 172.20.30.0/24
+
+$ ip -n addrmatch route get 172.20.30.42
+172.20.30.42 via 10.0.0.2 dev broad0 src 10.0.0.1 uid 0 
+    cache 
+
+## Rollback
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^addrmatch\(\ \|\$\)\'\ \|\|\ true
+
+## Result
+Lab complete. Temporary namespace removed.
+Transcript saved to: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/addresses-longest-match-20260616T124649Z.txt

@@ -65,11 +65,34 @@ Reader has not yet been taught:
 - DN42 registry objects,
 - DNS forwarding or delegation.
 
-## After Part 1, Chapter 2: Addresses and Subnets
+## After Part 1, Chapter 2: Addresses, Prefixes, and Longest Match
 
 Introduced by `docs/part-01-first-principles/02-addressing-and-subnets.md`.
 
-This chapter is still a draft. Until it is expanded and reviewed, beginner reviews should assume it adds no concepts beyond the prefix and local-link basics already introduced in Chapter 1.
+Reader has seen:
+
+- prefix length: the number after `/`,
+- host route: a route for exactly one IP address,
+- default route: the fallback route when nothing more specific matches,
+- longest-prefix match: the most specific matching route wins,
+- route specificity: `/32` is more specific than `/24`, which is more specific than `/16`,
+- overlapping routes: several routes can match the same destination at the same time,
+- route fallback: removing a more-specific route can reveal the next-best broader route,
+- source address note: route lookup can show the source address Linux would prefer for that route.
+
+Reader has only been lightly introduced to:
+
+- source address selection.
+
+Reader has not yet been taught:
+
+- policy routing and multiple route tables,
+- WireGuard cryptokey routing,
+- BIRD configuration,
+- BGP sessions,
+- ASNs,
+- DN42 registry objects,
+- DNS forwarding or delegation.
 
 ## After Part 1, Pocket Internet with Static Routes
 

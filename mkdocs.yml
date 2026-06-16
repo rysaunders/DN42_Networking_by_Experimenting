@@ -64,7 +64,7 @@ nav:
   - Part 1 - From Host to Router:
       - Overview: part-01-first-principles/index.md
       - Linux as a Router: part-01-first-principles/01-linux-networking.md
-      - Addresses and Subnets: part-01-first-principles/02-addressing-and-subnets.md
+      - Addresses, Prefixes, and Longest Match: part-01-first-principles/02-addressing-and-subnets.md
       - Pocket Internet Static Routing: part-01-first-principles/03-pocket-internet-static-routing.md
       - Routing Tables: part-01-first-principles/04-routing-tables.md
   - Later - DN42 Node:
