@@ -309,15 +309,23 @@ Read that as:
 
 > To reach `10.10.2.0/30`, send packets to the next hop `10.10.1.1` through `left0`.
 
-Right needs the matching return route:
+Right needs the matching return route.
 
-```sh
-ip -n dn42lab-right route add 10.10.1.0/30 via 10.10.2.1 dev right0
-```
+Before revealing it, derive it from the topology:
 
-Read that as:
+- Right wants to reach the left-side subnet: `10.10.1.0/30`.
+- Right's next hop toward that subnet is the router's right-side address: `10.10.2.1`.
+- Right reaches that next hop through its own interface: `right0`.
 
-> To reach `10.10.1.0/30`, send packets to the next hop `10.10.2.1` through `right0`.
+??? question "Reveal the matching return-route command"
+
+    ```sh
+    ip -n dn42lab-right route add 10.10.1.0/30 via 10.10.2.1 dev right0
+    ```
+
+    Read that as:
+
+    > To reach `10.10.1.0/30`, send packets to the next hop `10.10.2.1` through `right0`.
 
 The return route matters. Ping is not one packet. It is a request and a reply. If left can send a request to right but right cannot send the reply back, the ping still fails.
 
