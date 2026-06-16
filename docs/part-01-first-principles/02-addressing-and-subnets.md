@@ -81,41 +81,25 @@ The `/30` routes in this lab are not the main lesson. They create small connecte
 
 ## Lab
 
-The validated lab script lives at:
+Build this lab by typing the commands yourself. The repeated typing is part of the lesson: routes become easier to reason about when you have created the namespace, interfaces, addresses, and route entries by hand.
 
-```text
-experiments/labs/addresses-longest-match/run.sh
-```
-
-The transcript used for this chapter is:
-
-```text
-experiments/transcripts/addresses-longest-match-20260616T124649Z.txt
-```
-
-Run it from the repository root on Linux or inside the OrbStack Linux machine:
+These commands must run with root privileges inside the Linux environment because network namespaces, interfaces, and routes are system-level objects. On macOS, use an OrbStack shell:
 
 ```sh
-bash experiments/labs/addresses-longest-match/run.sh
+orb
 ```
 
-On macOS with OrbStack:
+Then run the commands from that Linux shell as root, or prefix them with `sudo`.
 
-```sh
-orb bash experiments/labs/addresses-longest-match/run.sh
-```
+## What You Will Build
 
-These commands must run with root privileges inside the Linux environment because network namespaces, interfaces, and routes are system-level objects. The script uses `sudo` when it is not already running as root.
-
-## What the Script Builds
-
-The script creates one temporary namespace:
+You will create one temporary namespace:
 
 ```text
 addrmatch
 ```
 
-Inside it, the script creates three dummy interfaces. A dummy interface is a local-only interface that is useful for route lookup experiments because no real packet needs to leave the machine.
+Inside it, you will create three dummy interfaces. A dummy interface is a local-only interface that is useful for route lookup experiments because no real packet needs to leave the machine.
 
 This lab tests route selection, not packet delivery. The next-hop addresses are placeholders inside each connected `/30`. We are asking Linux which route it would choose; we are not proving that a packet reaches a real neighbor. The next Pocket Internet lab uses real veth peers, so delivery and replies become visible there.
 
@@ -125,7 +109,7 @@ This lab tests route selection, not packet delivery. The next-hop addresses are 
 | `specific0` | `10.0.1.0/30` | path for more-specific routes |
 | `host0` | `10.0.2.0/30` | path for one exact host route |
 
-Then the script installs overlapping routes:
+Then you will install overlapping routes:
 
 ```text
 default via 10.0.0.2 dev broad0
@@ -135,6 +119,127 @@ default via 10.0.0.2 dev broad0
 ```
 
 These routes are intentionally artificial. They create a clean route table where the only thing changing is prefix specificity.
+
+## Step 1: Clean Up Any Old Lab State
+
+If you ran this lab before, delete the old namespace first:
+
+```sh
+ip netns delete addrmatch 2>/dev/null || true
+```
+
+Confirm it is gone:
+
+```sh
+ip netns list | grep -E '^addrmatch( |$)' || true
+```
+
+No output is the expected result.
+
+## Step 2: Create One Namespace
+
+Create the namespace:
+
+```sh
+ip netns add addrmatch
+```
+
+Check that Linux sees it:
+
+```sh
+ip netns list
+```
+
+Expected output includes:
+
+```text
+addrmatch
+```
+
+At this point, you have one isolated network stack. It has its own interfaces and route table.
+
+## Step 3: Add Local-Only Interfaces
+
+Create three dummy interfaces inside the namespace:
+
+```sh
+ip -n addrmatch link add broad0 type dummy
+ip -n addrmatch link add specific0 type dummy
+ip -n addrmatch link add host0 type dummy
+```
+
+These names are deliberately plain:
+
+- `broad0` will carry broad routes,
+- `specific0` will carry more-specific routes,
+- `host0` will carry one exact host route.
+
+## Step 4: Add Addresses
+
+Assign one `/30` address to each dummy interface:
+
+```sh
+ip -n addrmatch addr add 10.0.0.1/30 dev broad0
+ip -n addrmatch addr add 10.0.1.1/30 dev specific0
+ip -n addrmatch addr add 10.0.2.1/30 dev host0
+```
+
+Each address creates a small connected prefix. For example, `10.0.0.1/30` creates a connected route for `10.0.0.0/30`.
+
+## Step 5: Bring Interfaces Up
+
+Bring up loopback and the three dummy interfaces:
+
+```sh
+ip -n addrmatch link set lo up
+ip -n addrmatch link set broad0 up
+ip -n addrmatch link set specific0 up
+ip -n addrmatch link set host0 up
+```
+
+Now inspect the connected routes Linux created automatically:
+
+```sh
+ip -n addrmatch route
+```
+
+Expected output:
+
+```text
+10.0.0.0/30 dev broad0 proto kernel scope link src 10.0.0.1
+10.0.1.0/30 dev specific0 proto kernel scope link src 10.0.1.1
+10.0.2.0/30 dev host0 proto kernel scope link src 10.0.2.1
+```
+
+Those routes exist because the interface addresses exist. You did not add them by hand.
+
+## Step 6: Add Overlapping Routes
+
+Now add the routes that will compete with each other:
+
+```sh
+ip -n addrmatch route add default via 10.0.0.2 dev broad0
+ip -n addrmatch route add 172.20.0.0/16 via 10.0.0.2 dev broad0
+ip -n addrmatch route add 172.20.30.0/24 via 10.0.1.2 dev specific0
+ip -n addrmatch route add 172.20.30.42/32 via 10.0.2.2 dev host0
+```
+
+Show the route table:
+
+```sh
+ip -n addrmatch route
+```
+
+Expected output includes:
+
+```text
+default via 10.0.0.2 dev broad0
+172.20.0.0/16 via 10.0.0.2 dev broad0
+172.20.30.0/24 via 10.0.1.2 dev specific0
+172.20.30.42 via 10.0.2.2 dev host0
+```
+
+Linux may display `172.20.30.42/32` as `172.20.30.42`. Those mean the same thing: an exact host route.
 
 ## Read One Route
 
@@ -198,7 +303,7 @@ Now decide which interface wins. Remember: the longest matching prefix wins.
 
 ## Observe Route Lookup
 
-The transcript confirms the predictions:
+Run the lookups and compare them to your predictions:
 
 ```sh
 ip -n addrmatch route get 172.20.30.42
@@ -242,7 +347,7 @@ The default route wins because no more-specific route matches.
 
 ## Remove a More-Specific Route
 
-The script removes the `/32` route:
+Remove the `/32` route:
 
 ```sh
 ip -n addrmatch route delete 172.20.30.42/32
@@ -260,7 +365,7 @@ ip -n addrmatch route get 172.20.30.42
 
 The destination did not change. The route table changed. Without the `/32`, the `/24` is now the longest matching prefix.
 
-Then the script removes the `/24`:
+Now remove the `/24`:
 
 ```sh
 ip -n addrmatch route delete 172.20.30.0/24
@@ -275,6 +380,42 @@ The same destination falls back again:
 This is the core rule:
 
 > Linux does not choose the first matching route. It chooses the longest matching route.
+
+## Roll Back
+
+Delete the namespace:
+
+```sh
+ip netns delete addrmatch
+```
+
+Confirm it is gone:
+
+```sh
+ip netns list | grep -E '^addrmatch( |$)' || true
+```
+
+No output is the expected result. Deleting the namespace removes the dummy interfaces and all routes inside it.
+
+## Repeat With the Validation Script
+
+After you have built the lab manually, you can rerun the validated script when you want a clean repeat or transcript:
+
+```sh
+bash experiments/labs/addresses-longest-match/run.sh
+```
+
+On macOS with OrbStack:
+
+```sh
+orb bash experiments/labs/addresses-longest-match/run.sh
+```
+
+The transcript used to validate this chapter is:
+
+```text
+experiments/transcripts/addresses-longest-match-20260616T124649Z.txt
+```
 
 ## Source Address Note
 

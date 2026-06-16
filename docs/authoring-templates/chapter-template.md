@@ -59,6 +59,8 @@ Ask the reader to predict one or more observable outcomes before running command
 
 Use commands only after they have been tested or clearly marked as research required. Explain what each command changes before showing the command.
 
+Labs should be manual-first. Show the reader the commands that build the state step by step. Scripts are allowed as repeatable validation and transcript capture, but they should not be the primary learning path unless the setup is too large or unsafe to type manually.
+
 ## Expected Observations
 
 Describe what the reader should see and why.

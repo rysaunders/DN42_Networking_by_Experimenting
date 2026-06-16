@@ -44,6 +44,8 @@ Describe the smallest useful model for the experiment. Include an ASCII or Merma
 
 For each command, explain what state it changes before showing the command.
 
+Experiments should be manual-first. A script can exist for repeatability and transcript capture, but the published lesson should teach the reader to build the important state directly in the shell.
+
 ## Predict Before Running
 
 Ask the reader to predict what should happen before at least one route lookup, packet test, or service check.
