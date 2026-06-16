@@ -126,3 +126,32 @@ Reader has not yet been taught:
 - WireGuard cryptokey routing,
 - DN42 registry objects,
 - DNS forwarding or delegation.
+
+## After Part 1, Pocket Internet Route Selection
+
+Introduced by `docs/part-01-first-principles/04-routing-tables.md`.
+
+Reader has seen:
+
+- edge router: a router at the edge of a network, where traffic leaves toward another network,
+- exit: the interface and next hop a route points toward,
+- fallback route: a broader route used when no more-specific route matches,
+- route lookup inside a Pocket Internet edge-router context,
+- connected route as the reason a next-hop address is accepted,
+- route fallback from `/32` to `/24` to `/16`.
+
+Reader has only been lightly introduced to:
+
+- route selection as a behavior that will continue after BGP installs routes automatically.
+
+Reader has not yet been taught:
+
+- dynamic routing,
+- BIRD configuration,
+- BGP sessions,
+- AS_PATH,
+- local preference,
+- route import and export policy,
+- WireGuard cryptokey routing,
+- DN42 registry objects,
+- DNS forwarding or delegation.

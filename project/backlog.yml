@@ -126,6 +126,22 @@ issues:
       - Connects the concept to Pocket Internet route selection.
       - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
+  - title: "Build Pocket Internet route-selection lab"
+    labels: ["experiment", "conceptual", "needs-lab-test", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Build a Pocket Internet lab that reinforces route selection and longest-prefix match inside a local router context.
+
+      Acceptance criteria:
+      - Lab is manual-first in the docs, with scripts used only for repeat validation.
+      - Lab uses Pocket Internet naming and a route-table view inside a local router/edge namespace.
+      - Lab shows a broad route and a more-specific route matching the same destination.
+      - Lab uses route lookup to prove that the more-specific route wins.
+      - Lab removes the more-specific route and shows fallback to the broader route.
+      - Lab explains why next hops must be on a connected route.
+      - Validation script and transcript live under `experiments/`.
+      - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
+
   - title: "Replace one Pocket Internet link with WireGuard"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"

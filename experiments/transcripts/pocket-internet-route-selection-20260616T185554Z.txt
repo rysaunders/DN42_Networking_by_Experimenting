@@ -1,0 +1,116 @@
+
+## Environment
+
+$ uname -a
+Linux ubuntu 7.0.11-orbstack-00360-gc9bc4d96ac70 #1 SMP PREEMPT Thu Jun  4 16:40:25 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ ip -V
+ip utility, iproute2-6.14.0, libbpf 1.5.0
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+
+Transcript: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/pocket-internet-route-selection-20260616T185554Z.txt
+
+## Rollback before setup
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^pocket-rs-edge\(\ \|\$\)\'\ \|\|\ true
+
+## Create the Pocket Internet edge router
+
+$ ip netns add pocket-rs-edge
+
+$ ip netns list
+pocket-rs-edge
+
+## Create local exits
+
+$ ip -n pocket-rs-edge link add edge-transit0 type dummy
+
+$ ip -n pocket-rs-edge link add edge-service0 type dummy
+
+$ ip -n pocket-rs-edge link add edge-host0 type dummy
+
+## Assign interface addresses
+
+$ ip -n pocket-rs-edge addr add 10.52.0.1/30 dev edge-transit0
+
+$ ip -n pocket-rs-edge addr add 10.52.1.1/30 dev edge-service0
+
+$ ip -n pocket-rs-edge addr add 10.52.2.1/30 dev edge-host0
+
+## Bring interfaces up
+
+$ ip -n pocket-rs-edge link set lo up
+
+$ ip -n pocket-rs-edge link set edge-transit0 up
+
+$ ip -n pocket-rs-edge link set edge-service0 up
+
+$ ip -n pocket-rs-edge link set edge-host0 up
+
+## Show connected routes
+
+$ ip -n pocket-rs-edge route
+10.52.0.0/30 dev edge-transit0 proto kernel scope link src 10.52.0.1
+10.52.1.0/30 dev edge-service0 proto kernel scope link src 10.52.1.1
+10.52.2.0/30 dev edge-host0 proto kernel scope link src 10.52.2.1
+
+## Probe an off-link next hop
+
+$ ip -n pocket-rs-edge route add 172.20.99.0/24 via 10.52.9.2 dev edge-transit0
+Error: Nexthop has invalid gateway.
+
+## Install overlapping routes
+
+$ ip -n pocket-rs-edge route add 172.20.0.0/16 via 10.52.0.2 dev edge-transit0
+
+$ ip -n pocket-rs-edge route add 172.20.3.0/24 via 10.52.1.2 dev edge-service0
+
+$ ip -n pocket-rs-edge route add 172.20.3.42/32 via 10.52.2.2 dev edge-host0
+
+$ ip -n pocket-rs-edge route
+10.52.0.0/30 dev edge-transit0 proto kernel scope link src 10.52.0.1
+10.52.1.0/30 dev edge-service0 proto kernel scope link src 10.52.1.1
+10.52.2.0/30 dev edge-host0 proto kernel scope link src 10.52.2.1
+172.20.0.0/16 via 10.52.0.2 dev edge-transit0
+172.20.3.0/24 via 10.52.1.2 dev edge-service0
+172.20.3.42 via 10.52.2.2 dev edge-host0
+
+## Inspect longest-prefix match
+
+$ ip -n pocket-rs-edge route get 172.20.3.42
+172.20.3.42 via 10.52.2.2 dev edge-host0 src 10.52.2.1 uid 0
+    cache
+
+$ ip -n pocket-rs-edge route get 172.20.3.99
+172.20.3.99 via 10.52.1.2 dev edge-service0 src 10.52.1.1 uid 0
+    cache
+
+$ ip -n pocket-rs-edge route get 172.20.9.9
+172.20.9.9 via 10.52.0.2 dev edge-transit0 src 10.52.0.1 uid 0
+    cache
+
+## Remove the exact host route
+
+$ ip -n pocket-rs-edge route delete 172.20.3.42/32
+
+$ ip -n pocket-rs-edge route get 172.20.3.42
+172.20.3.42 via 10.52.1.2 dev edge-service0 src 10.52.1.1 uid 0
+    cache
+
+## Remove the /24 route
+
+$ ip -n pocket-rs-edge route delete 172.20.3.0/24
+
+$ ip -n pocket-rs-edge route get 172.20.3.42
+172.20.3.42 via 10.52.0.2 dev edge-transit0 src 10.52.0.1 uid 0
+    cache
+
+## Rollback
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^pocket-rs-edge\(\ \|\$\)\'\ \|\|\ true
+
+## Result
+Lab complete. Temporary namespace removed.
+Transcript saved to: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/pocket-internet-route-selection-20260616T185554Z.txt
