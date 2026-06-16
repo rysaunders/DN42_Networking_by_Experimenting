@@ -176,7 +176,7 @@ These names are deliberately plain:
 
 ## Step 4: Add Addresses
 
-Assign one `/30` address to each dummy interface:
+Assign one address-with-prefix to each dummy interface:
 
 ```sh
 ip -n addrmatch addr add 10.0.0.1/30 dev broad0
@@ -184,7 +184,16 @@ ip -n addrmatch addr add 10.0.1.1/30 dev specific0
 ip -n addrmatch addr add 10.0.2.1/30 dev host0
 ```
 
-Each address creates a small connected prefix. For example, `10.0.0.1/30` creates a connected route for `10.0.0.0/30`.
+This syntax can look odd at first. `10.0.0.1/30` does two related things:
+
+- `10.0.0.1` is the specific address assigned to `broad0`,
+- `/30` tells Linux the size of the local connected prefix around that address.
+
+So the interface does have one specific address: `10.0.0.1`. The `/30` does not mean "assign every address in the `/30` to this interface." It means "this address lives on a local link whose prefix is `/30`."
+
+Linux uses that prefix length to create a connected route. For example, assigning `10.0.0.1/30` to `broad0` creates a connected route for `10.0.0.0/30`.
+
+If you assigned `10.0.0.1/32` instead, Linux would treat only `10.0.0.1` as directly connected. That is useful for loopback service addresses, but it would not describe a small local link with a next-hop address like `10.0.0.2`.
 
 ## Step 5: Bring Interfaces Up
 
@@ -241,6 +250,8 @@ default via 10.0.0.2 dev broad0
 
 Linux may display `172.20.30.42/32` as `172.20.30.42`. Those mean the same thing: an exact host route.
 
+Keep this route table visible while you work through the prediction exercise. You do not need to do subnet math in your head. The point is to compare the destination against the route table and ask which listed route is the most specific match.
+
 ## Read One Route
 
 Take this route:
@@ -265,7 +276,9 @@ Longest-prefix match is about the destination prefix part. After Linux chooses t
 
 ## Predict Before Revealing
 
-Work in two passes. First decide which prefixes match each destination.
+Work in two passes. Keep the route table from Step 6 visible. First decide which listed prefixes match each destination.
+
+For example, `172.20.30.99` starts with `172.20.`, so it matches `172.20.0.0/16`. It also starts with `172.20.30.`, so it matches `172.20.30.0/24`. It is not exactly `172.20.30.42`, so it does not match the `/32`.
 
 | Destination | Does `/16` match? | Does `/24` match? | Does `/32` match? |
 | --- | --- | --- | --- |
