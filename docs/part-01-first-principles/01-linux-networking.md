@@ -109,7 +109,7 @@ experiments/labs/linux-routing-namespaces/run.sh
 The transcript used for this chapter is:
 
 ```text
-experiments/transcripts/linux-routing-namespaces-20260615T223330Z.txt
+experiments/transcripts/linux-routing-namespaces-20260616T110920Z.txt
 ```
 
 Run it from the repository root on Linux or inside the OrbStack Linux machine:
@@ -169,6 +169,24 @@ ip link set rtr-right0 netns dn42lab-router
 ```
 
 Now the topology exists, but the interfaces still need addresses and must be brought up.
+
+The lab checks that intermediate state with:
+
+```sh
+ip -all netns exec ip link show
+```
+
+Read that command as: "for all network namespaces, run `ip link show` inside each one."
+
+The transcript shows each namespace has its own `lo` interface. It also shows the veth ends in their new homes:
+
+```text
+dn42lab-left: left0
+dn42lab-router: rtr-left0 and rtr-right0
+dn42lab-right: right0
+```
+
+At this point the veth links exist, but they are still `state DOWN` and have no IP addresses. That is the difference between creating a cable and making the cable usable for IP traffic.
 
 ## Step 3: Add Addresses
 
@@ -540,4 +558,4 @@ DN42 adds new control-plane tools, but packets still cross Linux interfaces beca
 
 - `linux-ip-route`: use this later when you want the exact Linux meanings of route fields such as `via`, `dev`, `src`, and `scope link`.
 - `dn42-network-settings`: use this later when forwarding, reverse-path filtering, or asymmetric routing becomes relevant on a real DN42 node.
-- Transcript: `experiments/transcripts/linux-routing-namespaces-20260615T223330Z.txt`.
+- Transcript: `experiments/transcripts/linux-routing-namespaces-20260616T110920Z.txt`.

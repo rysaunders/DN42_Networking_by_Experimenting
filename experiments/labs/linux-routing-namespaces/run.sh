@@ -65,6 +65,9 @@ run ip link add right0 type veth peer name rtr-right0
 run ip link set right0 netns "${NS_RIGHT}"
 run ip link set rtr-right0 netns "${NS_ROUTER}"
 
+section "Inspect links before addresses"
+run ip -all netns exec ip link show
+
 section "Configure addresses"
 run ip -n "${NS_LEFT}" addr add 10.10.1.2/30 dev left0
 run ip -n "${NS_ROUTER}" addr add 10.10.1.1/30 dev rtr-left0
