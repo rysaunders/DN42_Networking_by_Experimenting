@@ -1,5 +1,7 @@
 # Glossary
 
+Tooltip definitions for recurring terms live in `includes/abbreviations.md`. Keep this page and that file aligned when introducing new beginner-facing terms.
+
 ASN
 : Autonomous System Number. A number identifying a routing domain in BGP.
 

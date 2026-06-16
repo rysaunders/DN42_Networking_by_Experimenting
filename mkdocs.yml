@@ -9,6 +9,7 @@ strict: true
 theme:
   name: material
   features:
+    - content.tooltips
     - navigation.sections
     - navigation.indexes
     - navigation.top
@@ -36,6 +37,7 @@ extra_javascript:
   - https://unpkg.com/mermaid@11/dist/mermaid.min.js
 
 markdown_extensions:
+  - abbr
   - admonition
   - attr_list
   - def_list
@@ -46,6 +48,9 @@ markdown_extensions:
       permalink: true
   - pymdownx.details
   - pymdownx.highlight
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -55,6 +60,9 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
+
+watch:
+  - includes
 
 nav:
   - Home: index.md

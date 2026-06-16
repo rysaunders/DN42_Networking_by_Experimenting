@@ -75,6 +75,8 @@ The larger prefix length is more specific:
 /16 is more specific than default
 ```
 
+Here, `default` means the default route: the fallback route Linux uses when no more-specific route matches.
+
 The `/30` routes in this lab are not the main lesson. They create small connected prefixes for the fake next-hop addresses. You do not need the full address math yet; notice only that assigning `10.0.0.1/30` to `broad0` creates a connected route for `10.0.0.0/30`.
 
 ## Lab
