@@ -109,7 +109,7 @@ experiments/labs/linux-routing-namespaces/run.sh
 The transcript used for this chapter is:
 
 ```text
-experiments/transcripts/linux-routing-namespaces-20260616T110920Z.txt
+experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt
 ```
 
 Run it from the repository root on Linux or inside the OrbStack Linux machine:
@@ -220,6 +220,14 @@ ip -n dn42lab-right link set right0 up
 
 Once addresses are configured and links are up, Linux automatically creates connected routes.
 
+The lab shows all three namespace route tables with:
+
+```sh
+ip -all netns exec ip route
+```
+
+Read that as: "for all network namespaces, run `ip route` inside each one."
+
 The lab also starts with forwarding disabled so the forwarding step is visible and deterministic:
 
 ```sh
@@ -244,6 +252,8 @@ The right namespace contains only its local link:
 ```text
 10.10.2.0/30 dev right0 proto kernel scope link src 10.10.2.2
 ```
+
+This is the first route-table snapshot that matters. Each edge namespace knows only its own directly connected `/30` link. The router namespace knows both directly connected `/30` links because it has one interface on each side.
 
 ## Predict Before Running: Can Left Reach Right?
 
@@ -558,4 +568,4 @@ DN42 adds new control-plane tools, but packets still cross Linux interfaces beca
 
 - `linux-ip-route`: use this later when you want the exact Linux meanings of route fields such as `via`, `dev`, `src`, and `scope link`.
 - `dn42-network-settings`: use this later when forwarding, reverse-path filtering, or asymmetric routing becomes relevant on a real DN42 node.
-- Transcript: `experiments/transcripts/linux-routing-namespaces-20260616T110920Z.txt`.
+- Transcript: `experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt`.

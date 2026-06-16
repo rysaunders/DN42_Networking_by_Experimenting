@@ -1,0 +1,208 @@
+
+## Environment
+
+$ uname -a
+Linux ubuntu 7.0.11-orbstack-00360-gc9bc4d96ac70 #1 SMP PREEMPT Thu Jun  4 16:40:25 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ ip -V
+ip utility, iproute2-6.14.0, libbpf 1.5.0
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+
+Transcript: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt
+
+## Rollback before setup
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(dn42lab-left\|dn42lab-router\|dn42lab-right\)\(\ \|\$\)\'\ \|\|\ true
+
+## Create isolated namespaces
+
+$ ip netns add dn42lab-left
+
+$ ip netns add dn42lab-router
+
+$ ip netns add dn42lab-right
+
+$ ip netns list
+dn42lab-right
+dn42lab-router
+dn42lab-left
+
+## Create veth links
+
+$ ip link add left0 type veth peer name rtr-left0
+
+$ ip link set left0 netns dn42lab-left
+
+$ ip link set rtr-left0 netns dn42lab-router
+
+$ ip link add right0 type veth peer name rtr-right0
+
+$ ip link set right0 netns dn42lab-right
+
+$ ip link set rtr-right0 netns dn42lab-router
+
+## Inspect links before addresses
+
+$ ip -all netns exec ip link show
+
+netns: dn42lab-right
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+10: right0@if9: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 2e:5c:48:09:25:21 brd ff:ff:ff:ff:ff:ff link-netns dn42lab-router
+
+netns: dn42lab-router
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+7: rtr-left0@if8: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 12:97:b8:7e:a2:6c brd ff:ff:ff:ff:ff:ff link-netns dn42lab-left
+9: rtr-right0@if10: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 5e:b5:0e:1a:30:23 brd ff:ff:ff:ff:ff:ff link-netns dn42lab-right
+
+netns: dn42lab-left
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+8: left0@if7: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether c6:30:7a:71:c9:2a brd ff:ff:ff:ff:ff:ff link-netns dn42lab-router
+
+## Configure addresses
+
+$ ip -n dn42lab-left addr add 10.10.1.2/30 dev left0
+
+$ ip -n dn42lab-router addr add 10.10.1.1/30 dev rtr-left0
+
+$ ip -n dn42lab-router addr add 10.10.2.1/30 dev rtr-right0
+
+$ ip -n dn42lab-right addr add 10.10.2.2/30 dev right0
+
+## Bring links up
+
+$ ip -n dn42lab-left link set lo up
+
+$ ip -n dn42lab-left link set left0 up
+
+$ ip -n dn42lab-router link set lo up
+
+$ ip -n dn42lab-router link set rtr-left0 up
+
+$ ip -n dn42lab-router link set rtr-right0 up
+
+$ ip -n dn42lab-right link set lo up
+
+$ ip -n dn42lab-right link set right0 up
+
+## Start with forwarding disabled
+
+$ ip netns exec dn42lab-router sysctl -w net.ipv4.ip_forward=0
+net.ipv4.ip_forward = 0
+
+## Show directly connected routes
+
+$ ip -all netns exec ip route
+
+netns: dn42lab-right
+10.10.2.0/30 dev right0 proto kernel scope link src 10.10.2.2 
+
+netns: dn42lab-router
+10.10.1.0/30 dev rtr-left0 proto kernel scope link src 10.10.1.1 
+10.10.2.0/30 dev rtr-right0 proto kernel scope link src 10.10.2.1 
+
+netns: dn42lab-left
+10.10.1.0/30 dev left0 proto kernel scope link src 10.10.1.2 
+
+## Route lookup before static routes
+
+$ ip -n dn42lab-left route get 10.10.2.2
+RTNETLINK answers: Network is unreachable
+
+$ ip netns exec dn42lab-left ping -c 1 -W 1 10.10.2.2
+ping: connect: Network is unreachable
+
+## Add routes through the router namespace
+
+$ ip -n dn42lab-left route add 10.10.2.0/30 via 10.10.1.1 dev left0
+
+$ ip -n dn42lab-right route add 10.10.1.0/30 via 10.10.2.1 dev right0
+
+## Route lookup after static routes
+
+$ ip -n dn42lab-left route get 10.10.2.2
+10.10.2.2 via 10.10.1.1 dev left0 src 10.10.1.2 uid 0 
+    cache 
+
+$ ip -n dn42lab-right route get 10.10.1.2
+10.10.1.2 via 10.10.2.1 dev right0 src 10.10.2.2 uid 0 
+    cache 
+
+## Ping still fails before forwarding is enabled
+
+$ ip netns exec dn42lab-router sysctl net.ipv4.ip_forward
+net.ipv4.ip_forward = 0
+
+$ ip netns exec dn42lab-left ping -c 1 -W 1 10.10.2.2
+PING 10.10.2.2 (10.10.2.2) 56(84) bytes of data.
+
+--- 10.10.2.2 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+
+## Enable forwarding inside the router namespace
+
+$ ip netns exec dn42lab-router sysctl -w net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
+
+## Forward traffic through the router namespace
+
+$ ip netns exec dn42lab-left ping -c 2 -W 1 10.10.2.2
+PING 10.10.2.2 (10.10.2.2) 56(84) bytes of data.
+64 bytes from 10.10.2.2: icmp_seq=1 ttl=63 time=0.057 ms
+64 bytes from 10.10.2.2: icmp_seq=2 ttl=63 time=0.038 ms
+
+--- 10.10.2.2 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1012ms
+rtt min/avg/max/mdev = 0.038/0.047/0.057/0.009 ms
+
+$ ip netns exec dn42lab-right ping -c 2 -W 1 10.10.1.2
+PING 10.10.1.2 (10.10.1.2) 56(84) bytes of data.
+64 bytes from 10.10.1.2: icmp_seq=1 ttl=63 time=0.023 ms
+64 bytes from 10.10.1.2: icmp_seq=2 ttl=63 time=0.071 ms
+
+--- 10.10.1.2 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1018ms
+rtt min/avg/max/mdev = 0.023/0.047/0.071/0.024 ms
+
+## Inspect router counters and routes
+
+$ ip -n dn42lab-router -s link show rtr-left0
+7: rtr-left0@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether 12:97:b8:7e:a2:6c brd ff:ff:ff:ff:ff:ff link-netns dn42lab-left
+    RX:  bytes packets errors dropped  missed   mcast           
+          1048      12      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+           950      11      0       0       0       0 
+
+$ ip -n dn42lab-router -s link show rtr-right0
+9: rtr-right0@if10: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether 5e:b5:0e:1a:30:23 brd ff:ff:ff:ff:ff:ff link-netns dn42lab-right
+    RX:  bytes packets errors dropped  missed   mcast           
+           950      11      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+           950      11      0       0       0       0 
+
+$ ip -n dn42lab-router route get 10.10.2.2
+10.10.2.2 dev rtr-right0 src 10.10.2.1 uid 0 
+    cache 
+
+$ ip -n dn42lab-router route get 10.10.1.2
+10.10.1.2 dev rtr-left0 src 10.10.1.1 uid 0 
+    cache 
+
+## Rollback
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(dn42lab-left\|dn42lab-router\|dn42lab-right\)\(\ \|\$\)\'\ \|\|\ true
+
+## Result
+Lab complete. Temporary namespaces removed.
+Transcript saved to: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt

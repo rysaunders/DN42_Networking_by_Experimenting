@@ -87,9 +87,7 @@ section "Start with forwarding disabled"
 run ip netns exec "${NS_ROUTER}" sysctl -w net.ipv4.ip_forward=0
 
 section "Show directly connected routes"
-run ip -n "${NS_LEFT}" route
-run ip -n "${NS_ROUTER}" route
-run ip -n "${NS_RIGHT}" route
+run ip -all netns exec ip route
 
 section "Route lookup before static routes"
 run ip -n "${NS_LEFT}" route get 10.10.2.2 || true
