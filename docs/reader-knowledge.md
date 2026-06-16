@@ -64,3 +64,41 @@ Reader has not yet been taught:
 - ASNs,
 - DN42 registry objects,
 - DNS forwarding or delegation.
+
+## After Part 1, Chapter 2: Addresses and Subnets
+
+Introduced by `docs/part-01-first-principles/02-addressing-and-subnets.md`.
+
+This chapter is still a draft. Until it is expanded and reviewed, beginner reviews should assume it adds no concepts beyond the prefix and local-link basics already introduced in Chapter 1.
+
+## After Part 1, Toy DN42 with Static Routes
+
+Introduced by `docs/part-01-first-principles/03-toy-dn42-static-routing.md`.
+
+Reader has seen:
+
+- autonomous system: for now, one independently controlled network boundary,
+- AS-shaped namespace: a namespace used as a toy autonomous system in the lab,
+- loopback: the `lo` interface inside a namespace,
+- service loopback: a stable address on `lo` that represents a service or prefix an AS could advertise later,
+- point-to-point link: a link with one device on each end,
+- static route: a route written by hand,
+- transit namespace: a namespace that forwards packets between other namespaces,
+- static route repair: changing route tables by hand after a topology change,
+- alternate physical path: a path that exists as links but is unused until routing points at it.
+
+Reader has only been lightly introduced to:
+
+- convergence as the process of routing recovering after a change.
+
+Reader has not yet been taught:
+
+- dynamic routing,
+- BIRD configuration,
+- BGP sessions,
+- AS_PATH,
+- local preference,
+- route import and export policy,
+- WireGuard cryptokey routing,
+- DN42 registry objects,
+- DNS forwarding or delegation.

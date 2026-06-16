@@ -64,9 +64,10 @@ nav:
       - Overview: part-01-first-principles/index.md
       - Linux as a Router: part-01-first-principles/01-linux-networking.md
       - Addresses and Subnets: part-01-first-principles/02-addressing-and-subnets.md
-      - Routing Tables: part-01-first-principles/03-routing-tables.md
-      - WireGuard as a Link: part-01-first-principles/04-wireguard-as-a-link.md
-      - BGP Before DN42: part-01-first-principles/05-bgp-before-dn42.md
+      - Toy DN42 Static Routing: part-01-first-principles/03-toy-dn42-static-routing.md
+      - Routing Tables: part-01-first-principles/04-routing-tables.md
+      - WireGuard as a Link: part-01-first-principles/05-wireguard-as-a-link.md
+      - BGP Before DN42: part-01-first-principles/06-bgp-before-dn42.md
   - Part 2 - First DN42 Node:
       - Overview: part-02-first-dn42-node/index.md
       - Registry Objects: part-02-first-dn42-node/01-registry-objects.md

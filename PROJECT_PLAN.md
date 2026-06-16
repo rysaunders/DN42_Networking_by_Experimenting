@@ -51,9 +51,10 @@ networking-by-experimenting-with-dn42/
       index.md
       01-linux-networking.md
       02-addressing-and-subnets.md
-      03-routing-tables.md
-      04-wireguard-as-a-link.md
-      05-bgp-before-dn42.md
+      03-toy-dn42-static-routing.md
+      04-routing-tables.md
+      05-wireguard-as-a-link.md
+      06-bgp-before-dn42.md
     part-02-first-dn42-node/
       index.md
       01-registry-objects.md

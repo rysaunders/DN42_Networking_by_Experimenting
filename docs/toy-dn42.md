@@ -62,3 +62,7 @@ New labs should reuse the Toy DN42 topology when possible. A one-off lab is acce
 
 This keeps the book from becoming a pile of unrelated recipes. Each chapter adds one new behavior to the same small Internet.
 
+## Validated Labs
+
+- [Toy DN42 with Static Routes](part-01-first-principles/03-toy-dn42-static-routing.md): four AS-shaped namespaces, service loopbacks, static routes, link failure, and manual route repair.
+
