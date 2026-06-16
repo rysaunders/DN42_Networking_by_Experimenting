@@ -124,6 +124,8 @@ On macOS with OrbStack:
 orb bash experiments/labs/linux-routing-namespaces/run.sh
 ```
 
+Before running, know why this lab may ask for a password: creating network namespaces and veth interfaces changes Linux kernel networking state, so Linux requires root privileges. The script checks whether it is already running as root. If not, it reruns itself with `sudo`.
+
 The script uses temporary namespaces named `dn42lab-left`, `dn42lab-router`, and `dn42lab-right`. It removes them at the end.
 
 ## Step 1: Create Three Isolated Network Stacks
@@ -135,6 +137,8 @@ ip netns add dn42lab-left
 ip netns add dn42lab-router
 ip netns add dn42lab-right
 ```
+
+These commands require root privileges. If you ran the lab script normally, the script handles this by using `sudo` before it reaches this point. If you type the commands by hand and see `Operation not permitted`, rerun them with `sudo` or switch to a root shell inside the lab machine.
 
 After this, `ip netns list` shows:
 
@@ -492,6 +496,7 @@ After rollback:
 
 ## Troubleshooting Notes
 
+- If `ip netns add` or `ip link add` says `Operation not permitted`, the command was not run with root privileges. Use the lab script, which invokes `sudo`, or run the command as root inside the Linux lab machine.
 - If `ip route get` says `Network is unreachable`, the namespace has no selected route for that destination.
 - If `ip route get` is correct but ping fails through a middle namespace, check forwarding on the middle namespace.
 - If one direction works but the other does not, check the return route.
