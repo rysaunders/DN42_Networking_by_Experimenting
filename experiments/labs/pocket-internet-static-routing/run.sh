@@ -42,6 +42,13 @@ cleanup() {
   ip netns delete "${AS4}" >/dev/null 2>&1
 }
 
+logged_cleanup() {
+  run ip netns delete "${AS1}" || true
+  run ip netns delete "${AS2}" || true
+  run ip netns delete "${AS3}" || true
+  run ip netns delete "${AS4}" || true
+}
+
 trap cleanup EXIT
 
 section "Environment"
@@ -83,6 +90,7 @@ run ip -n "${AS1}" addr add 172.20.1.1/32 dev lo
 run ip -n "${AS2}" addr add 172.20.2.1/32 dev lo
 run ip -n "${AS3}" addr add 172.20.3.1/32 dev lo
 run ip -n "${AS4}" addr add 172.20.4.1/32 dev lo
+run ip -n "${AS1}" addr show lo
 
 section "Configure point-to-point link addresses"
 run ip -n "${AS1}" addr add 10.42.12.1/30 dev as1-as2
@@ -96,6 +104,7 @@ run ip -n "${AS4}" addr add 10.42.34.2/30 dev as4-as3
 
 run ip -n "${AS4}" addr add 10.42.41.1/30 dev as4-as1
 run ip -n "${AS1}" addr add 10.42.41.2/30 dev as1-as4
+run ip -n "${AS1}" addr show as1-as2
 
 section "Bring links up"
 for ns in "${AS1}" "${AS2}" "${AS3}" "${AS4}"; do
@@ -115,6 +124,7 @@ section "Enable forwarding in every AS namespace"
 for ns in "${AS1}" "${AS2}" "${AS3}" "${AS4}"; do
   run ip netns exec "${ns}" sysctl -w net.ipv4.ip_forward=1
 done
+run ip netns exec "${AS1}" sysctl net.ipv4.ip_forward
 
 section "Show connected routes"
 run ip -n "${AS1}" route
@@ -163,12 +173,14 @@ run ip -n "${AS4}" route add 172.20.1.1/32 via 10.42.41.2 dev as4-as1
 section "Verify repaired path through AS4"
 run ip -n "${AS1}" route get 172.20.3.1 from 172.20.1.1
 run ip -n "${AS4}" route get 172.20.3.1
+run ip -n "${AS3}" route get 172.20.1.1 from 172.20.3.1
+run ip -n "${AS4}" route get 172.20.1.1
 run ip netns exec "${AS1}" ping -c 2 -W 1 -I 172.20.1.1 172.20.3.1
 run ip -n "${AS4}" -s link show as4-as1
 run ip -n "${AS4}" -s link show as4-as3
 
 section "Rollback"
-cleanup
+logged_cleanup
 run bash -c "ip netns list | grep -E '^(${AS1}|${AS2}|${AS3}|${AS4})( |$)' || true"
 
 trap - EXIT
