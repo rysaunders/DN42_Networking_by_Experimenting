@@ -245,6 +245,24 @@ issues:
       - Apply this guidance sparingly: no more than a couple of asides per chapter unless the chapter genuinely needs more.
       - Beginner review checks whether the voice improves motivation without distracting from the commands.
 
+  - title: "Add state snapshot diagrams to Pocket Internet static routing"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Add lightweight state-snapshot diagrams to the Pocket Internet static routing chapter to reduce topology working-memory load.
+
+      Why:
+      The manual-first static routing lab is intentionally command-heavy. The reader has to track four namespaces, four links, service loopbacks, connected /30s, selected forward and return routes, a broken clockwise path, and a repaired alternate path. One opening topology diagram is not enough.
+
+      Acceptance criteria:
+      - Add diagrams at key state changes in `docs/part-01-first-principles/03-pocket-internet-static-routing.md`.
+      - Diagrams show only the state relevant at that moment.
+      - Distinguish physical links from selected routes.
+      - Include forward and return paths where both matter.
+      - Suggested snapshots: after veth links, after service loopbacks, before static routes, after clockwise static routes, after breaking AS2-AS3, and after repairing via AS4.
+      - Keep diagrams lightweight; avoid visual noise or repeating the same diagram without new information.
+      - Beginner review checks whether the diagrams reduce mental load for a first-time networking learner.
+
   - title: "Replace one Pocket Internet link with WireGuard"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"
