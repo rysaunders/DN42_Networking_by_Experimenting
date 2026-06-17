@@ -46,6 +46,8 @@ flowchart LR
 
 ## Lab / Experiment
 
+Use `docs/safety.md` to identify the lab safety level, boundary, state changes, and rollback checks.
+
 ### Goal
 
 State the observable outcome.
@@ -101,6 +103,7 @@ Compare the lab to public Internet practice without pretending DN42 is identical
 
 ## Verify Before Proceeding
 
+- [ ] Safety level and lab boundary are stated.
 - [ ] Route lookup matches the expected interface.
 - [ ] No unintended default route exists.
 - [ ] Export policy is explicit.
@@ -110,7 +113,7 @@ Compare the lab to public Internet practice without pretending DN42 is identical
 
 ## Rollback
 
-List exact rollback commands.
+List exact rollback commands. Include the verification commands that prove rollback worked.
 
 ## References
 

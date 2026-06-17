@@ -30,6 +30,8 @@ Describe the smallest useful model for the experiment. Include an ASCII or Merma
 
 ## Safety Boundaries
 
+Use `docs/safety.md` to choose the lab safety level and required checks.
+
 - No unintended default route.
 - No unintended export.
 - No persistent state without rollback.
@@ -83,6 +85,7 @@ Map the lab result to later Pocket Internet, interconnect, or DN42 work. Identif
 - Exit codes.
 - Relevant stdout and stderr.
 - Environment metadata.
+- Safety baseline and rollback verification.
 
 ## Beginner Review
 
