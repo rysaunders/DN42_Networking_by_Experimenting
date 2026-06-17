@@ -15,7 +15,7 @@ DN42 will later add WireGuard tunnels, BIRD (a routing daemon), registry objects
 | Term | Plain-language meaning | Example in this lab |
 | --- | --- | --- |
 | Network stack | The part of an operating system that owns interfaces, addresses, routes, and packet handling. | Each namespace has its own route table. |
-| Namespace | An isolated copy of a Linux network stack. | `dn42lab-left` cannot see interfaces inside `dn42lab-right`. |
+| Namespace | An isolated copy of a Linux network stack. | `pocket-left` cannot see interfaces inside `pocket-right`. |
 | Interface | A place where packets enter or leave a network stack. | `left0` is the interface inside the left namespace. |
 | veth pair | A virtual Ethernet cable with two ends. A packet sent into one end comes out the other. | `left0` connects to `rtr-left0`. |
 | Address | A label assigned to an interface so packets can name a source or destination. | `10.10.1.2` belongs to `left0`. |
@@ -42,9 +42,9 @@ This lab creates three tiny machines:
 
 ```mermaid
 flowchart LR
-  left["dn42lab-left<br/>left0: 10.10.1.2/30"]
-  router["dn42lab-router<br/>rtr-left0: 10.10.1.1/30<br/>rtr-right0: 10.10.2.1/30"]
-  right["dn42lab-right<br/>right0: 10.10.2.2/30"]
+  left["pocket-left<br/>left0: 10.10.1.2/30"]
+  router["pocket-router<br/>rtr-left0: 10.10.1.1/30<br/>rtr-right0: 10.10.2.1/30"]
+  right["pocket-right<br/>right0: 10.10.2.2/30"]
 
   left -- "left link<br/>10.10.1.0/30" --> router
   router -- "right link<br/>10.10.2.0/30" --> right
@@ -96,13 +96,13 @@ That is why Linux creates the connected route automatically.
 This chapter uses two command forms:
 
 ```sh
-ip -n dn42lab-left route
+ip -n pocket-left route
 ```
 
 and:
 
 ```sh
-ip netns exec dn42lab-left ping -c 1 10.10.2.2
+ip netns exec pocket-left ping -c 1 10.10.2.2
 ```
 
 `ip -n NAME ...` is a shortcut built into the `ip` command. It means "run this `ip` operation against namespace `NAME`."
@@ -141,25 +141,25 @@ Then run the commands from that Linux shell as root, or prefix them with `sudo`.
 Start by deleting any old lab namespaces:
 
 ```sh
-ip netns delete dn42lab-left 2>/dev/null || true
-ip netns delete dn42lab-router 2>/dev/null || true
-ip netns delete dn42lab-right 2>/dev/null || true
+ip netns delete pocket-left 2>/dev/null || true
+ip netns delete pocket-router 2>/dev/null || true
+ip netns delete pocket-right 2>/dev/null || true
 ```
 
 Then create three new ones:
 
 ```sh
-ip netns add dn42lab-left
-ip netns add dn42lab-router
-ip netns add dn42lab-right
+ip netns add pocket-left
+ip netns add pocket-router
+ip netns add pocket-right
 ```
 
 After this, `ip netns list` shows:
 
 ```text
-dn42lab-right
-dn42lab-router
-dn42lab-left
+pocket-right
+pocket-router
+pocket-left
 ```
 
 At this point there are three isolated network stacks, but they are not connected to anything useful yet.
@@ -176,10 +176,10 @@ ip link add right0 type veth peer name rtr-right0
 Then it moves each cable end into the correct namespace:
 
 ```sh
-ip link set left0 netns dn42lab-left
-ip link set rtr-left0 netns dn42lab-router
-ip link set right0 netns dn42lab-right
-ip link set rtr-right0 netns dn42lab-router
+ip link set left0 netns pocket-left
+ip link set rtr-left0 netns pocket-router
+ip link set right0 netns pocket-right
+ip link set rtr-right0 netns pocket-router
 ```
 
 Now the topology exists, but the interfaces still need addresses and must be brought up.
@@ -195,9 +195,9 @@ Read that command as: "for all network namespaces, run `ip link show` inside eac
 The transcript shows each namespace has its own `lo` interface. It also shows the veth ends in their new homes:
 
 ```text
-dn42lab-left: left0
-dn42lab-router: rtr-left0 and rtr-right0
-dn42lab-right: right0
+pocket-left: left0
+pocket-router: rtr-left0 and rtr-right0
+pocket-right: right0
 ```
 
 At this point the veth links exist, but they are still `state DOWN` and have no IP addresses. That is the difference between creating a cable and making the cable usable for IP traffic.
@@ -207,10 +207,10 @@ At this point the veth links exist, but they are still `state DOWN` and have no 
 The lab gives each interface an IPv4 address:
 
 ```sh
-ip -n dn42lab-left addr add 10.10.1.2/30 dev left0
-ip -n dn42lab-router addr add 10.10.1.1/30 dev rtr-left0
-ip -n dn42lab-router addr add 10.10.2.1/30 dev rtr-right0
-ip -n dn42lab-right addr add 10.10.2.2/30 dev right0
+ip -n pocket-left addr add 10.10.1.2/30 dev left0
+ip -n pocket-router addr add 10.10.1.1/30 dev rtr-left0
+ip -n pocket-router addr add 10.10.2.1/30 dev rtr-right0
+ip -n pocket-right addr add 10.10.2.2/30 dev right0
 ```
 
 The `/30` prefix creates a tiny subnet with two usable interface addresses. That is enough for a point-to-point link:
@@ -223,13 +223,13 @@ The `/30` prefix creates a tiny subnet with two usable interface addresses. That
 Linux interfaces can exist while administratively down. The lab enables loopback and veth interfaces inside each namespace:
 
 ```sh
-ip -n dn42lab-left link set lo up
-ip -n dn42lab-left link set left0 up
-ip -n dn42lab-router link set lo up
-ip -n dn42lab-router link set rtr-left0 up
-ip -n dn42lab-router link set rtr-right0 up
-ip -n dn42lab-right link set lo up
-ip -n dn42lab-right link set right0 up
+ip -n pocket-left link set lo up
+ip -n pocket-left link set left0 up
+ip -n pocket-router link set lo up
+ip -n pocket-router link set rtr-left0 up
+ip -n pocket-router link set rtr-right0 up
+ip -n pocket-right link set lo up
+ip -n pocket-right link set right0 up
 ```
 
 Once addresses are configured and links are up, Linux automatically creates connected routes.
@@ -245,7 +245,7 @@ Read that as: "for all network namespaces, run `ip route` inside each one."
 The lab also starts with forwarding disabled so the forwarding step is visible and deterministic:
 
 ```sh
-ip netns exec dn42lab-router sysctl -w net.ipv4.ip_forward=0
+ip netns exec pocket-router sysctl -w net.ipv4.ip_forward=0
 ```
 
 The left namespace route table contains only its local link:
@@ -292,7 +292,7 @@ So the route lookup should fail.
 The transcript confirms it:
 
 ```sh
-ip -n dn42lab-left route get 10.10.2.2
+ip -n pocket-left route get 10.10.2.2
 ```
 
 ```text
@@ -302,7 +302,7 @@ RTNETLINK answers: Network is unreachable
 Ping fails for the same reason:
 
 ```sh
-ip netns exec dn42lab-left ping -c 1 -W 1 10.10.2.2
+ip netns exec pocket-left ping -c 1 -W 1 10.10.2.2
 ```
 
 ```text
@@ -316,7 +316,7 @@ This is a good failure. It proves Linux is using the route table rather than gue
 Left needs an instruction for the right-side subnet:
 
 ```sh
-ip -n dn42lab-left route add 10.10.2.0/30 via 10.10.1.1 dev left0
+ip -n pocket-left route add 10.10.2.0/30 via 10.10.1.1 dev left0
 ```
 
 Read that as:
@@ -334,7 +334,7 @@ Before revealing it, derive it from the topology:
 ??? question "Reveal the matching return-route command"
 
     ```sh
-    ip -n dn42lab-right route add 10.10.1.0/30 via 10.10.2.1 dev right0
+    ip -n pocket-right route add 10.10.1.0/30 via 10.10.2.1 dev right0
     ```
 
     Read that as:
@@ -357,7 +357,7 @@ It should name:
 The transcript confirms it:
 
 ```sh
-ip -n dn42lab-left route get 10.10.2.2
+ip -n pocket-left route get 10.10.2.2
 ```
 
 ```text
@@ -368,7 +368,7 @@ ip -n dn42lab-left route get 10.10.2.2
 Right has the mirror image route:
 
 ```sh
-ip -n dn42lab-right route get 10.10.1.2
+ip -n pocket-right route get 10.10.1.2
 ```
 
 ```text
@@ -385,7 +385,7 @@ Routes on the edge namespaces are necessary, but they are not enough.
 The lab checks forwarding before trying ping:
 
 ```sh
-ip netns exec dn42lab-router sysctl net.ipv4.ip_forward
+ip netns exec pocket-router sysctl net.ipv4.ip_forward
 ```
 
 The transcript shows:
@@ -397,7 +397,7 @@ net.ipv4.ip_forward = 0
 Now left has a route to right, but the router namespace is not willing to forward packets that are not addressed to itself:
 
 ```sh
-ip netns exec dn42lab-left ping -c 1 -W 1 10.10.2.2
+ip netns exec pocket-left ping -c 1 -W 1 10.10.2.2
 ```
 
 The transcript shows:
@@ -416,7 +416,7 @@ This is the second useful failure in the lab:
 The middle namespace must be willing to forward packets that are not addressed to itself. Linux controls this with:
 
 ```sh
-ip netns exec dn42lab-router sysctl -w net.ipv4.ip_forward=1
+ip netns exec pocket-router sysctl -w net.ipv4.ip_forward=1
 ```
 
 The transcript shows:
@@ -431,17 +431,17 @@ Without this setting, the router namespace can talk to both connected networks i
 
 After routes and forwarding are in place, a ping from left to right has a concrete path:
 
-1. `dn42lab-left` creates an ICMP echo request from `10.10.1.2` to `10.10.2.2`.
+1. `pocket-left` creates an ICMP echo request from `10.10.1.2` to `10.10.2.2`.
 2. Left looks up `10.10.2.2` in its route table.
 3. Left matches `10.10.2.0/30 via 10.10.1.1 dev left0`.
 4. Left sends the packet out `left0` to the next hop `10.10.1.1`.
 5. The veth pair carries the packet across the left local link to `rtr-left0`.
-6. `dn42lab-router` receives the packet. The destination is not one of the router's own addresses.
+6. `pocket-router` receives the packet. The destination is not one of the router's own addresses.
 7. Because `net.ipv4.ip_forward=1`, the router does its own route lookup for `10.10.2.2`.
 8. The router matches its connected route `10.10.2.0/30 dev rtr-right0`.
 9. The router sends the packet out `rtr-right0`.
 10. The second veth pair carries the packet across the right local link to `right0`.
-11. `dn42lab-right` receives a packet addressed to its own `10.10.2.2` address and sends an echo reply back.
+11. `pocket-right` receives a packet addressed to its own `10.10.2.2` address and sends an echo reply back.
 12. The reply follows the mirror-image route through `10.10.2.1`, the router namespace, `10.10.1.1`, and finally `left0`.
 
 The important split is this: veth links move packets across one local link, while IP route lookups decide the next link to use.
@@ -451,7 +451,7 @@ The important split is this: veth links move packets across one local link, whil
 Now left can ping right:
 
 ```sh
-ip netns exec dn42lab-left ping -c 2 -W 1 10.10.2.2
+ip netns exec pocket-left ping -c 2 -W 1 10.10.2.2
 ```
 
 The transcript shows two replies:
@@ -464,7 +464,7 @@ The transcript shows two replies:
 Right can ping left:
 
 ```sh
-ip netns exec dn42lab-right ping -c 2 -W 1 10.10.1.2
+ip netns exec pocket-right ping -c 2 -W 1 10.10.1.2
 ```
 
 The transcript shows two replies again:
@@ -481,8 +481,8 @@ The `ttl=63` is supporting evidence in this lab. Linux commonly starts IPv4 ping
 The router namespace saw packets on both veth interfaces:
 
 ```sh
-ip -n dn42lab-router -s link show rtr-left0
-ip -n dn42lab-router -s link show rtr-right0
+ip -n pocket-router -s link show rtr-left0
+ip -n pocket-router -s link show rtr-right0
 ```
 
 The transcript shows nonzero RX and TX packet counters on both links.
@@ -490,7 +490,7 @@ The transcript shows nonzero RX and TX packet counters on both links.
 The router's own route lookup is simple because both edge addresses are directly connected from its point of view:
 
 ```sh
-ip -n dn42lab-router route get 10.10.2.2
+ip -n pocket-router route get 10.10.2.2
 ```
 
 ```text
@@ -501,7 +501,7 @@ ip -n dn42lab-router route get 10.10.2.2
 And the other direction:
 
 ```sh
-ip -n dn42lab-router route get 10.10.1.2
+ip -n pocket-router route get 10.10.1.2
 ```
 
 ```text
@@ -516,9 +516,9 @@ The router does not need a next hop for these destinations because both destinat
 The lab removes all three namespaces:
 
 ```sh
-ip netns delete dn42lab-left
-ip netns delete dn42lab-router
-ip netns delete dn42lab-right
+ip netns delete pocket-left
+ip netns delete pocket-router
+ip netns delete pocket-right
 ```
 
 Deleting a namespace also removes the interfaces inside it. The transcript's final namespace check prints no lab namespace names, which confirms rollback.
@@ -528,22 +528,22 @@ Deleting a namespace also removes the interfaces inside it. The transcript's fin
 After you have built the lab manually, you can rerun the validated script when you want a clean repeat or transcript:
 
 ```sh
-bash experiments/labs/linux-routing-namespaces/run.sh
+bash experiments/labs/pocket-internet-linux-router/run.sh
 ```
 
 On macOS with OrbStack:
 
 ```sh
-orb bash experiments/labs/linux-routing-namespaces/run.sh
+orb bash experiments/labs/pocket-internet-linux-router/run.sh
 ```
 
 The transcript used to validate this chapter is:
 
 ```text
-experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt
+experiments/transcripts/pocket-internet-linux-router-20260617T183713Z.txt
 ```
 
-The script uses temporary namespaces named `dn42lab-left`, `dn42lab-router`, and `dn42lab-right`. It removes them at the end.
+The script uses temporary namespaces named `pocket-left`, `pocket-router`, and `pocket-right`. It removes them at the end.
 
 ## What Changed
 
@@ -633,4 +633,4 @@ Next we need:
 
 - `linux-ip-route`: use this later when you want the exact Linux meanings of route fields such as `via`, `dev`, `src`, and `scope link`.
 - `dn42-network-settings`: use this later when forwarding, reverse-path filtering, or asymmetric routing becomes relevant on a real DN42 node.
-- Transcript: `experiments/transcripts/linux-routing-namespaces-20260616T112550Z.txt`.
+- Transcript: `experiments/transcripts/pocket-internet-linux-router-20260617T183713Z.txt`.

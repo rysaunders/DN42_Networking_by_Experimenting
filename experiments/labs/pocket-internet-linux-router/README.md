@@ -1,10 +1,10 @@
-# Linux Routing Namespaces Lab
+# Pocket Internet Linux Router Lab
 
 This lab builds a disposable three-node IPv4 network with Linux network namespaces:
 
-- `dn42lab-left`
-- `dn42lab-router`
-- `dn42lab-right`
+- `pocket-left`
+- `pocket-router`
+- `pocket-right`
 
 The middle namespace forwards traffic between the two edge namespaces. The lab demonstrates:
 
@@ -26,11 +26,11 @@ The middle namespace forwards traffic between the two edge namespaces. The lab d
 Run from the repository root on a Linux host or OrbStack Linux machine:
 
 ```sh
-bash experiments/labs/linux-routing-namespaces/run.sh
+bash experiments/labs/pocket-internet-linux-router/run.sh
 ```
 
 On macOS with OrbStack:
 
 ```sh
-orb bash experiments/labs/linux-routing-namespaces/run.sh
+orb bash experiments/labs/pocket-internet-linux-router/run.sh
 ```

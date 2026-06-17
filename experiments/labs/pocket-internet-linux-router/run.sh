@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LAB_NAME="linux-routing-namespaces"
-NS_LEFT="dn42lab-left"
-NS_ROUTER="dn42lab-router"
-NS_RIGHT="dn42lab-right"
+LAB_NAME="pocket-internet-linux-router"
+NS_LEFT="pocket-left"
+NS_ROUTER="pocket-router"
+NS_RIGHT="pocket-right"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 TRANSCRIPT_DIR="${REPO_ROOT}/experiments/transcripts"
