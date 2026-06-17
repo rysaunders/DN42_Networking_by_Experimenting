@@ -42,10 +42,17 @@ flowchart LR
   AS3["pocket-as3<br/>service: 172.20.3.1/32"]
   AS4["pocket-as4<br/>service: 172.20.4.1/32"]
 
-  AS1 -- "10.42.12.0/30" --> AS2
-  AS2 -- "10.42.23.0/30" --> AS3
-  AS3 -- "10.42.34.0/30" --> AS4
-  AS4 -- "10.42.41.0/30" --> AS1
+  AS1 ---|"10.42.12.0/30"| AS2
+  AS2 ---|"10.42.23.0/30"| AS3
+  AS3 ---|"10.42.34.0/30"| AS4
+  AS4 ---|"10.42.41.0/30"| AS1
+```
+
+Legend:
+
+```text
+--- physical link
+==> selected service route
 ```
 
 The first selected path from `pocket-as1` to `pocket-as3` will be clockwise:
@@ -219,6 +226,18 @@ Expected observation:
 
 The links exist, but they are not useful for IP traffic yet. They still need addresses and must be brought up.
 
+State snapshot:
+
+```text
+Physical links exist, but they do not have IP addresses yet.
+
+pocket-as1 --as1-as2-- pocket-as2 --as2-as3-- pocket-as3
+    |                                             |
+ as1-as4                                      as3-as4
+    |                                             |
+    +---------------- pocket-as4 -----------------+
+```
+
 ## Step 4: Add Service Loopbacks
 
 Assign one service loopback address to each namespace:
@@ -248,6 +267,18 @@ You will test reachability from `pocket-as1`'s service loopback to `pocket-as3`'
 
 ```text
 172.20.1.1 -> 172.20.3.1
+```
+
+State snapshot:
+
+```text
+Physical links still exist. Each namespace now also has a service address.
+No service routes exist yet.
+
+pocket-as1[172.20.1.1/32] --- pocket-as2[172.20.2.1/32]
+          |                                  |
+          |                                  |
+pocket-as4[172.20.4.1/32] --- pocket-as3[172.20.3.1/32]
 ```
 
 ## Step 5: Add Link Addresses
@@ -341,6 +372,25 @@ For example, `pocket-as1` should have connected routes for:
 Those are possible exits. They are not yet routes to `pocket-as3`'s service loopback.
 
 The service loopback addresses exist too, but the plain `ip route` view is focused on the main route table. For this lab, the connected link routes are the routes to pay attention to.
+
+State snapshot:
+
+```text
+The links are usable now. Service routes still do not exist.
+
+              10.42.12.0/30
+pocket-as1 ------------------ pocket-as2
+    |                              |
+    | 10.42.41.0/30                | 10.42.23.0/30
+    |                              |
+pocket-as4 ------------------ pocket-as3
+              10.42.34.0/30
+
+Known to pocket-as1:
+- 10.42.12.0/30 is directly connected
+- 10.42.41.0/30 is directly connected
+- 172.20.3.1/32 is still unknown
+```
 
 ## Step 7: Enable Forwarding
 
@@ -442,6 +492,8 @@ ip -n pocket-as2 route add 172.20.1.1/32 via 10.42.12.1 dev as2-as1
 
 Ping is a request and a reply. If you write only the forward routes, the request may arrive but the reply will not know how to return.
 
+If this feels annoying, that is the point. You have four namespaces, a few links, and only two service addresses you care about, and you are already writing routes in both directions. This is the maintenance work BGP will reduce later: learning routes, choosing usable paths, and updating the kernel route table when the network changes.
+
 ## Step 9: Inspect the Selected Paths
 
 Ask `pocket-as1` how it reaches `pocket-as3`'s service loopback:
@@ -497,6 +549,25 @@ Reply path:
 | `pocket-as2` | `172.20.1.1/32` | `via 10.42.12.1 dev as2-as1` |
 
 If any one of those entries is missing, ping can fail.
+
+State snapshot:
+
+```text
+Selected static routes now use the clockwise path.
+
+Physical links:
+pocket-as1 --- pocket-as2 --- pocket-as3
+    |                         |
+    +------ pocket-as4 -------+
+
+Selected forward request:
+pocket-as1 ==> pocket-as2 ==> pocket-as3
+172.20.1.1                  172.20.3.1
+
+Selected reply:
+pocket-as3 ==> pocket-as2 ==> pocket-as1
+172.20.3.1                  172.20.1.1
+```
 
 ## Step 10: Test Service Reachability
 
@@ -570,6 +641,25 @@ The useful lesson is not merely "a link broke." The useful lesson is:
 
 > A possible alternate path does not matter until route tables point at it.
 
+State snapshot:
+
+```text
+The route still points clockwise, but the AS2-AS3 link is down.
+
+Physical links:
+pocket-as1 --- pocket-as2 =X= pocket-as3
+    |                         |
+    +------ pocket-as4 -------+
+
+Selected forward route still says:
+pocket-as1 ==> pocket-as2 =X= pocket-as3
+
+Unused physical path still exists:
+pocket-as1 --- pocket-as4 --- pocket-as3
+
+Static routing does not move to the alternate path by itself.
+```
+
 ## Step 13: Prove the Alternate Physical Path Exists
 
 The alternate path is:
@@ -637,6 +727,8 @@ ip -n pocket-as3 route replace 172.20.1.1/32 via 10.42.34.2 dev as3-as4
 ip -n pocket-as4 route add 172.20.1.1/32 via 10.42.41.2 dev as4-as1
 ```
 
+Later, convergence will mean routing recovering after a change. Here, nothing converges until you edit the routes yourself.
+
 Now inspect the repaired forward path:
 
 ```sh
@@ -680,6 +772,25 @@ Repaired reply path:
 | --- | --- | --- |
 | `pocket-as3` | `172.20.1.1/32` | `via 10.42.34.2 dev as3-as4` |
 | `pocket-as4` | `172.20.1.1/32` | `via 10.42.41.2 dev as4-as1` |
+
+State snapshot:
+
+```text
+Selected static routes now use the alternate path through pocket-as4.
+
+Physical links:
+pocket-as1 --- pocket-as2 =X= pocket-as3
+    |                         |
+    +------ pocket-as4 -------+
+
+Selected forward request:
+pocket-as1 ==> pocket-as4 ==> pocket-as3
+172.20.1.1                  172.20.3.1
+
+Selected reply:
+pocket-as3 ==> pocket-as4 ==> pocket-as1
+172.20.3.1                  172.20.1.1
+```
 
 ## Step 15: Verify the Repaired Path
 
@@ -787,6 +898,8 @@ ip route add 172.20.3.1/32 via ...
 ```
 
 You do not need to understand BIRD or BGP yet. Keep only this idea for now: later, a routing program will write the same kind of kernel route for us.
+
+The point of doing it by hand was to see the work. Every route you typed is a thing a routing system will eventually learn, choose, install, or withdraw for you.
 
 BIRD and BGP will eventually replace those handwritten routes with learned routes:
 
