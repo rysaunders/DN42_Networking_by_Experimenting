@@ -1,8 +1,10 @@
-# Pocket Internet to DN42 Interconnect
+# Pocket Internet to DN42 Border
 
-Pocket Internet is a lab. DN42 is the bridge to a living network.
+Pocket Internet is the lab. DN42 is the living network beyond the lab.
 
-The interconnect is the point where packets stop being purely local lab traffic and start crossing into a shared routing ecosystem. That makes it the most important safety boundary in the book.
+The border is where local lab reasoning meets shared routing practice. It should teach containment before connection.
+
+This page is not a promise that the book will publish Pocket Internet routes into DN42 by default. The safer default is to keep Pocket Internet local, then use the border model to make real DN42 setup feel intuitive instead of magical.
 
 ## Reader Starting Point
 
@@ -24,7 +26,7 @@ For now, read this page as a map of where Pocket Internet is going.
 
 - Border router: the router where Pocket Internet meets DN42.
 - Outbound reachability: Pocket Internet sends traffic toward DN42.
-- Inbound reachability: DN42 sends traffic toward a selected Pocket Internet service.
+- Inbound reachability: DN42 sends traffic toward a selected service behind the border.
 - Return path: the route a reply packet uses to get back to the original sender.
 - Route advertisement: telling another router that you can carry traffic for a prefix.
 - Import filter: a rule for which routes you accept from a neighbor.
@@ -34,7 +36,15 @@ For now, read this page as a map of where Pocket Internet is going.
 
 ## Goal
 
-The first interconnect goal is outbound reachability:
+The first goal is border literacy:
+
+```text
+Pocket Internet side -> border router -> DN42 side
+```
+
+The reader should be able to explain what is allowed to cross that boundary, what is blocked, and how to prove both.
+
+Outbound reachability is a later design question:
 
 ```text
 Pocket Internet service or host -> Pocket Internet border -> DN42 peer -> DN42 service
@@ -46,7 +56,7 @@ Inbound reachability is a later goal and must be authorized:
 DN42 node -> DN42 peer -> Pocket Internet border -> selected Pocket Internet service
 ```
 
-The book should not imply that every lab address can be advertised to DN42. Only authorized prefixes should ever be exported.
+The book should not imply that lab addresses can be advertised to DN42. Only authorized DN42 resources should ever be exported toward a DN42 peer.
 
 ## Border Model
 
@@ -74,12 +84,14 @@ Keeping those roles visible makes route leaks easier to reason about.
 ## Design Principles
 
 - Pocket Internet to DN42 is a border, not a shortcut.
+- Pocket Internet remains the laboratory; it is not the thing being published by default.
 - Do not install a default route into DN42 unless a chapter explicitly proves why it is safe.
 - Do not advertise routes into DN42 unless the prefix is authorized and filters are explicit.
-- Start with outbound-only reachability from Pocket Internet toward DN42.
+- Start with containment: no default route into DN42 and no Pocket Internet route export.
+- Treat outbound reachability as a deliberate design, not a default assumption.
 - Treat return path as a first-class concept.
 - Prefer explicit import and export filters over permissive examples.
-- Include rollback and "what could leak?" checks in every interconnect chapter.
+- Include rollback and "what could leak?" checks in every border chapter.
 
 ## Return Path
 
@@ -91,6 +103,8 @@ Outbound traffic from Pocket Internet to DN42 has two routing questions:
 - Does DN42 know how to send the reply back to the source?
 
 If the source address is private lab-only space, DN42 will not know how to return the packet. A later chapter must either use an authorized DN42 prefix, translate at the border, or choose a test where return reachability is intentionally out of scope.
+
+That is why outbound reachability is not the default first action. Without a valid return path, "send packets toward DN42" can become confusing rather than instructive.
 
 ## Route Advertisement
 
@@ -105,10 +119,13 @@ Before any route is advertised toward DN42, the chapter must show:
 - how to verify what BIRD will export,
 - how to roll the change back.
 
+For the default learning path, Pocket Internet routes are not exported toward DN42. The real DN42 chapters should use authorized DN42 resources and normal peer expectations instead of asking DN42 to accept arbitrary lab topology.
+
 ## What This Enables
 
-The advanced payoff is services crossing the boundary:
+The advanced payoff is understanding the boundary well enough to operate safely:
 
-- Pocket Internet can reach selected DN42 services when return routing is valid.
-- DN42 can reach selected Pocket Internet services only after the reader owns or is authorized to advertise the relevant prefix.
+- The reader can configure a real DN42 node without treating BGP, filters, and kernel routes as recipes.
+- Pocket Internet can remain a private testbed for concepts before real DN42 changes.
+- Services can cross the boundary only after return path, authorization, filtering, and rollback are explicit.
 - The reader can compare lab routing behavior with real routing behavior instead of treating DN42 as a separate recipe.

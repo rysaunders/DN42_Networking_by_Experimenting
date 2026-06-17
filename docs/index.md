@@ -19,7 +19,7 @@ The first version of the site focuses on:
 - Pocket Internet: a local laboratory built from namespaces, veth links, loopbacks, BIRD, and controlled failures.
 - WireGuard as a replacement for one local link.
 - BGP concepts inside the local topology before public DN42 configuration.
-- The Pocket Internet to DN42 interconnect as the bridge from lab routing to a living network.
+- The Pocket Internet to DN42 border as the bridge from lab routing to a living network.
 - DN42 registry objects and first-peer chapters remain later-phase drafts until the lab foundation and border model are clear.
 
 ## Project Rules

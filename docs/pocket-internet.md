@@ -91,4 +91,4 @@ Pocket Internet eventually gets a border to DN42. That border must be explicit a
 - return path treated as a first-class requirement,
 - rollback tested before any real peering change.
 
-See [Pocket Internet to DN42 Interconnect](pocket-internet-dn42-interconnect.md).
+See [Pocket Internet to DN42 Border](pocket-internet-dn42-interconnect.md).

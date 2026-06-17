@@ -6,7 +6,7 @@ The project should not become a command cookbook. Every chapter should connect a
 
 Pocket Internet is the laboratory, not the destination. Before readers touch public DN42, they build a small local Internet on one Linux machine. Namespaces act as routers, veth pairs act as links, loopbacks act as advertised service addresses, BIRD acts as the routing speaker, and WireGuard later replaces one local link with an encrypted tunnel.
 
-DN42 is the bridge from the laboratory to a living routing ecosystem. The advanced payoff is an explicit interconnect: selected Pocket Internet traffic can route toward DN42, and selected services can cross that boundary only when return path, authorization, filtering, and rollback are understood.
+DN42 is the bridge from the laboratory to a living routing ecosystem. The advanced payoff is not publishing the lab by default; it is understanding the border well enough that real DN42 peering, route policy, and service operation feel like the same mechanics at larger scale.
 
 Guiding question for every chapter:
 
@@ -247,9 +247,9 @@ Chapters:
    - Concept: packets inside packets, endpoint reachability, and packet size limits.
    - Lab: observe clear overlay traffic and encrypted underlay traffic.
 
-### Part 5: Connect Pocket Internet to DN42
+### Part 5: Design the DN42 Border
 
-Reader outcome: the reader connects the lab-built network to a living routing ecosystem safely.
+Reader outcome: the reader understands the boundary between the lab-built network and a living routing ecosystem before configuring real peers.
 
 Chapters:
 
@@ -258,8 +258,8 @@ Chapters:
    - Lab: prepare registry changes locally; do not submit until validated.
 
 2. **Pocket Internet to DN42 Border**
-   - Concept: border router, outbound reachability, return path, import/export filters.
-   - Lab: design the border before public peering.
+   - Concept: border router, containment, return path, import/export filters.
+   - Lab: design the border before public peering; do not export Pocket Internet routes by default.
 
 3. **First Real Peer**
    - Concept: WireGuard peer plus BGP neighbor on the DN42 side of the border.
@@ -401,7 +401,7 @@ Rules:
 4. Prove the return path before expecting service reachability.
 5. Add explicit import and export filters.
 6. Verify that no default route or unauthorized prefix leaks across the border.
-7. Roll back the interconnect and prove lab routing still works.
+7. Roll back border changes and prove lab routing still works.
 
 ### First Real DN42 Labs
 
@@ -561,15 +561,16 @@ You know it works when:
 
 ### After Part 5
 
-The reader can connect Pocket Internet to DN42 through a controlled border.
+The reader can explain how Pocket Internet approaches DN42 through a controlled border.
 
 You know it works when:
 
-- selected Pocket Internet traffic can route toward DN42,
+- no Pocket Internet route is exported toward DN42 by default,
+- outbound reachability is treated as an explicit design question,
 - no default route is accidentally accepted or exported,
 - authorized prefixes are explicit,
 - filters prevent route leaks,
-- rollback removes the interconnect without damaging the local lab.
+- rollback removes border changes without damaging the local lab.
 
 ### After Part 6
 
@@ -636,7 +637,7 @@ You know it works when:
 10. Add BIRD and BGP to Pocket Internet.
 11. Replace one Pocket Internet link with WireGuard.
 12. Draft addresses, prefixes, and longest match.
-13. Design Pocket Internet to DN42 interconnect.
+13. Design the Pocket Internet to DN42 border.
 14. Draft safety page.
 15. Draft registry objects chapter.
 16. Draft first WireGuard peer chapter.
@@ -965,7 +966,7 @@ Excluded from v0.1:
 15. Write and test Pocket Internet route-selection lab.
 16. Write and test local BIRD/BGP lab.
 17. Replace one Pocket Internet link with WireGuard.
-18. Design the Pocket Internet to DN42 interconnect.
+18. Design the Pocket Internet to DN42 border.
 19. Add link checker and strict docs build CI.
 20. Run a source freshness review before tagging v0.1.
 21. Tag `v0.1.0` only after all published command blocks are either tested or clearly marked research-required.

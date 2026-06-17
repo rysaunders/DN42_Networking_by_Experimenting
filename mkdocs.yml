@@ -69,7 +69,7 @@ nav:
   - Start Here: start-here.md
   - Linux Networking Objects: linux-networking-objects.md
   - Pocket Internet: pocket-internet.md
-  - Pocket Internet Interconnect: pocket-internet-dn42-interconnect.md
+  - Pocket Internet Border: pocket-internet-dn42-interconnect.md
   - Part 1 - From Host to Router:
       - Overview: part-01-first-principles/index.md
       - Linux as a Router: part-01-first-principles/01-linux-networking.md

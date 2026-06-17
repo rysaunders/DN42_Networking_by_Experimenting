@@ -292,18 +292,22 @@ issues:
       - Lab includes troubleshooting branches for session and route-install failures.
       - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
-  - title: "Design Pocket Internet to DN42 interconnect"
+  - title: "Design the Pocket Internet to DN42 border"
     labels: ["chapter", "conceptual", "safety", "dn42-current", "v0.1"]
     milestone: "v0.1"
     body: |
       Design the conceptual border between Pocket Internet and DN42 before implementing real peering chapters.
 
+      This is not a default "publish the lab into DN42" chapter. Pocket Internet remains the local laboratory. DN42 is the living routing ecosystem the reader approaches after the lab concepts are clear.
+
       Acceptance criteria:
-      - Explains Pocket Internet as the lab and DN42 as the bridge to a living routing ecosystem.
+      - Explains Pocket Internet as the lab and DN42 as the living network beyond the lab.
       - Uses a dedicated border namespace/router in the design.
-      - Starts with outbound-only reachability from Pocket Internet toward DN42.
+      - Starts with containment: no default route into DN42 and no Pocket Internet route export.
+      - Explains outbound reachability as a design question, not a guaranteed first implementation.
       - Treats return path as a first-class requirement.
-      - Explains what route advertisements are authorized and what must be filtered.
+      - Explains that route advertisement toward DN42 requires authorized DN42 resources and explicit peer expectations.
+      - Makes live Pocket Internet-to-DN42 route export optional, advanced, and out of the default path.
       - Includes rollback and "what could leak?" checks.
       - Beginner review is run or explicitly deferred according to `docs/authoring-templates/review-loop.md`.
 
