@@ -606,6 +606,27 @@ DN42 adds new control-plane tools, but packets still cross Linux interfaces beca
 - [ ] You can identify the next hop and outgoing interface in `ip route get` output.
 - [ ] You can explain why `ttl=63` supports, but does not universally prove, the one-hop explanation in this lab.
 
+## Before You Continue
+
+You can now explain:
+
+- how namespaces act like separate Linux network stacks,
+- how veth pairs connect those stacks,
+- how interface addresses create connected routes,
+- why both forward and return routes matter,
+- why forwarding must be enabled on a namespace that routes packets for others.
+
+Still okay if fuzzy:
+
+- the exact address math behind `/30`,
+- why Linux chooses one route over another when several routes match,
+- source address selection in `ip route get` output.
+
+Next we need:
+
+- a clearer way to think about addresses and prefixes,
+- a rule for predicting which route wins when more than one route could match.
+
 ## References
 
 - `linux-ip-route`: use this later when you want the exact Linux meanings of route fields such as `via`, `dev`, `src`, and `scope link`.

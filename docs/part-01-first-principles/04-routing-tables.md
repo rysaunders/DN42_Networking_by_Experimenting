@@ -6,6 +6,8 @@ This chapter assumes you have completed Pocket Internet with Static Routes. You 
 
 You have also seen longest-prefix match in a small isolated lab. This chapter puts that idea back into the Pocket Internet model.
 
+The previous Pocket Internet lab mostly used exact service routes. Real route tables often contain broader routes and more-specific exceptions at the same time. This chapter is the bridge between "I can write a route by hand" and "I can predict which route a router will actually use."
+
 The goal is to answer one question:
 
 > When a Pocket Internet router has several routes that could match a destination, which exit does it choose?
@@ -401,6 +403,27 @@ orb bash experiments/labs/pocket-internet-route-selection/run.sh
 - `ip route get` shows the route Linux would actually use.
 - A route's next hop must be reachable through a connected route.
 - Removing a more-specific route can make traffic fall back to a broader route.
+
+## Before You Continue
+
+You can now explain:
+
+- why a broad route and a more-specific route can both match the same destination,
+- why the more-specific route wins inside a Pocket Internet edge router,
+- why removing a specific route can reveal a broader fallback route to a different exit,
+- why every next hop still has to be reachable through a connected route.
+
+Still okay if fuzzy:
+
+- how a routing program will choose routes later,
+- how learned routes will appear in Linux,
+- how larger route tables can still be checked with the same lookup habit.
+
+Next we need:
+
+- to move from hand-written routes to learned routes,
+- to introduce a routing program that can install and withdraw routes for us,
+- to keep the same Linux route-lookup habits when BGP appears.
 
 ## How This Connects to DN42
 

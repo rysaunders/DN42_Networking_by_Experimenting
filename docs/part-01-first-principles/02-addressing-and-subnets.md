@@ -4,6 +4,8 @@
 
 This chapter assumes you have completed Linux as a Router. You should know what an address, interface, prefix, route, next hop, and route lookup are.
 
+The previous lab showed that packets only move when route tables say where they should go. This chapter slows down on one part of that idea: how Linux chooses a route when several route entries could match the same destination.
+
 You do not need to know binary subnet math yet. This chapter uses route lookups to build the idea from observable behavior first.
 
 The goal is to answer one question:
@@ -527,6 +529,27 @@ Specific service routes override broader reachability. That is the route-selecti
 - [ ] You can predict which route wins when several routes match.
 - [ ] You can use `ip route get` to check Linux's selected route.
 - [ ] You can explain why removing a more-specific route changes the selected path.
+
+## Before You Continue
+
+You can now explain:
+
+- the difference between one address and a prefix,
+- why `/32` means one exact IPv4 address,
+- why the most specific matching route wins,
+- how `ip route get` reveals Linux's selected route.
+
+Still okay if fuzzy:
+
+- binary subnet math,
+- source address selection,
+- how these route choices look inside a larger topology.
+
+Next we need:
+
+- to use these ideas in Pocket Internet,
+- to make service loopbacks reachable across multiple namespaces,
+- to feel why writing routes by hand gets tiring.
 
 ## References
 

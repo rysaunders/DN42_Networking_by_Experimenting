@@ -8,6 +8,8 @@ Use this file to keep chapter drafts honest:
 - Keep definitions plain and concrete.
 - List important ideas that have not been introduced yet so later drafts do not accidentally assume them.
 
+Recurring checkpoint labels such as "You can now explain," "Still okay if fuzzy," and "Next we need" are reader scaffolding, not technical concepts. They should summarize only what the reader has already seen or name the immediate learning gap without adding new required vocabulary.
+
 ## Before Part 1
 
 Reader can be assumed to know:

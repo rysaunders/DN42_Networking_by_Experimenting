@@ -8,7 +8,7 @@ This experiment does not assume you understand BGP, BIRD, real DN42 registry obj
 
 The goal is to expand from one router to a small local Internet.
 
-You have already seen one Linux namespace forward packets between two links. Now you will build four small routing domains, give each one a service address, and write the route tables by hand.
+You have already seen one Linux namespace forward packets between two links, and you have seen how Linux chooses the most specific matching route. Now you will build four namespaces, give each one a stable service address, and write the route tables by hand.
 
 ## New Terms
 
@@ -915,7 +915,30 @@ WireGuard will later replace one veth link. The routing idea stays the same: a p
 - [ ] You can identify the selected next hop from `ip route get`.
 - [ ] You can explain why both forward and return routes matter.
 - [ ] You can explain why the alternate physical path does not help until static routes are changed.
-- [ ] You can explain what BIRD will automate later.
+- [ ] You can explain why hand-written routes become tedious and fragile.
+
+## Before You Continue
+
+You can now explain:
+
+- how four namespaces can form a small routed network,
+- why service loopbacks need explicit routes,
+- why request and reply traffic require separate route-table entries,
+- why static routes keep pointing at a broken path until you change them,
+- why hand-written routes become tedious and fragile.
+
+Still okay if fuzzy:
+
+- real autonomous system rules,
+- the details of routing programs,
+- how routers will learn routes later,
+- how broad and specific service routes interact inside a larger route table.
+
+Next we need:
+
+- to revisit route selection inside a Pocket Internet router,
+- to see what happens when broad routes and more-specific routes overlap,
+- to prepare for a routing program to install routes instead of typing every route by hand.
 
 ## References
 
