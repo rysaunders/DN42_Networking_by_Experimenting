@@ -6,6 +6,8 @@ This chapter assumes you can run shell commands, but it does not assume you have
 
 The goal is to prove one small fact: Linux can act as a router when it has interfaces, addresses, routes, and forwarding enabled.
 
+Keep [Linux Networking Objects](../linux-networking-objects.md) nearby if the object names start to blur together. This chapter builds the first working version of that map.
+
 DN42 will later add WireGuard tunnels, BIRD (a routing daemon), registry objects, and peer policy. Those pieces matter, but they all sit on top of ordinary Linux packet forwarding.
 
 ## New Terms

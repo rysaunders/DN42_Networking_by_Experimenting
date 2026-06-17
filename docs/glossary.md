@@ -2,6 +2,8 @@
 
 Tooltip definitions for recurring terms live in `includes/abbreviations.md`. Keep this page and that file aligned when introducing new beginner-facing terms.
 
+For the beginner-facing map of Linux objects, see [Linux Networking Objects](linux-networking-objects.md).
+
 ASN
 : Autonomous System Number. A number identifying a routing domain in BGP.
 

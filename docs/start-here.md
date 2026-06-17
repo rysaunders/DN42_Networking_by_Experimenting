@@ -2,6 +2,8 @@
 
 This book assumes curiosity and basic command-line comfort, not professional network engineering experience.
 
+If the early Linux terms start to blur together, keep [Linux Networking Objects](linux-networking-objects.md) open as the visual map. It shows how namespaces, interfaces, addresses, routes, loopback, and forwarding fit together before the labs start combining them.
+
 ## Reader Path
 
 1. Learn what Linux does with interfaces, addresses, routes, and forwarding.

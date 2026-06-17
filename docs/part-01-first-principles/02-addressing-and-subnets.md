@@ -8,6 +8,8 @@ The previous lab showed that packets only move when route tables say where they 
 
 Treat this chapter like a microscope. The lab is intentionally small and artificial so only one thing is changing: the specificity of the destination prefix. You will not prove packet delivery here. You will learn the route-lookup rule that later Pocket Internet routers will use.
 
+If you need the bigger map while working through the small lab, use [Linux Networking Objects](../linux-networking-objects.md).
+
 You do not need to know binary subnet math yet. This chapter uses route lookups to build the idea from observable behavior first.
 
 The goal is to answer one question:

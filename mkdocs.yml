@@ -67,6 +67,7 @@ watch:
 nav:
   - Home: index.md
   - Start Here: start-here.md
+  - Linux Networking Objects: linux-networking-objects.md
   - Pocket Internet: pocket-internet.md
   - Pocket Internet Interconnect: pocket-internet-dn42-interconnect.md
   - Part 1 - From Host to Router:

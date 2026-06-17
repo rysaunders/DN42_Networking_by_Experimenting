@@ -10,6 +10,8 @@ Use this file to keep chapter drafts honest:
 
 Recurring checkpoint labels such as "You can now explain," "Still okay if fuzzy," and "Next we need" are reader scaffolding, not technical concepts. They should summarize only what the reader has already seen or name the immediate learning gap without adding new required vocabulary.
 
+The visual glossary at `docs/linux-networking-objects.md` is a reference map. It may preview terms before a lab teaches them, but beginner reviews should not assume the reader has mastered a term until the chapter ledger below says the reader has seen it in context.
+
 ## Before Part 1
 
 Reader can be assumed to know:

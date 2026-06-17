@@ -8,6 +8,8 @@ This experiment does not assume you understand BGP, BIRD, real DN42 registry obj
 
 The goal is to expand from one router to a small local Internet.
 
+This lab combines most of the objects from [Linux Networking Objects](../linux-networking-objects.md): namespaces, veth pairs, route tables, loopback addresses, connected routes, next hops, and forwarding.
+
 You have already seen one Linux namespace forward packets between two links, and you have seen how Linux chooses the most specific matching route. Now you will build four namespaces, give each one a stable service address, and write the route tables by hand.
 
 ## New Terms
