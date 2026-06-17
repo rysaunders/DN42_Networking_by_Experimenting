@@ -159,3 +159,37 @@ Reader has not yet been taught:
 - WireGuard cryptokey routing,
 - DN42 registry objects,
 - DNS forwarding or delegation.
+
+## After Part 1, BGP Before DN42
+
+Introduced by `docs/part-01-first-principles/06-bgp-before-dn42.md`.
+
+Reader has seen:
+
+- routing daemon: a background program that manages routes,
+- BIRD: the routing daemon used in the Pocket Internet lab,
+- BGP: a protocol routers use to exchange reachability,
+- BGP session: one BGP conversation between two routers,
+- neighbor: the router on the other side of a BGP session,
+- local AS: the autonomous system number a router uses for itself,
+- peer AS: the autonomous system number expected from the neighbor,
+- route advertisement: telling a neighbor that a prefix is reachable,
+- import filter: a rule for deciding which received routes to accept,
+- export filter: a rule for deciding which routes to announce,
+- kernel protocol: the BIRD component that installs selected routes into Linux,
+- convergence: the network settling on new routes after a change,
+- BIRD route state and Linux route state as related but separate views,
+- route withdrawal after BGP sessions lose reachability.
+
+Reader has only been lightly introduced to:
+
+- AS path as route metadata,
+- BGP path choice when more than one route exists.
+
+Reader has not yet been taught:
+
+- local preference,
+- BGP communities,
+- WireGuard cryptokey routing,
+- DN42 registry objects,
+- DNS forwarding or delegation.

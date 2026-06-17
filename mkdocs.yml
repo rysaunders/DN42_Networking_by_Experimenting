@@ -76,6 +76,7 @@ nav:
       - Addresses, Prefixes, and Longest Match: part-01-first-principles/02-addressing-and-subnets.md
       - Pocket Internet Static Routing: part-01-first-principles/03-pocket-internet-static-routing.md
       - Pocket Internet Route Selection: part-01-first-principles/04-routing-tables.md
+      - BGP Before DN42: part-01-first-principles/06-bgp-before-dn42.md
   - Later - DN42 Node:
       - Overview: part-02-first-dn42-node/index.md
       - Registry Objects: part-02-first-dn42-node/01-registry-objects.md
@@ -98,4 +99,3 @@ nav:
       - Reader Knowledge Ledger: reader-knowledge.md
       - Future Lab Drafts:
           - WireGuard as a Link: part-01-first-principles/05-wireguard-as-a-link.md
-          - BGP Before DN42: part-01-first-principles/06-bgp-before-dn42.md

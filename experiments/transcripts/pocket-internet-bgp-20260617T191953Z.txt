@@ -1,0 +1,305 @@
+
+## Environment
+
+$ uname -a
+Linux ubuntu 7.0.11-orbstack-00360-gc9bc4d96ac70 #1 SMP PREEMPT Thu Jun  4 16:40:25 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ ip -V
+ip utility, iproute2-6.14.0, libbpf 1.5.0
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+
+$ bird --version
+BIRD version 2.16.1
+
+Transcript: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/pocket-internet-bgp-20260617T191953Z.txt
+
+## Rollback before setup
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(pocket-as1\|pocket-as2\|pocket-as3\|pocket-as4\)\(\ \|\$\)\'\ \|\|\ true
+
+## Create AS-shaped namespaces
+
+$ mkdir -p /tmp/pocket-internet-bgp
+
+$ ip netns add pocket-as1
+
+$ ip netns add pocket-as2
+
+$ ip netns add pocket-as3
+
+$ ip netns add pocket-as4
+
+$ ip netns list
+pocket-as4
+pocket-as3
+pocket-as2
+pocket-as1
+
+## Create veth links
+
+$ ip link add as1-as2 type veth peer name as2-as1
+
+$ ip link set as1-as2 netns pocket-as1
+
+$ ip link set as2-as1 netns pocket-as2
+
+$ ip link add as2-as3 type veth peer name as3-as2
+
+$ ip link set as2-as3 netns pocket-as2
+
+$ ip link set as3-as2 netns pocket-as3
+
+$ ip link add as3-as4 type veth peer name as4-as3
+
+$ ip link set as3-as4 netns pocket-as3
+
+$ ip link set as4-as3 netns pocket-as4
+
+$ ip link add as4-as1 type veth peer name as1-as4
+
+$ ip link set as4-as1 netns pocket-as4
+
+$ ip link set as1-as4 netns pocket-as1
+
+## Configure addresses
+
+$ ip -n pocket-as1 addr add 172.20.1.1/32 dev lo
+
+$ ip -n pocket-as2 addr add 172.20.2.1/32 dev lo
+
+$ ip -n pocket-as3 addr add 172.20.3.1/32 dev lo
+
+$ ip -n pocket-as4 addr add 172.20.4.1/32 dev lo
+
+$ ip -n pocket-as1 addr add 10.42.12.1/30 dev as1-as2
+
+$ ip -n pocket-as2 addr add 10.42.12.2/30 dev as2-as1
+
+$ ip -n pocket-as2 addr add 10.42.23.1/30 dev as2-as3
+
+$ ip -n pocket-as3 addr add 10.42.23.2/30 dev as3-as2
+
+$ ip -n pocket-as3 addr add 10.42.34.1/30 dev as3-as4
+
+$ ip -n pocket-as4 addr add 10.42.34.2/30 dev as4-as3
+
+$ ip -n pocket-as4 addr add 10.42.41.1/30 dev as4-as1
+
+$ ip -n pocket-as1 addr add 10.42.41.2/30 dev as1-as4
+
+## Bring links up and enable forwarding
+
+$ ip -n pocket-as1 link set lo up
+
+$ ip netns exec pocket-as1 sysctl -w net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
+
+$ ip -n pocket-as2 link set lo up
+
+$ ip netns exec pocket-as2 sysctl -w net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
+
+$ ip -n pocket-as3 link set lo up
+
+$ ip netns exec pocket-as3 sysctl -w net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
+
+$ ip -n pocket-as4 link set lo up
+
+$ ip netns exec pocket-as4 sysctl -w net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
+
+$ ip -n pocket-as1 link set as1-as2 up
+
+$ ip -n pocket-as1 link set as1-as4 up
+
+$ ip -n pocket-as2 link set as2-as1 up
+
+$ ip -n pocket-as2 link set as2-as3 up
+
+$ ip -n pocket-as3 link set as3-as2 up
+
+$ ip -n pocket-as3 link set as3-as4 up
+
+$ ip -n pocket-as4 link set as4-as3 up
+
+$ ip -n pocket-as4 link set as4-as1 up
+
+## Show connected routes before BGP
+
+$ ip -n pocket-as1 route
+10.42.12.0/30 dev as1-as2 proto kernel scope link src 10.42.12.1
+10.42.41.0/30 dev as1-as4 proto kernel scope link src 10.42.41.2
+
+$ ip -n pocket-as2 route
+10.42.12.0/30 dev as2-as1 proto kernel scope link src 10.42.12.2
+10.42.23.0/30 dev as2-as3 proto kernel scope link src 10.42.23.1
+
+$ ip -n pocket-as3 route
+10.42.23.0/30 dev as3-as2 proto kernel scope link src 10.42.23.2
+10.42.34.0/30 dev as3-as4 proto kernel scope link src 10.42.34.1
+
+$ ip -n pocket-as4 route
+10.42.34.0/30 dev as4-as3 proto kernel scope link src 10.42.34.2
+10.42.41.0/30 dev as4-as1 proto kernel scope link src 10.42.41.1
+
+$ ip -n pocket-as1 route show 172.20.3.1
+
+$ ip -n pocket-as1 route get 172.20.3.1
+RTNETLINK answers: Network is unreachable
+
+## Write and validate BIRD configs
+
+$ bird -p -c /tmp/pocket-internet-bgp/pocket-as1.conf
+
+$ ip netns exec pocket-as1 bird -c /tmp/pocket-internet-bgp/pocket-as1.conf -s /tmp/pocket-internet-bgp/pocket-as1.ctl -P /tmp/pocket-internet-bgp/pocket-as1.pid
+
+$ bird -p -c /tmp/pocket-internet-bgp/pocket-as2.conf
+
+$ ip netns exec pocket-as2 bird -c /tmp/pocket-internet-bgp/pocket-as2.conf -s /tmp/pocket-internet-bgp/pocket-as2.ctl -P /tmp/pocket-internet-bgp/pocket-as2.pid
+
+$ bird -p -c /tmp/pocket-internet-bgp/pocket-as3.conf
+
+$ ip netns exec pocket-as3 bird -c /tmp/pocket-internet-bgp/pocket-as3.conf -s /tmp/pocket-internet-bgp/pocket-as3.ctl -P /tmp/pocket-internet-bgp/pocket-as3.pid
+
+$ bird -p -c /tmp/pocket-internet-bgp/pocket-as4.conf
+
+$ ip netns exec pocket-as4 bird -c /tmp/pocket-internet-bgp/pocket-as4.conf -s /tmp/pocket-internet-bgp/pocket-as4.ctl -P /tmp/pocket-internet-bgp/pocket-as4.pid
+
+## Wait for BGP sessions
+
+$ ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols
+BIRD 2.16.1 ready.
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     15:19:53.947
+direct_loopbacks Direct     ---        up     15:19:53.947
+kernel_ipv4 Kernel     master4    up     15:19:53.947
+to_as2     BGP        ---        up     15:19:57.865  Established
+to_as4     BGP        ---        up     15:19:58.192  Established
+
+$ ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-bgp/pocket-as2.ctl show protocols
+BIRD 2.16.1 ready.
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     15:19:53.950
+direct_loopbacks Direct     ---        up     15:19:53.950
+kernel_ipv4 Kernel     master4    up     15:19:53.950
+to_as1     BGP        ---        up     15:19:57.865  Established
+to_as3     BGP        ---        up     15:19:58.096  Established
+
+## Observe BIRD routes and kernel routes
+
+$ ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.3.1/32 all
+BIRD 2.16.1 ready.
+Table master4:
+172.20.3.1/32        unicast [to_as2 15:19:58.096] * (100) [AS4242420003i]
+	via 10.42.12.2 on as1-as2
+	Type: BGP univ
+	BGP.origin: IGP
+	BGP.as_path: 4242420002 4242420003
+	BGP.next_hop: 10.42.12.2
+	BGP.local_pref: 100
+                     unicast [to_as4 15:19:58.237] (100) [AS4242420003i]
+	via 10.42.41.1 on as1-as4
+	Type: BGP univ
+	BGP.origin: IGP
+	BGP.as_path: 4242420004 4242420003
+	BGP.next_hop: 10.42.41.1
+	BGP.local_pref: 100
+
+$ ip -n pocket-as1 route show 172.20.3.1
+172.20.3.1 via 10.42.12.2 dev as1-as2 proto bird metric 32
+
+$ ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
+172.20.3.1 from 172.20.1.1 via 10.42.12.2 dev as1-as2 uid 0
+    cache
+
+$ ip netns exec pocket-as1 ping -c 2 -W 1 -I 172.20.1.1 172.20.3.1
+PING 172.20.3.1 (172.20.3.1) from 172.20.1.1 : 56(84) bytes of data.
+64 bytes from 172.20.3.1: icmp_seq=1 ttl=63 time=0.027 ms
+64 bytes from 172.20.3.1: icmp_seq=2 ttl=63 time=0.063 ms
+
+--- 172.20.3.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1037ms
+rtt min/avg/max/mdev = 0.027/0.045/0.063/0.018 ms
+
+## Isolate AS3 and observe withdrawal
+
+$ ip -n pocket-as2 link set as2-as3 down
+
+$ ip -n pocket-as4 link set as4-as3 down
+
+$ ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols
+BIRD 2.16.1 ready.
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     15:19:53.947
+direct_loopbacks Direct     ---        up     15:19:53.947
+kernel_ipv4 Kernel     master4    up     15:19:53.947
+to_as2     BGP        ---        up     15:19:57.865  Established
+to_as4     BGP        ---        up     15:19:58.192  Established
+
+$ ip -n pocket-as1 route get 172.20.3.1
+RTNETLINK answers: Network is unreachable
+
+$ ip netns exec pocket-as1 ping -c 1 -W 1 -I 172.20.1.1 172.20.3.1
+PING 172.20.3.1 (172.20.3.1) from 172.20.1.1 : 56(84) bytes of data.
+
+--- 172.20.3.1 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+
+## Restore AS3 links and observe convergence
+
+$ ip -n pocket-as2 link set as2-as3 up
+
+$ ip -n pocket-as4 link set as4-as3 up
+
+$ ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.3.1/32 all
+BIRD 2.16.1 ready.
+Table master4:
+172.20.3.1/32        unicast [to_as2 15:20:57.327] * (100) [AS4242420003i]
+	via 10.42.12.2 on as1-as2
+	Type: BGP univ
+	BGP.origin: IGP
+	BGP.as_path: 4242420002 4242420003
+	BGP.next_hop: 10.42.12.2
+	BGP.local_pref: 100
+                     unicast [to_as4 15:20:54.283] (100) [AS4242420003i]
+	via 10.42.41.1 on as1-as4
+	Type: BGP univ
+	BGP.origin: IGP
+	BGP.as_path: 4242420004 4242420003
+	BGP.next_hop: 10.42.41.1
+	BGP.local_pref: 100
+
+$ ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
+172.20.3.1 from 172.20.1.1 via 10.42.12.2 dev as1-as2 uid 0
+    cache
+
+$ ip netns exec pocket-as1 ping -c 2 -W 1 -I 172.20.1.1 172.20.3.1
+PING 172.20.3.1 (172.20.3.1) from 172.20.1.1 : 56(84) bytes of data.
+64 bytes from 172.20.3.1: icmp_seq=1 ttl=63 time=0.038 ms
+64 bytes from 172.20.3.1: icmp_seq=2 ttl=63 time=0.037 ms
+
+--- 172.20.3.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1006ms
+rtt min/avg/max/mdev = 0.037/0.037/0.038/0.000 ms
+
+## Rollback
+
+$ ip netns delete pocket-as1
+
+$ ip netns delete pocket-as2
+
+$ ip netns delete pocket-as3
+
+$ ip netns delete pocket-as4
+
+$ rm -rf /tmp/pocket-internet-bgp
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(pocket-as1\|pocket-as2\|pocket-as3\|pocket-as4\)\(\ \|\$\)\'\ \|\|\ true
+
+## Result
+Lab complete. Temporary namespaces and BIRD state removed.
+Transcript saved to: /Users/kernel/Documents/Networking by Experimenting with DN42/experiments/transcripts/pocket-internet-bgp-20260617T191953Z.txt
