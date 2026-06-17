@@ -4,9 +4,9 @@
 
 This chapter assumes you have completed Pocket Internet with Static Routes. You should know what a namespace, interface, address, prefix, connected route, next hop, route lookup, service loopback, and static route are.
 
-You have also seen longest-prefix match in a small isolated lab. This chapter puts that idea back into the Pocket Internet model.
+You have already seen longest-prefix match in a small isolated lab. That earlier lab was a microscope: one namespace, fake exits, and no packet delivery. This chapter puts the same rule into a Pocket Internet router role.
 
-The previous Pocket Internet lab mostly used exact service routes. Real route tables often contain broader routes and more-specific exceptions at the same time. This chapter is the bridge between "I can write a route by hand" and "I can predict which route a router will actually use."
+The previous Pocket Internet lab mostly used exact service routes. Real route tables often contain broader routes and more-specific exceptions at the same time. This chapter is the bridge between "I can write a route by hand" and "I can predict which exit a router will actually use."
 
 The goal is to answer one question:
 
@@ -19,6 +19,20 @@ The goal is to answer one question:
 | Edge router | A router at the edge of a network, where traffic leaves toward another network. | `pocket-rs-edge` |
 | Exit | The interface and next hop a route points toward. | `via 10.52.1.2 dev edge-service0` |
 | Fallback route | A broader route that is used only when no more-specific route matches. | `172.20.0.0/16` after a `/24` is removed |
+
+## What This Chapter Adds
+
+Chapter 2 taught the lookup rule in isolation. This chapter uses that rule to answer a router question:
+
+> If several routes match, which exit does this Pocket Internet router choose?
+
+That adds three practical details:
+
+- the winning route points traffic toward a specific exit,
+- the next hop for that exit must be reachable through a connected route,
+- removing one route can move traffic to a different exit without changing the destination.
+
+Those details are what make route selection matter when Pocket Internet grows beyond one lab namespace.
 
 ## Mental Model
 
@@ -44,7 +58,7 @@ Read those as:
 - anything in `172.20.3.0/24` has a more specific service-side exit,
 - exactly `172.20.3.42` has the most specific instruction.
 
-The destination `172.20.3.42` matches all three routes. Linux chooses the most specific matching route.
+The destination `172.20.3.42` matches all three routes. You already know the most specific route wins. The new question is what that means for the router: the packet would leave through `edge-host0`, not through the broader service or transit exits.
 
 ## Why It Matters
 
@@ -54,7 +68,7 @@ The kernel still asks:
 
 > Which route is the best match for this destination?
 
-If you can predict that decision from `ip route`, dynamic routing becomes much less mysterious.
+If you can predict that decision from `ip route`, dynamic routing becomes much less mysterious. BGP will change how routes arrive in the table. It will not change the basic habit of checking which installed route the kernel will use.
 
 ## Safety Boundaries
 
@@ -204,7 +218,7 @@ This matters because a route with `via 10.52.0.2 dev edge-transit0` depends on `
 
 ## Step 5: Bring Interfaces Up
 
-Bring up loopback and both exits:
+Bring up loopback and all three exits:
 
 ```sh
 ip -n pocket-rs-edge link set lo up
@@ -275,23 +289,31 @@ The exact host route may display as `172.20.3.42` instead of `172.20.3.42/32`. I
 
 ## Predict Before Revealing
 
-Keep the route table visible while you answer these.
+This is not another prefix-matching quiz. Chapter 2 already taught that.
 
-For each destination, choose the route you expect Linux to use:
+This time, keep the route table visible and focus on the router job:
 
-| Destination | Matching routes | Predicted winner |
+- Which exit would the packet use?
+- Which next hop would the packet be sent toward?
+- Is that next hop reachable through the exit's connected route?
+
+For each destination, predict the selected exit:
+
+| Destination | Predicted exit | Predicted next hop |
 | --- | --- | --- |
-| `172.20.3.42` | `/16`, `/24`, `/32` | ? |
-| `172.20.3.99` | `/16`, `/24` | ? |
-| `172.20.9.9` | `/16` | ? |
+| `172.20.3.42` | ? | ? |
+| `172.20.3.99` | ? | ? |
+| `172.20.9.9` | ? | ? |
 
-??? question "Reveal the expected winners"
+??? question "Reveal the expected exits"
 
-    | Destination | Winner | Why |
-    | --- | --- | --- |
-    | `172.20.3.42` | `172.20.3.42/32` | `/32` is the most specific match. |
-    | `172.20.3.99` | `172.20.3.0/24` | It matches `/24` and `/16`; `/24` is more specific. |
-    | `172.20.9.9` | `172.20.0.0/16` | It matches only the broad `/16`. |
+    | Destination | Selected exit | Selected next hop | Why this matters |
+    | --- | --- | --- | --- |
+    | `172.20.3.42` | `edge-host0` | `10.52.2.2` | The exact service route sends this one destination to the host exit. |
+    | `172.20.3.99` | `edge-service0` | `10.52.1.2` | The service route sends the rest of `172.20.3.0/24` to the service exit. |
+    | `172.20.9.9` | `edge-transit0` | `10.52.0.2` | The broad route sends other `172.20.0.0/16` traffic to transit. |
+
+The route prefix decides the exit, but the exit is the operational thing you care about. In a real router, changing the selected exit changes where traffic leaves the network.
 
 ## Step 7: Ask Linux Which Route Wins
 
@@ -318,6 +340,16 @@ The first two destinations leave through different exits:
 
 The third destination leaves through `edge-transit0` because only the broad `/16` route matches.
 
+Now check the next-hop side of the decision:
+
+| Exit | Selected next hop | Connected route that makes it valid |
+| --- | --- | --- |
+| `edge-host0` | `10.52.2.2` | `10.52.2.0/30 dev edge-host0` |
+| `edge-service0` | `10.52.1.2` | `10.52.1.0/30 dev edge-service0` |
+| `edge-transit0` | `10.52.0.2` | `10.52.0.0/30 dev edge-transit0` |
+
+That is the router-role lesson: a selected route is not just a matching prefix. It is an exit plus a next hop that Linux believes is on that exit's local link.
+
 ## Step 8: Remove the Exact Host Route
 
 Delete the `/32` route:
@@ -338,9 +370,9 @@ Expected output:
 172.20.3.42 via 10.52.1.2 dev edge-service0 src 10.52.1.1 uid 0
 ```
 
-The output still points at `edge-service0`, but the reason changed. The exact host route is gone, so Linux falls back to the `172.20.3.0/24` route.
+The destination stayed the same, but the selected exit changed from `edge-host0` to `edge-service0`. The exact host route is gone, so Linux falls back to the `172.20.3.0/24` route.
 
-This is route fallback: removing a more-specific match reveals the next-best broader match.
+This is route fallback from a router's point of view: removing one route can move traffic to a different exit.
 
 ## Step 9: Remove the Service Route
 
@@ -362,7 +394,9 @@ Expected output:
 172.20.3.42 via 10.52.0.2 dev edge-transit0 src 10.52.0.1 uid 0
 ```
 
-Now only the broad `172.20.0.0/16` route matches, so the packet would leave through `edge-transit0`.
+Now only the broad `172.20.0.0/16` route matches, so the selected exit changes again. The packet would leave through `edge-transit0`.
+
+This is the behavior BGP will make dynamic later. A route can appear, disappear, or be replaced. When that happens, Linux does another lookup against the installed route table and the selected exit may change.
 
 ## Step 10: Roll Back
 
@@ -398,11 +432,10 @@ orb bash experiments/labs/pocket-internet-route-selection/run.sh
 
 ## What You Learned
 
-- A route table can contain overlapping routes.
-- Linux chooses the most specific matching route.
-- `ip route get` shows the route Linux would actually use.
-- A route's next hop must be reachable through a connected route.
-- Removing a more-specific route can make traffic fall back to a broader route.
+- Inside a Pocket Internet edge router, the selected route decides the selected exit.
+- A route's next hop must be reachable through a connected route before Linux will accept it.
+- Removing a more-specific route can move traffic to a broader fallback exit.
+- `ip route get` shows the route and exit Linux would actually use.
 
 ## Before You Continue
 
@@ -430,3 +463,5 @@ Next we need:
 DN42 routers receive many prefixes from peers. Some routes are broad, some are specific, and some may disappear when a peer withdraws them.
 
 BIRD and BGP will decide which routes to install, but the Linux kernel still performs route lookup. The packet leaves through the route that best matches its destination in the installed route table.
+
+That is the handoff to BGP: the next step is not a new forwarding rule. The next step is learning how route entries can be exchanged, selected, installed, and withdrawn automatically.

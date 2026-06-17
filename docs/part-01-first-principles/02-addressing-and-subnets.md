@@ -6,6 +6,8 @@ This chapter assumes you have completed Linux as a Router. You should know what 
 
 The previous lab showed that packets only move when route tables say where they should go. This chapter slows down on one part of that idea: how Linux chooses a route when several route entries could match the same destination.
 
+Treat this chapter like a microscope. The lab is intentionally small and artificial so only one thing is changing: the specificity of the destination prefix. You will not prove packet delivery here. You will learn the route-lookup rule that later Pocket Internet routers will use.
+
 You do not need to know binary subnet math yet. This chapter uses route lookups to build the idea from observable behavior first.
 
 The goal is to answer one question:
@@ -147,7 +149,17 @@ addrmatch
 
 Inside it, you will create three dummy interfaces. A dummy interface is a local-only interface that is useful for route lookup experiments because no real packet needs to leave the machine.
 
-This lab tests route selection, not packet delivery. The next-hop addresses are placeholders inside each connected `/30`. We are asking Linux which route it would choose; we are not proving that a packet reaches a real neighbor. The next Pocket Internet lab uses real veth peers, so delivery and replies become visible there.
+This lab tests route selection, not packet delivery. The next-hop addresses are placeholders inside each connected `/30`. We are asking Linux which route it would choose; we are not proving that a packet reaches a real neighbor.
+
+That is the boundary of this chapter:
+
+- one namespace,
+- fake local exits,
+- no neighbor namespaces,
+- no ping test,
+- no return path.
+
+The next Pocket Internet lab uses real veth peers, so delivery and replies become visible there. The Pocket Internet route-selection lab later reuses this same lookup rule inside a router role, where each winning route points toward a different exit.
 
 | Interface | Connected prefix | Meaning in this lab |
 | --- | --- | --- |
@@ -522,6 +534,13 @@ Traffic to `172.20.3.1` follows the `/32` service route because it is more speci
 
 Specific service routes override broader reachability. That is the route-selection habit this chapter is building before the topology gets larger.
 
+You will see the same idea again in two different roles:
+
+| Later chapter | What changes |
+| --- | --- |
+| Pocket Internet with Static Routes | Route tables carry real traffic between namespaces, so request and reply paths matter. |
+| Pocket Internet Route Selection | The same lookup rule is placed inside an edge router with different exits, so the selected route changes where traffic would leave the network. |
+
 ## Verify Before Proceeding
 
 - [ ] You can explain the difference between one address and a prefix.
@@ -549,7 +568,8 @@ Next we need:
 
 - to use these ideas in Pocket Internet,
 - to make service loopbacks reachable across multiple namespaces,
-- to feel why writing routes by hand gets tiring.
+- to feel why writing routes by hand gets tiring,
+- to come back to route selection later inside a Pocket Internet edge router.
 
 ## References
 
