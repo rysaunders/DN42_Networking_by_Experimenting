@@ -228,6 +228,23 @@ issues:
       - Keep both labs if they serve distinct learning jobs; merge or shorten if review shows they feel redundant.
       - Beginner review specifically evaluates whether the two chapters feel complementary rather than repetitive.
 
+  - title: "Add human narration around intentional lab friction"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Add a restrained human voice where the labs are intentionally tedious, starting with Pocket Internet static routing.
+
+      Why:
+      Some friction is the curriculum. Static routing should feel annoying before BGP appears: the reader has to write forward paths, return paths, and repairs by hand. That feeling sets up why dynamic routing exists. The book should name that without becoming jokey or distracting.
+
+      Acceptance criteria:
+      - Add one or two short human notes to the static routing chapter where the tedium is educational.
+      - Explicitly connect manual route maintenance to why BGP will feel useful later.
+      - Keep the tone plainspoken and direct; avoid cute, performative, or clearly AI-sounding phrasing.
+      - Update authoring guidance so future intentionally tedious labs name the pain and explain the concept or tool that will relieve it.
+      - Apply this guidance sparingly: no more than a couple of asides per chapter unless the chapter genuinely needs more.
+      - Beginner review checks whether the voice improves motivation without distracting from the commands.
+
   - title: "Replace one Pocket Internet link with WireGuard"
     labels: ["experiment", "needs-lab-test", "v0.1"]
     milestone: "v0.1"

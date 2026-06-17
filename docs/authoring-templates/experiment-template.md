@@ -56,6 +56,13 @@ List the specific command outputs or state transitions expected.
 
 For every important output, explain why it happened.
 
+If the experiment is intentionally repetitive or annoying, name that friction in plain language. The point is not to entertain the reader; the point is to make the learning arc visible. Say what the manual work teaches, and name the later tool or concept that will reduce the pain.
+
+Examples:
+
+- Writing both forward and return routes by hand is tedious. That is the pressure that makes dynamic routing useful.
+- Checking every filter by hand is slow. That is why later safety patterns need to be explicit and reusable.
+
 ## What Changed
 
 Explain the before/after state in the kernel, daemon, registry, or service being tested.

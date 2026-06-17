@@ -26,6 +26,13 @@ Update `docs/reader-knowledge.md` for every term this chapter teaches for the fi
 
 Explain what breaks if the reader does not understand this.
 
+When the chapter is intentionally tedious, say so directly. Name the friction in plain language, then explain which later concept or tool the friction prepares the reader to appreciate. Keep this restrained: one or two short notes are usually enough.
+
+Examples:
+
+- Static routes are annoying to maintain by hand. That is why BGP will feel useful later.
+- Manual tunnel setup exposes the moving parts. Reusable configuration comes after the reader has seen those parts.
+
 ## Mental Model
 
 Describe the smallest useful model the reader should hold in their head.
