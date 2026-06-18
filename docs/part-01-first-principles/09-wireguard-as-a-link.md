@@ -22,7 +22,7 @@ That is deliberate. Before asking a routing daemon to use a WireGuard link, you 
 | Term | Plain-language meaning | Example in this lab |
 | --- | --- | --- |
 | WireGuard | A VPN protocol that creates encrypted tunnel interfaces. | The `wg23` interface inside each namespace |
-| Private key | A secret WireGuard key that stays local. | `/tmp/pocket-internet-wireguard-link/as2.key` |
+| Private key | A secret WireGuard key that stays local. | `/tmp/wireguard-point-to-point/as2.key` |
 | Public key | The key you give to the peer. | `as2.pub` |
 | Endpoint | The underlay IP and UDP port where a peer receives WireGuard packets. | `192.0.2.2:51824` |
 | Handshake | Evidence that the WireGuard peers exchanged setup traffic. | `latest handshake` in `wg show` |
@@ -73,8 +73,8 @@ Safety level: WireGuard lab.
 - The lab does not use `wg-quick`.
 - The lab does not add host default routes.
 - The lab does not touch public DN42 peers.
-- Rollback deletes the namespaces and removes generated keys with `/tmp/pocket-internet-wireguard-link`.
-- Cleanup also deletes possible `pocket-as1` and `pocket-as4` leftovers from earlier four-AS labs. This chapter itself creates only `pocket-as2` and `pocket-as3`.
+- Rollback deletes the namespaces and removes generated keys with `/tmp/wireguard-point-to-point`.
+- This chapter creates and deletes only `pocket-as2` and `pocket-as3`.
 
 Before the lab, capture the host baseline:
 
@@ -104,23 +104,19 @@ Expected observations:
 
 ## Lab Continuity Note
 
-This chapter is a manual-first version of the first half of the WireGuard experiment.
-
-There is not yet a standalone two-namespace validation transcript for this smaller lab. The repeatable validation script currently builds the full BGP-over-WireGuard topology used by the next chapter:
+This chapter is a manual-first WireGuard mechanics lab. The repeatable validation script builds only this two-namespace point-to-point link:
 
 ```text
-experiments/labs/pocket-internet-wireguard-link/run.sh
+experiments/labs/wireguard-point-to-point/run.sh
 ```
 
-The validated transcript for the full experiment is:
+The validated transcript for this experiment is:
 
 ```text
-experiments/transcripts/pocket-internet-wireguard-link-20260618T112938Z.txt
+experiments/transcripts/wireguard-point-to-point-20260618T213251Z.txt
 ```
 
-Read that transcript as evidence for the complete chapter-9-plus-chapter-10 path, not as an exact transcript for this chapter alone. The transcript uses four namespaces, BIRD, and broader `AllowedIPs` because it validates the full BGP-over-WireGuard lab.
-
-This chapter intentionally stops earlier so the WireGuard mechanics are not buried under BIRD configuration.
+This chapter intentionally stops before BIRD and BGP so the WireGuard mechanics are not buried under routing-daemon configuration.
 
 ## What You Will Build
 
@@ -140,20 +136,18 @@ The link has two layers:
 
 ## Step 1: Clean Up Any Old Lab State
 
-Delete old namespaces and temporary files:
+Delete old namespaces and temporary files for this lab:
 
 ```sh
-ip netns delete pocket-as1 2>/dev/null || true
 ip netns delete pocket-as2 2>/dev/null || true
 ip netns delete pocket-as3 2>/dev/null || true
-ip netns delete pocket-as4 2>/dev/null || true
-rm -rf /tmp/pocket-internet-wireguard-link
+rm -rf /tmp/wireguard-point-to-point
 ```
 
 Confirm cleanup:
 
 ```sh
-ip netns list | grep -E '^(pocket-as1|pocket-as2|pocket-as3|pocket-as4)( |$)' || true
+ip netns list | grep -E '^(pocket-as2|pocket-as3)( |$)' || true
 ```
 
 No output is the expected result.
@@ -163,7 +157,8 @@ No output is the expected result.
 Create a working directory and two namespaces:
 
 ```sh
-mkdir -p /tmp/pocket-internet-wireguard-link
+install -d -m 700 /tmp/wireguard-point-to-point
+stat -c "%a %n" /tmp/wireguard-point-to-point
 
 ip netns add pocket-as2
 ip netns add pocket-as3
@@ -222,18 +217,18 @@ If this fails, stop here. WireGuard has nowhere to send encrypted packets.
 Each side gets a private key and a public key:
 
 ```sh title="Generate WireGuard private and public keys from the root Linux shell"
-( umask 077; wg genkey > /tmp/pocket-internet-wireguard-link/as2.key )
-wg pubkey < /tmp/pocket-internet-wireguard-link/as2.key > /tmp/pocket-internet-wireguard-link/as2.pub
+( umask 077; wg genkey > /tmp/wireguard-point-to-point/as2.key )
+wg pubkey < /tmp/wireguard-point-to-point/as2.key > /tmp/wireguard-point-to-point/as2.pub
 
-( umask 077; wg genkey > /tmp/pocket-internet-wireguard-link/as3.key )
-wg pubkey < /tmp/pocket-internet-wireguard-link/as3.key > /tmp/pocket-internet-wireguard-link/as3.pub
+( umask 077; wg genkey > /tmp/wireguard-point-to-point/as3.key )
+wg pubkey < /tmp/wireguard-point-to-point/as3.key > /tmp/wireguard-point-to-point/as3.pub
 ```
 
 Print only public keys:
 
 ```sh
-cat /tmp/pocket-internet-wireguard-link/as2.pub
-cat /tmp/pocket-internet-wireguard-link/as3.pub
+cat /tmp/wireguard-point-to-point/as2.pub
+cat /tmp/wireguard-point-to-point/as3.pub
 ```
 
 Private keys stay local. Public keys are what peers exchange.
@@ -263,15 +258,15 @@ This reuses the familiar AS2-AS3 link prefix from earlier Pocket Internet labs. 
 Read the public keys into shell variables:
 
 ```sh title="Read WireGuard public keys into shell variables"
-AS2_PUB="$(cat /tmp/pocket-internet-wireguard-link/as2.pub)"
-AS3_PUB="$(cat /tmp/pocket-internet-wireguard-link/as3.pub)"
+AS2_PUB="$(cat /tmp/wireguard-point-to-point/as2.pub)"
+AS3_PUB="$(cat /tmp/wireguard-point-to-point/as3.pub)"
 ```
 
 Configure AS2:
 
 ```sh title="Configure the AS2 WireGuard peer"
 ip netns exec pocket-as2 wg set wg23 \
-  private-key /tmp/pocket-internet-wireguard-link/as2.key \
+  private-key /tmp/wireguard-point-to-point/as2.key \
   listen-port 51823 \
   peer "$AS3_PUB" \
   allowed-ips 10.42.23.2/32 \
@@ -282,7 +277,7 @@ Configure AS3:
 
 ```sh title="Configure the AS3 WireGuard peer"
 ip netns exec pocket-as3 wg set wg23 \
-  private-key /tmp/pocket-internet-wireguard-link/as3.key \
+  private-key /tmp/wireguard-point-to-point/as3.key \
   listen-port 51824 \
   peer "$AS2_PUB" \
   allowed-ips 10.42.23.1/32 \
@@ -418,17 +413,17 @@ Delete namespaces and generated files:
 ```sh
 ip netns delete pocket-as2 2>/dev/null || true
 ip netns delete pocket-as3 2>/dev/null || true
-rm -rf /tmp/pocket-internet-wireguard-link
+rm -rf /tmp/wireguard-point-to-point
 ```
 
 Prove cleanup worked:
 
 ```sh
-if ip netns list | grep -E '^(pocket-as1|pocket-as2|pocket-as3|pocket-as4)( |$)'; then
-  echo 'leftover Pocket Internet namespaces found'
+if ip netns list | grep -E '^(pocket-as2|pocket-as3)( |$)'; then
+  echo 'leftover WireGuard lab namespaces found'
   exit 1
 fi
-echo 'no Pocket Internet namespaces remain'
+echo 'no WireGuard lab namespaces remain'
 ```
 
 Confirm the public default path still uses the normal host route:

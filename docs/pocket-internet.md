@@ -85,7 +85,8 @@ This keeps the book from becoming a pile of unrelated recipes. Each chapter adds
 ## Validated Labs
 
 - [Pocket Internet with Static Routes](part-01-first-principles/03-pocket-internet-static-routing.md): four AS-shaped namespaces, service loopbacks, static routes, link failure, and manual route repair.
-- [Run BGP Over WireGuard](part-01-first-principles/10-bgp-over-wireguard.md): four AS-shaped namespaces, a local WireGuard AS2-AS3 link, BIRD/BGP over the overlay, and service-loopback traffic across the tunnel. The same transcript validates [Build and Verify a WireGuard Link](part-01-first-principles/09-wireguard-as-a-link.md) only as a subset; a standalone two-namespace transcript has not been added yet.
+- [Build and Verify a WireGuard Link](part-01-first-principles/09-wireguard-as-a-link.md): two AS-shaped namespaces, a local veth underlay, a WireGuard overlay link, route lookup checks, handshake inspection, and rollback.
+- [Run BGP Over WireGuard](part-01-first-principles/10-bgp-over-wireguard.md): four AS-shaped namespaces, a local WireGuard AS2-AS3 link, BIRD/BGP over the overlay, and service-loopback traffic across the tunnel.
 
 ## Interconnect
 
