@@ -5,6 +5,7 @@
 *[bind address]: The local address a service attaches to when it starts listening.
 *[BGP]: Border Gateway Protocol. Routers use BGP to exchange network reachability with other routers.
 *[BIRD]: A routing daemon that can learn, select, filter, and install routes.
+*[convergence]: The network settling on usable routes after a routing change or failure.
 *[connected route]: A route Linux creates automatically for a prefix assigned directly to an interface.
 *[default route]: The fallback route used when no more-specific route matches. In IPv4 it is also written as `0.0.0.0/0`.
 *[DN42]: A community overlay network used for learning and experimenting with routing, DNS, and network services.

@@ -19,6 +19,9 @@ BGP
 BIRD
 : A routing daemon commonly used in DN42 labs and deployments.
 
+Convergence
+: The network settling on usable routes after a routing change or failure.
+
 DN42
 : A community overlay network used for learning and experimenting with routing, DNS, and network services.
 
