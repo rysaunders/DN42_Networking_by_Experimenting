@@ -301,7 +301,7 @@ If this fails, WireGuard has nowhere to send encrypted packets.
 
 Each side gets a private key and a public key:
 
-```sh
+```sh title="Generate WireGuard private and public keys from the root Linux shell"
 ( umask 077; wg genkey > /tmp/pocket-internet-wireguard-link/as2.key )
 wg pubkey < /tmp/pocket-internet-wireguard-link/as2.key > /tmp/pocket-internet-wireguard-link/as2.pub
 
@@ -342,14 +342,14 @@ This reuses the familiar AS2-AS3 link prefix from the earlier labs. The differen
 
 Set shell variables for the public keys:
 
-```sh
+```sh title="Read WireGuard public keys into shell variables"
 AS2_PUB="$(cat /tmp/pocket-internet-wireguard-link/as2.pub)"
 AS3_PUB="$(cat /tmp/pocket-internet-wireguard-link/as3.pub)"
 ```
 
 Configure AS2:
 
-```sh
+```sh title="Configure the AS2 WireGuard peer"
 ip netns exec pocket-as2 wg set wg23 \
   private-key /tmp/pocket-internet-wireguard-link/as2.key \
   listen-port 51823 \
@@ -360,7 +360,7 @@ ip netns exec pocket-as2 wg set wg23 \
 
 Configure AS3:
 
-```sh
+```sh title="Configure the AS3 WireGuard peer"
 ip netns exec pocket-as3 wg set wg23 \
   private-key /tmp/pocket-internet-wireguard-link/as3.key \
   listen-port 51824 \
@@ -395,7 +395,7 @@ That statement is specific to this raw `wg set` lab. Later tools such as `wg-qui
 
 Compare the two route lookups from AS2:
 
-```sh
+```sh title="Compare AS2 underlay and overlay route lookups"
 ip -n pocket-as2 route get 192.0.2.2
 ip -n pocket-as2 route get 10.42.23.2
 ```
@@ -420,7 +420,7 @@ ip netns exec pocket-as2 ping -c 2 -W 1 10.42.23.2
 
 Then inspect WireGuard:
 
-```sh
+```sh title="Inspect WireGuard state inside pocket-as2"
 ip netns exec pocket-as2 wg show wg23
 ```
 
@@ -444,9 +444,31 @@ pocket-as2 -> pocket-as3
 
 The important point for this chapter is that BIRD does not need to know the link is encrypted. It sees a local interface and a neighbor address.
 
+Read the AS2-to-AS3 shape before writing the full configs:
+
+```text title="Read the BGP-over-WireGuard config shape"
+protocol bgp to_as3 {                 # (1)
+  local as 4242420002;                # (2)
+  neighbor 10.42.23.2 as 4242420003;  # (3)
+  source address 10.42.23.1;          # (4)
+  check link yes;
+  ipv4 {
+    import filter pocket_import;      # (5)
+    export filter pocket_export;      # (6)
+  };
+}
+```
+
+1. This is AS2's BGP session toward AS3.
+2. AS2 uses its own local AS number.
+3. AS3's neighbor address is the overlay address on AS3's `wg23`.
+4. AS2's source address is the overlay address on AS2's `wg23`.
+5. Import policy still controls which routes AS2 accepts.
+6. Export policy still controls which routes AS2 announces.
+
 Write the AS1 config:
 
-```sh
+```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as1.conf"
 cat >/tmp/pocket-internet-wireguard-link/pocket-as1.conf <<'EOF'
 log stderr all;
 router id 172.20.1.1;
@@ -510,7 +532,7 @@ EOF
 
 Write the AS2 config:
 
-```sh
+```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as2.conf"
 cat >/tmp/pocket-internet-wireguard-link/pocket-as2.conf <<'EOF'
 log stderr all;
 router id 172.20.2.1;
@@ -576,7 +598,7 @@ The `to_as3` neighbor is the important change. AS2 peers with AS3 at `10.42.23.2
 
 Write the AS3 config:
 
-```sh
+```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as3.conf"
 cat >/tmp/pocket-internet-wireguard-link/pocket-as3.conf <<'EOF'
 log stderr all;
 router id 172.20.3.1;
@@ -642,7 +664,7 @@ AS3's `to_as2` block is the matching half of the WireGuard BGP session.
 
 Write the AS4 config:
 
-```sh
+```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as4.conf"
 cat >/tmp/pocket-internet-wireguard-link/pocket-as4.conf <<'EOF'
 log stderr all;
 router id 172.20.4.1;
@@ -706,7 +728,7 @@ EOF
 
 Validate the configs before starting BIRD:
 
-```sh
+```sh title="Validate BIRD configs from the root Linux shell"
 bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as1.conf
 bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as2.conf
 bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as3.conf
@@ -715,7 +737,7 @@ bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as4.conf
 
 Start BIRD in each namespace:
 
-```sh
+```sh title="Start BIRD in all four namespaces"
 ip netns exec pocket-as1 bird \
   -c /tmp/pocket-internet-wireguard-link/pocket-as1.conf \
   -s /tmp/pocket-internet-wireguard-link/pocket-as1.ctl \
@@ -739,7 +761,7 @@ ip netns exec pocket-as4 bird \
 
 After BIRD starts, verify the AS2-AS3 BGP session:
 
-```sh
+```sh title="Inspect BGP protocols across the WireGuard link"
 ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-wireguard-link/pocket-as2.ctl show protocols
 ip netns exec pocket-as3 birdc -s /tmp/pocket-internet-wireguard-link/pocket-as3.ctl show protocols
 ```
@@ -757,13 +779,13 @@ If those sessions establish, BGP is running over WireGuard.
 
 From AS1, ask how to reach AS3's service loopback:
 
-```sh
+```sh title="Check service-loopback route from pocket-as1"
 ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
 ```
 
 At AS2, the path should cross `wg23`:
 
-```sh
+```sh title="Check that AS2 crosses wg23 toward AS3"
 ip -n pocket-as2 route get 172.20.3.1 from 172.20.2.1
 ```
 
@@ -775,7 +797,7 @@ via 10.42.23.2 dev wg23
 
 Check the return path from AS3:
 
-```sh
+```sh title="Check the return path from pocket-as3"
 ip -n pocket-as3 route get 172.20.1.1 from 172.20.3.1
 ```
 
@@ -795,7 +817,7 @@ ip netns exec pocket-as1 ping -c 2 -W 1 -I 172.20.1.1 172.20.3.1
 
 Finally, inspect WireGuard counters again:
 
-```sh
+```sh title="Inspect WireGuard state inside pocket-as2"
 ip netns exec pocket-as2 wg show wg23
 ```
 
@@ -825,7 +847,7 @@ Check:
 
 Use:
 
-```sh
+```sh title="Inspect WireGuard state on both tunnel endpoints"
 ip netns exec pocket-as2 wg show wg23
 ip netns exec pocket-as3 wg show wg23
 ```
@@ -841,7 +863,7 @@ ip netns exec pocket-as3 ping -c 1 -W 1 10.42.23.1
 
 If overlay ping works, inspect BIRD:
 
-```sh
+```sh title="Inspect the detailed AS2 to AS3 BGP session"
 ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-wireguard-link/pocket-as2.ctl show protocols all to_as3
 ```
 

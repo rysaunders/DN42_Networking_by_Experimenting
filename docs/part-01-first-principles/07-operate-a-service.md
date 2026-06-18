@@ -98,7 +98,7 @@ If you already have the BGP lab running, you can continue from it. The checkpoin
 
 You should be able to run:
 
-```sh
+```sh title="Verify the BGP checkpoint from the root Linux shell"
 ip -n pocket-as1 route show 172.20.3.1
 ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
 ```
@@ -144,7 +144,7 @@ If `pocket-as1` can fetch that line from `172.20.3.1:8080`, Pocket Internet is c
 
 Create a temporary directory and one file:
 
-```sh
+```sh title="Create service content from the root Linux shell"
 mkdir -p /tmp/pocket-internet-service/www
 printf 'hello from pocket-as3 service loopback\n' > /tmp/pocket-internet-service/www/index.html
 cat /tmp/pocket-internet-service/www/index.html
@@ -162,7 +162,7 @@ This file lives in the Linux lab environment, not inside a namespace by itself. 
 
 From the BGP chapter, `pocket-as1` should already have a BGP-learned route:
 
-```sh
+```sh title="Check the client route before starting a service"
 ip -n pocket-as1 route show 172.20.3.1
 ```
 
@@ -174,13 +174,13 @@ Expected output looks like:
 
 Ask Linux how a packet would leave:
 
-```sh
+```sh title="Check how pocket-as1 would reach the service loopback"
 ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
 ```
 
 Now try HTTP before a service exists:
 
-```sh
+```sh title="Try HTTP from pocket-as1 before a listener exists"
 ip netns exec pocket-as1 curl \
   --connect-timeout 2 \
   --max-time 4 \
@@ -197,7 +197,7 @@ That failure is useful. The route can exist while the service does not. Routing 
 
 Start the HTTP service inside `pocket-as3`, but bind it to `127.0.0.1`:
 
-```sh
+```sh title="Start a deliberately wrong listener inside pocket-as3"
 ip netns exec pocket-as3 python3 -m http.server 8080 \
   --bind 127.0.0.1 \
   --directory /tmp/pocket-internet-service/www \
@@ -210,7 +210,7 @@ That starts the service in the background and saves its process ID. The log goes
 
 Inspect the listener:
 
-```sh
+```sh title="Inspect listeners inside pocket-as3"
 ip netns exec pocket-as3 ss -ltnp 'sport = :8080'
 ```
 
@@ -226,7 +226,7 @@ LISTEN ... 127.0.0.1:8080 ...
 
 Now test from inside `pocket-as3`:
 
-```sh
+```sh title="Fetch the wrong listener locally inside pocket-as3"
 ip netns exec pocket-as3 curl --connect-timeout 2 --max-time 4 --fail http://127.0.0.1:8080/
 ```
 
@@ -240,7 +240,7 @@ The service is alive. But it is alive only on `127.0.0.1` inside `pocket-as3`.
 
 Try from `pocket-as1`:
 
-```sh
+```sh title="Try HTTP from pocket-as1 while the listener is bound to the wrong address"
 ip netns exec pocket-as1 curl \
   --connect-timeout 2 \
   --max-time 4 \
@@ -261,13 +261,13 @@ This is a common real-world shape. "The service is running" is not the same as "
 
 Inspect the service log if you want to see the local request:
 
-```sh
+```sh title="Inspect the HTTP service log"
 cat /tmp/pocket-internet-service/service.log
 ```
 
 Stop the wrong listener before continuing:
 
-```sh
+```sh title="Stop the current HTTP listener"
 ip netns exec pocket-as3 kill "$(cat /tmp/pocket-internet-service/service.pid)"
 rm -f /tmp/pocket-internet-service/service.pid
 ```
@@ -276,7 +276,7 @@ rm -f /tmp/pocket-internet-service/service.pid
 
 Start the HTTP service again, this time bound to `172.20.3.1`:
 
-```sh
+```sh title="Start the service listener on pocket-as3 service loopback"
 ip netns exec pocket-as3 python3 -m http.server 8080 \
   --bind 172.20.3.1 \
   --directory /tmp/pocket-internet-service/www \
@@ -289,7 +289,7 @@ As before, the service is running in the background while you test it.
 
 Inspect the listener:
 
-```sh
+```sh title="Inspect listeners inside pocket-as3"
 ip netns exec pocket-as3 ss -ltnp 'sport = :8080'
 ```
 
@@ -301,7 +301,7 @@ LISTEN ... 172.20.3.1:8080 ...
 
 Now fetch the service from `pocket-as1`:
 
-```sh
+```sh title="Fetch the service from pocket-as1"
 ip netns exec pocket-as1 curl \
   --connect-timeout 2 \
   --max-time 4 \
@@ -322,13 +322,13 @@ The `--interface 172.20.1.1` option tells `curl` to use `pocket-as1`'s service l
 
 Forward path from client to service:
 
-```sh
+```sh title="Check how pocket-as1 would reach the service loopback"
 ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
 ```
 
 Return path from service back to client:
 
-```sh
+```sh title="Check the service return path from pocket-as3"
 ip -n pocket-as3 route get 172.20.1.1 from 172.20.3.1
 ```
 
@@ -338,7 +338,7 @@ The HTTP response is the application proof.
 
 Inspect the service log:
 
-```sh
+```sh title="Inspect the HTTP service log"
 cat /tmp/pocket-internet-service/service.log
 ```
 
@@ -356,7 +356,7 @@ That line matters. It says the service saw the request as coming from `172.20.1.
 
 Check whether anything is listening:
 
-```sh
+```sh title="Inspect listeners inside pocket-as3"
 ip netns exec pocket-as3 ss -ltnp 'sport = :8080'
 ```
 
@@ -384,7 +384,7 @@ For this lab, it should say:
 
 Check the return path:
 
-```sh
+```sh title="Check the service return path from pocket-as3"
 ip -n pocket-as3 route get 172.20.1.1 from 172.20.3.1
 ```
 
@@ -394,7 +394,7 @@ Packets need a way back. A forward route alone is not a working service path.
 
 Stop the HTTP service if it is still running:
 
-```sh
+```sh title="Stop the HTTP service during rollback"
 if [ -f /tmp/pocket-internet-service/service.pid ]; then
   ip netns exec pocket-as3 kill "$(cat /tmp/pocket-internet-service/service.pid)" 2>/dev/null || true
   rm -f /tmp/pocket-internet-service/service.pid

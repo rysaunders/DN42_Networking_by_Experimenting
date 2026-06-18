@@ -304,6 +304,50 @@ Read the main blocks before typing it:
 - `pocket_export` rejects unexpected announced prefixes.
 - each `protocol bgp` block defines one neighbor session.
 
+Here is the shape with the important lines called out:
+
+```text title="Read the BIRD config shape"
+router id 172.20.1.1;                 # (1)
+
+protocol direct direct_loopbacks {    # (2)
+  ipv4;
+  interface "lo";
+}
+
+protocol kernel kernel_ipv4 {         # (3)
+  ipv4 {
+    import none;
+    export all;
+  };
+}
+
+filter pocket_import {                # (4)
+  if net = 172.20.3.1/32 then accept;
+  reject;
+}
+
+filter pocket_export {                # (5)
+  if net = 172.20.1.1/32 then accept;
+  reject;
+}
+
+protocol bgp to_as2 {                 # (6)
+  local as 4242420001;                # (7)
+  neighbor 10.42.12.2 as 4242420002;  # (8)
+  source address 10.42.12.1;          # (9)
+}
+```
+
+1. `router id` is BIRD's stable ID for this router.
+2. `protocol direct` learns the service loopback from `lo`.
+3. `protocol kernel` writes selected BIRD routes into Linux.
+4. `pocket_import` decides which received prefixes are accepted.
+5. `pocket_export` decides which local prefixes are announced.
+6. Each `protocol bgp` block is one neighbor session.
+7. `local as` is this namespace's AS number.
+8. `neighbor` names the peer address and peer AS number.
+9. `source address` is the local address BIRD uses for that session.
+
 One word needs care here: **export**.
 
 BIRD uses export in more than one direction:
@@ -315,7 +359,7 @@ The BGP export filter below is narrow: it allows only the four service loopbacks
 
 Write the config:
 
-```sh
+```sh title="Write /tmp/pocket-internet-bgp/pocket-as1.conf"
 cat >/tmp/pocket-internet-bgp/pocket-as1.conf <<'EOF'
 log stderr all;
 router id 172.20.1.1;
@@ -383,7 +427,7 @@ The important mental shift is that the export filter is not "send everything I k
 
 `pocket-as2`:
 
-```sh
+```sh title="Write /tmp/pocket-internet-bgp/pocket-as2.conf"
 cat >/tmp/pocket-internet-bgp/pocket-as2.conf <<'EOF'
 log stderr all;
 router id 172.20.2.1;
@@ -445,7 +489,7 @@ EOF
 
 `pocket-as3`:
 
-```sh
+```sh title="Write /tmp/pocket-internet-bgp/pocket-as3.conf"
 cat >/tmp/pocket-internet-bgp/pocket-as3.conf <<'EOF'
 log stderr all;
 router id 172.20.3.1;
@@ -507,7 +551,7 @@ EOF
 
 `pocket-as4`:
 
-```sh
+```sh title="Write /tmp/pocket-internet-bgp/pocket-as4.conf"
 cat >/tmp/pocket-internet-bgp/pocket-as4.conf <<'EOF'
 log stderr all;
 router id 172.20.4.1;
@@ -581,7 +625,7 @@ Those five values are the heart of a first BGP session.
 
 Before starting BIRD, ask BIRD to parse each config:
 
-```sh
+```sh title="Validate BIRD configs from the root Linux shell"
 bird -p -c /tmp/pocket-internet-bgp/pocket-as1.conf
 bird -p -c /tmp/pocket-internet-bgp/pocket-as2.conf
 bird -p -c /tmp/pocket-internet-bgp/pocket-as3.conf
@@ -596,7 +640,7 @@ This catches a large class of mistakes before any route can be installed.
 
 Start BIRD in `pocket-as1`:
 
-```sh
+```sh title="Start BIRD inside pocket-as1"
 ip netns exec pocket-as1 bird \
   -c /tmp/pocket-internet-bgp/pocket-as1.conf \
   -s /tmp/pocket-internet-bgp/pocket-as1.ctl \
@@ -605,7 +649,7 @@ ip netns exec pocket-as1 bird \
 
 Start the other three:
 
-```sh
+```sh title="Start BIRD inside pocket-as2, pocket-as3, and pocket-as4"
 ip netns exec pocket-as2 bird \
   -c /tmp/pocket-internet-bgp/pocket-as2.conf \
   -s /tmp/pocket-internet-bgp/pocket-as2.ctl \
@@ -628,7 +672,7 @@ The `-s` option gives each namespace a separate control socket. That lets `birdc
 
 Ask `pocket-as1` what its protocols are doing:
 
-```sh
+```sh title="Watch route withdrawal from pocket-as1"
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols
 ```
 
@@ -647,7 +691,7 @@ The names and timestamps may differ. The important word is `Established`.
 
 Check the other namespaces:
 
-```sh
+```sh title="Watch BGP recover after restoring AS3 links"
 ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-bgp/pocket-as2.ctl show protocols
 ip netns exec pocket-as3 birdc -s /tmp/pocket-internet-bgp/pocket-as3.ctl show protocols
 ip netns exec pocket-as4 birdc -s /tmp/pocket-internet-bgp/pocket-as4.ctl show protocols
@@ -659,7 +703,7 @@ If a session is not established yet, wait a few seconds and run the command agai
 
 Ask `pocket-as1` what BIRD knows about `pocket-as3`'s service loopback:
 
-```sh
+```sh title="Inspect the selected BGP route inside pocket-as1"
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.3.1/32 all
 ```
 
@@ -694,7 +738,7 @@ This is the control-plane view. It answers:
 
 Now ask Linux:
 
-```sh
+```sh title="Compare BIRD route export with Linux route lookup"
 ip -n pocket-as1 route show 172.20.3.1
 ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
 ```
@@ -732,7 +776,7 @@ ip -n pocket-as4 link set as4-as3 down
 
 That isolates `pocket-as3` from the rest of Pocket Internet. Watch `pocket-as1` again:
 
-```sh
+```sh title="Inspect BGP protocols inside pocket-as1"
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.3.1/32 all
 ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
@@ -753,7 +797,7 @@ ip -n pocket-as4 link set as4-as3 up
 
 Wait a few seconds, then check again:
 
-```sh
+```sh title="Inspect BGP protocols inside the remaining namespaces"
 ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-bgp/pocket-as2.ctl show protocols
 ip netns exec pocket-as3 birdc -s /tmp/pocket-internet-bgp/pocket-as3.ctl show protocols
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.3.1/32 all
@@ -780,7 +824,7 @@ If the neighbor address is not reachable, BGP cannot establish. Fix the link bef
 
 Then inspect the BIRD protocol:
 
-```sh
+```sh title="Inspect the detailed pocket-as1 to_as2 session"
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols all to_as2
 ```
 
@@ -808,14 +852,14 @@ That is not a bad thing. Filters are supposed to reject unexpected routes. The j
 
 Compare BIRD and Linux:
 
-```sh
+```sh title="Compare BIRD and Linux route state inside pocket-as1"
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.3.1/32 all
 ip -n pocket-as1 route show 172.20.3.1
 ```
 
 If BIRD knows the route but Linux does not, look at the kernel protocol:
 
-```sh
+```sh title="Inspect the BIRD kernel export protocol inside pocket-as1"
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols all kernel_ipv4
 ```
 
