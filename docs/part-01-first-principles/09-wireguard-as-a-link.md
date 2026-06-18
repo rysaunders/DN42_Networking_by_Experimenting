@@ -1,88 +1,80 @@
-# Replace a Pocket Internet Link with WireGuard
+# Build and Verify a WireGuard Link
 
 ## Reader Starting Point
 
-This chapter assumes you have completed the BGP, service, and tunnel-model chapters. You should know what a namespace, service loopback, route lookup, return path, BIRD, BGP session, route advertisement, kernel route, convergence, listener, application traffic, underlay, and overlay are.
+This chapter assumes you have completed the tunnel-model chapter. You should know what a namespace, interface, address, prefix, route lookup, VPN, tunnel, underlay, overlay, inner packet, and outer packet are.
 
-You have used veth pairs as links between Pocket Internet routers. You have also seen the tunnel model: WireGuard creates an overlay link, but the encrypted WireGuard packets still need an underlay path.
+You have already seen the idea:
 
-Now you will build that model by replacing one routed Pocket Internet veth link with WireGuard.
+```text
+underlay = the path that carries the tunnel packets
+overlay  = the link the lab network wants to use
+```
 
-The important idea is:
+Now you will build only that link.
 
-> The link changes. The routing model should still look familiar.
+No BIRD. No BGP. No four-router Pocket Internet yet.
 
-This is still Pocket Internet work. You are not creating a DN42 peer yet. You are learning how an encrypted tunnel can behave like a point-to-point link inside the lab.
+That is deliberate. Before asking a routing daemon to use a WireGuard link, you should be able to prove that the link itself works.
 
 ## New Terms
 
 | Term | Plain-language meaning | Example in this lab |
 | --- | --- | --- |
+| WireGuard | A VPN protocol that creates encrypted tunnel interfaces. | The `wg23` interface inside each namespace |
 | Private key | A secret WireGuard key that stays local. | `/tmp/pocket-internet-wireguard-link/as2.key` |
 | Public key | The key you give to the peer. | `as2.pub` |
 | Endpoint | The underlay IP and UDP port where a peer receives WireGuard packets. | `192.0.2.2:51824` |
-| Handshake | Evidence that the WireGuard peers exchanged cryptographic setup traffic. | `latest handshake` in `wg show` |
-| AllowedIPs | WireGuard's peer-selection and packet-allow list. | `172.20.3.1/32` on AS2's peer |
+| Handshake | Evidence that the WireGuard peers exchanged setup traffic. | `latest handshake` in `wg show` |
+| AllowedIPs | WireGuard's peer-selection and packet-allow list. | `10.42.23.2/32` on AS2's peer |
 
 ## Question
 
-Can one Pocket Internet link become a WireGuard tunnel while BGP-learned service-loopback reachability still works?
+Can two namespaces build an encrypted point-to-point link over an ordinary local veth underlay?
 
 ## Hypothesis
 
-If `pocket-as2` and `pocket-as3` have an underlay path, and each side has a WireGuard interface with matching peer keys, endpoints, and allowed inner destinations, then the `10.42.23.0/30` AS2-AS3 link can move from veth to WireGuard.
-
-If BIRD uses the WireGuard interface as the AS2-AS3 link, then `pocket-as1` should still reach `pocket-as3`'s service loopback through BGP-learned routes.
+If `pocket-as2` and `pocket-as3` have an underlay path, and each side has a WireGuard interface with matching peer keys, endpoints, and allowed overlay neighbor addresses, then AS2 should be able to ping AS3's overlay address through `wg23`.
 
 ## Lab Mental Model
 
-The old AS2-AS3 link was direct:
+The underlay is the carrier path:
 
 ```text
-pocket-as2 as2-as3  <---- veth ---->  as3-as2 pocket-as3
-          10.42.23.1/30          10.42.23.2/30
+pocket-as2 as2-underlay 192.0.2.1  <---- veth ---->  192.0.2.2 as3-underlay pocket-as3
 ```
 
-The new shape has two layers:
+The overlay is the encrypted point-to-point link:
 
 ```text
-Underlay packet path:
-pocket-as2 as2-underlay 192.0.2.1  <---- veth ---->  192.0.2.2 as3-underlay pocket-as3
-
-Overlay routed link:
 pocket-as2 wg23 10.42.23.1  <==== WireGuard ====>  10.42.23.2 wg23 pocket-as3
 ```
 
-The underlay carries encrypted WireGuard packets. The overlay is the link that BIRD and Linux routing use.
-
-You should end the lab with this path:
-
-```text
-pocket-as1
-  -> pocket-as2
-  -> wg23 over underlay
-  -> pocket-as3 service loopback 172.20.3.1
-```
+When you ping `10.42.23.2`, Linux gives the inner packet to `wg23`. WireGuard wraps it, encrypts it, and sends an outer UDP packet to `192.0.2.2:51824` across the underlay.
 
 ## Why This Lab Matters
 
-DN42 peers are usually not connected by physical cables. They use tunnels over the public Internet, and BGP runs across those tunnels.
+The next chapter runs BGP over this link. Real DN42 peers often do the same thing across the public Internet.
 
-This lab keeps the tunnel local and disposable. That lets you learn the mechanics before any real DN42 peer, public endpoint, or route policy enters the picture.
+But BGP should not be your first proof that WireGuard works. This chapter gives you a smaller checkpoint:
 
-Host-to-lab access is also still out of scope. Later, an outside host or network reaching Pocket Internet starts to look like a controlled path toward a Pocket Internet AS. That is a useful idea, but this lab has one job: replace an internal Pocket Internet link.
+1. the underlay works,
+2. the WireGuard interface exists,
+3. the peers can handshake,
+4. overlay traffic crosses the tunnel.
 
 ## Safety Boundaries
 
 Safety level: WireGuard lab.
 
-- The lab uses only temporary Linux network namespaces.
+- The lab uses only two temporary Linux network namespaces.
 - The lab creates WireGuard interfaces only inside `pocket-as2` and `pocket-as3`.
 - The underlay is a local veth link, not the public Internet.
 - The lab does not use `wg-quick`.
 - The lab does not add host default routes.
 - The lab does not touch public DN42 peers.
 - Rollback deletes the namespaces and removes generated keys with `/tmp/pocket-internet-wireguard-link`.
+- Cleanup also deletes possible `pocket-as1` and `pocket-as4` leftovers from earlier four-AS labs. This chapter itself creates only `pocket-as2` and `pocket-as3`.
 
 Before the lab, capture the host baseline:
 
@@ -93,90 +85,64 @@ ip route get 1.1.1.1
 
 ## Lab Requirements
 
-Run this chapter inside the Linux lab environment from a root shell. The commands below are written without `sudo` so they stay readable and match the validation transcript.
+Run this chapter inside the Linux lab environment from a root shell. The commands below are written without `sudo` so they stay readable and match the validation transcript style.
 
-Check the required tools before building the topology:
+Check the required tools before building the link:
 
 ```sh
 id
 ip -V
-bird --version
-command -v birdc
 wg --version
 ```
 
 Expected observations:
 
 - `id` should show `uid=0(root)`. If it does not, enter a root lab shell before continuing.
-- `bird --version` should report BIRD 2.
-- `command -v birdc` should print a path.
 - `wg --version` should print the WireGuard tools version.
-
-If `wg` is missing, install `wireguard-tools` in the Linux lab environment. If `ip -n pocket-as2 link add wg23 type wireguard` later fails with `Operation not supported`, the environment has the tools but not usable WireGuard kernel support.
+- If `wg` is missing, install `wireguard-tools` in the Linux lab environment.
+- If `ip -n pocket-as2 link add wg23 type wireguard` later fails with `Operation not supported`, the environment has the tools but not usable WireGuard kernel support.
 
 ## Lab Continuity Note
 
-This chapter rebuilds the Pocket Internet topology from scratch because every previous lab rolls back at the end. That is not ideal for reader ergonomics, and the project tracks a better continuity pattern separately.
+This chapter is a manual-first version of the first half of the WireGuard experiment.
 
-For now, this chapter is deliberately self-contained:
-
-- the validation script builds the whole lab,
-- the manual steps below show the WireGuard replacement clearly,
-- rollback removes everything.
-
-The repeatable validation script lives at:
+There is not yet a standalone two-namespace validation transcript for this smaller lab. The repeatable validation script currently builds the full BGP-over-WireGuard topology used by the next chapter:
 
 ```text
 experiments/labs/pocket-internet-wireguard-link/run.sh
 ```
 
-The validated transcript for this experiment is:
+The validated transcript for the full experiment is:
 
 ```text
 experiments/transcripts/pocket-internet-wireguard-link-20260618T112938Z.txt
 ```
 
+Read that transcript as evidence for the complete chapter-9-plus-chapter-10 path, not as an exact transcript for this chapter alone. The transcript uses four namespaces, BIRD, and broader `AllowedIPs` because it validates the full BGP-over-WireGuard lab.
+
+This chapter intentionally stops earlier so the WireGuard mechanics are not buried under BIRD configuration.
+
 ## What You Will Build
 
-You will create the same four AS-shaped namespaces:
+You will create two AS-shaped namespaces:
 
-| Namespace | Local AS | Service loopback |
-| --- | --- | --- |
-| `pocket-as1` | `4242420001` | `172.20.1.1/32` |
-| `pocket-as2` | `4242420002` | `172.20.2.1/32` |
-| `pocket-as3` | `4242420003` | `172.20.3.1/32` |
-| `pocket-as4` | `4242420004` | `172.20.4.1/32` |
-
-Three links remain veth routed links:
-
-| Link | Prefix |
+| Namespace | Role |
 | --- | --- |
-| AS1-AS2 | `10.42.12.0/30` |
-| AS3-AS4 | `10.42.34.0/30` |
-| AS4-AS1 | `10.42.41.0/30` |
+| `pocket-as2` | left side of the tunnel |
+| `pocket-as3` | right side of the tunnel |
 
-The AS2-AS3 routed link becomes WireGuard:
+The link has two layers:
 
 | Layer | Interface(s) | Prefix |
 | --- | --- | --- |
 | Underlay | `as2-underlay`, `as3-underlay` | `192.0.2.0/30` |
 | Overlay | `wg23`, `wg23` | `10.42.23.0/30` |
 
-The underlay is local transport. The overlay is the link BIRD uses.
-
 ## Step 1: Clean Up Any Old Lab State
 
 Delete old namespaces and temporary files:
 
 ```sh
-for ns in pocket-as1 pocket-as2 pocket-as3 pocket-as4; do
-  for dir in /tmp/pocket-internet-wireguard-link /tmp/pocket-internet-bgp; do
-    if [ -f "${dir}/${ns}.pid" ]; then
-      ip netns exec "$ns" kill "$(cat "${dir}/${ns}.pid")" 2>/dev/null || true
-    fi
-  done
-done
-
 ip netns delete pocket-as1 2>/dev/null || true
 ip netns delete pocket-as2 2>/dev/null || true
 ip netns delete pocket-as3 2>/dev/null || true
@@ -192,40 +158,29 @@ ip netns list | grep -E '^(pocket-as1|pocket-as2|pocket-as3|pocket-as4)( |$)' ||
 
 No output is the expected result.
 
-## Step 2: Create Namespaces And The Veth Links That Remain
+## Step 2: Create The Two Namespaces
 
-Create the namespaces:
+Create a working directory and two namespaces:
 
 ```sh
 mkdir -p /tmp/pocket-internet-wireguard-link
 
-ip netns add pocket-as1
 ip netns add pocket-as2
 ip netns add pocket-as3
-ip netns add pocket-as4
 ```
 
-Create the three routed veth links that are not being replaced:
+Bring up each loopback:
 
 ```sh
-ip link add as1-as2 type veth peer name as2-as1
-ip link set as1-as2 netns pocket-as1
-ip link set as2-as1 netns pocket-as2
-
-ip link add as3-as4 type veth peer name as4-as3
-ip link set as3-as4 netns pocket-as3
-ip link set as4-as3 netns pocket-as4
-
-ip link add as4-as1 type veth peer name as1-as4
-ip link set as4-as1 netns pocket-as4
-ip link set as1-as4 netns pocket-as1
+ip -n pocket-as2 link set lo up
+ip -n pocket-as3 link set lo up
 ```
 
-Notice what is missing: there is no `as2-as3` routed veth link. That is the link WireGuard will replace.
+At this point, the namespaces exist but have no path between them.
 
-## Step 3: Create The AS2-AS3 Underlay
+## Step 3: Build The Underlay
 
-WireGuard still needs a path for its encrypted packets. In this local lab, that path is another veth pair:
+Create the veth pair that will carry encrypted WireGuard packets:
 
 ```sh
 ip link add as2-underlay type veth peer name as3-underlay
@@ -240,52 +195,11 @@ ip -n pocket-as2 addr add 192.0.2.1/30 dev as2-underlay
 ip -n pocket-as3 addr add 192.0.2.2/30 dev as3-underlay
 ```
 
-Read that as:
-
-- `192.0.2.1` is where AS2 sends encrypted WireGuard packets,
-- `192.0.2.2` is where AS3 receives them,
-- this is not the routed Pocket Internet service path.
-
-## Step 4: Add Service And Remaining Link Addresses
-
-Add service loopbacks:
+Bring up the underlay interfaces:
 
 ```sh
-ip -n pocket-as1 addr add 172.20.1.1/32 dev lo
-ip -n pocket-as2 addr add 172.20.2.1/32 dev lo
-ip -n pocket-as3 addr add 172.20.3.1/32 dev lo
-ip -n pocket-as4 addr add 172.20.4.1/32 dev lo
-```
-
-Add the remaining veth link addresses:
-
-```sh
-ip -n pocket-as1 addr add 10.42.12.1/30 dev as1-as2
-ip -n pocket-as2 addr add 10.42.12.2/30 dev as2-as1
-
-ip -n pocket-as3 addr add 10.42.34.1/30 dev as3-as4
-ip -n pocket-as4 addr add 10.42.34.2/30 dev as4-as3
-
-ip -n pocket-as4 addr add 10.42.41.1/30 dev as4-as1
-ip -n pocket-as1 addr add 10.42.41.2/30 dev as1-as4
-```
-
-Bring loopbacks, veth links, and underlay links up:
-
-```sh
-for ns in pocket-as1 pocket-as2 pocket-as3 pocket-as4; do
-  ip -n "$ns" link set lo up
-  ip netns exec "$ns" sysctl -w net.ipv4.ip_forward=1
-done
-
-ip -n pocket-as1 link set as1-as2 up
-ip -n pocket-as1 link set as1-as4 up
-ip -n pocket-as2 link set as2-as1 up
 ip -n pocket-as2 link set as2-underlay up
 ip -n pocket-as3 link set as3-underlay up
-ip -n pocket-as3 link set as3-as4 up
-ip -n pocket-as4 link set as4-as3 up
-ip -n pocket-as4 link set as4-as1 up
 ```
 
 Prove the underlay works:
@@ -295,9 +209,15 @@ ip -n pocket-as2 route get 192.0.2.2
 ip netns exec pocket-as2 ping -c 1 -W 1 192.0.2.2
 ```
 
-If this fails, WireGuard has nowhere to send encrypted packets.
+Expected route lookup:
 
-## Step 5: Generate WireGuard Keys
+```text
+192.0.2.2 dev as2-underlay ...
+```
+
+If this fails, stop here. WireGuard has nowhere to send encrypted packets.
+
+## Step 4: Generate WireGuard Keys
 
 Each side gets a private key and a public key:
 
@@ -318,9 +238,9 @@ cat /tmp/pocket-internet-wireguard-link/as3.pub
 
 Private keys stay local. Public keys are what peers exchange.
 
-The parentheses keep the stricter `umask` scoped to each private-key command. That makes the private key files readable only by their owner without changing the file permissions for everything else you create in the same shell.
+The parentheses keep the stricter `umask` scoped to each private-key command. That makes the private key files readable only by their owner without changing file permissions for later commands in the same shell.
 
-## Step 6: Create WireGuard Overlay Interfaces
+## Step 5: Create WireGuard Overlay Interfaces
 
 Create `wg23` inside AS2 and AS3:
 
@@ -336,11 +256,11 @@ ip -n pocket-as2 addr add 10.42.23.1/30 dev wg23
 ip -n pocket-as3 addr add 10.42.23.2/30 dev wg23
 ```
 
-This reuses the familiar AS2-AS3 link prefix from the earlier labs. The difference is the interface carrying it.
+This reuses the familiar AS2-AS3 link prefix from earlier Pocket Internet labs. The difference is the interface carrying it.
 
-## Step 7: Configure WireGuard Peers
+## Step 6: Configure WireGuard Peers
 
-Set shell variables for the public keys:
+Read the public keys into shell variables:
 
 ```sh title="Read WireGuard public keys into shell variables"
 AS2_PUB="$(cat /tmp/pocket-internet-wireguard-link/as2.pub)"
@@ -354,7 +274,7 @@ ip netns exec pocket-as2 wg set wg23 \
   private-key /tmp/pocket-internet-wireguard-link/as2.key \
   listen-port 51823 \
   peer "$AS3_PUB" \
-  allowed-ips 10.42.23.2/32,172.20.3.1/32,172.20.4.1/32 \
+  allowed-ips 10.42.23.2/32 \
   endpoint 192.0.2.2:51824
 ```
 
@@ -365,7 +285,7 @@ ip netns exec pocket-as3 wg set wg23 \
   private-key /tmp/pocket-internet-wireguard-link/as3.key \
   listen-port 51824 \
   peer "$AS2_PUB" \
-  allowed-ips 10.42.23.1/32,172.20.1.1/32,172.20.2.1/32 \
+  allowed-ips 10.42.23.1/32 \
   endpoint 192.0.2.1:51823
 ```
 
@@ -376,41 +296,44 @@ ip -n pocket-as2 link set wg23 up
 ip -n pocket-as3 link set wg23 up
 ```
 
-The `endpoint` is the underlay address and UDP port. The `allowed-ips` list is WireGuard's peer-selection rule for inner packets.
+Read the AS2 peer configuration like this:
 
-That is why AS2 allows `172.20.3.1/32`: when AS2 forwards a packet toward AS3's service loopback, the inner destination is `172.20.3.1`, not merely `10.42.23.2`.
-
-Read the `AllowedIPs` lists this way:
-
-| Namespace | Peer represents | Inner destinations allowed through that peer |
-| --- | --- | --- |
-| `pocket-as2` | AS3's side of the tunnel | `10.42.23.2/32`, `172.20.3.1/32`, `172.20.4.1/32` |
-| `pocket-as3` | AS2's side of the tunnel | `10.42.23.1/32`, `172.20.1.1/32`, `172.20.2.1/32` |
-
-This does not create BGP routes. BGP still learns reachability and installs routes. WireGuard decides which peer may carry an already-routed inner packet once Linux chooses `wg23`.
-
-That statement is specific to this raw `wg set` lab. Later tools such as `wg-quick`, and many real peer examples, may also install routes from `AllowedIPs`. Here, BGP and the kernel routing table remain separate from WireGuard's peer-selection rule so you can see each layer clearly.
-
-## Step 8: Verify The Overlay Link
-
-Compare the two route lookups from AS2:
-
-```sh title="Compare AS2 underlay and overlay route lookups"
-ip -n pocket-as2 route get 192.0.2.2
-ip -n pocket-as2 route get 10.42.23.2
+```text
+private-key ...            use AS2's private identity
+listen-port 51823          receive WireGuard packets on UDP port 51823
+peer "$AS3_PUB"            the other side should prove it owns AS3's private key
+allowed-ips 10.42.23.2/32  send this overlay neighbor through that peer
+endpoint 192.0.2.2:51824   reach that peer at this underlay address and port
 ```
 
-The first lookup is the underlay endpoint. It should use `as2-underlay`.
+For now, `AllowedIPs` includes only the other overlay address. The next chapter broadens that list so service-loopback traffic can cross the tunnel.
 
-The second lookup is the overlay neighbor. It should use `wg23`.
+## Step 7: Compare Underlay And Overlay Route Lookups
 
-Ask Linux how AS2 reaches the overlay neighbor again if you want to isolate just that result:
+Ask AS2 how it reaches the underlay endpoint:
+
+```sh
+ip -n pocket-as2 route get 192.0.2.2
+```
+
+Expected output uses `as2-underlay`.
+
+Ask AS2 how it reaches the overlay neighbor:
 
 ```sh
 ip -n pocket-as2 route get 10.42.23.2
 ```
 
 Expected output uses `wg23`.
+
+Those two lookups are the whole model:
+
+| Destination | Meaning | Interface Linux chooses |
+| --- | --- | --- |
+| `192.0.2.2` | underlay endpoint | `as2-underlay` |
+| `10.42.23.2` | overlay neighbor | `wg23` |
+
+## Step 8: Prove The WireGuard Link Works
 
 Ping the overlay neighbor:
 
@@ -431,397 +354,15 @@ latest handshake: ...
 transfer: ...
 ```
 
-A handshake says the peers have exchanged WireGuard setup traffic. The transfer counters should increase after ping or routed traffic.
+A handshake says the peers exchanged WireGuard setup traffic. The transfer counters should increase after ping.
 
-## Step 9: Start BIRD Over The New Link
+Inspect AS3 too:
 
-Use the same BIRD pattern as the BGP chapter, with one change: AS2 and AS3 now peer over `wg23` addresses:
-
-```text
-pocket-as2 -> pocket-as3
-10.42.23.1 -> 10.42.23.2
+```sh title="Inspect WireGuard state inside pocket-as3"
+ip netns exec pocket-as3 wg show wg23
 ```
 
-The important point for this chapter is that BIRD does not need to know the link is encrypted. It sees a local interface and a neighbor address.
-
-Read the AS2-to-AS3 shape before writing the full configs:
-
-```text title="Read the BGP-over-WireGuard config shape"
-protocol bgp to_as3 {                 # (1)
-  local as 4242420002;                # (2)
-  neighbor 10.42.23.2 as 4242420003;  # (3)
-  source address 10.42.23.1;          # (4)
-  check link yes;
-  ipv4 {
-    import filter pocket_import;      # (5)
-    export filter pocket_export;      # (6)
-  };
-}
-```
-
-1. This is AS2's BGP session toward AS3.
-2. AS2 uses its own local AS number.
-3. AS3's neighbor address is the overlay address on AS3's `wg23`.
-4. AS2's source address is the overlay address on AS2's `wg23`.
-5. Import policy still controls which routes AS2 accepts.
-6. Export policy still controls which routes AS2 announces.
-
-Write the AS1 config:
-
-```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as1.conf"
-cat >/tmp/pocket-internet-wireguard-link/pocket-as1.conf <<'EOF'
-log stderr all;
-router id 172.20.1.1;
-
-protocol device {
-  scan time 1;
-}
-
-protocol direct direct_loopbacks {
-  ipv4;
-  interface "lo";
-}
-
-protocol kernel kernel_ipv4 {
-  ipv4 {
-    import none;
-    export all;
-  };
-  scan time 1;
-}
-
-filter pocket_import {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-filter pocket_export {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-protocol bgp to_as2 {
-  local as 4242420001;
-  neighbor 10.42.12.2 as 4242420002;
-  source address 10.42.12.1;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-
-protocol bgp to_as4 {
-  local as 4242420001;
-  neighbor 10.42.41.1 as 4242420004;
-  source address 10.42.41.2;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-EOF
-```
-
-Write the AS2 config:
-
-```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as2.conf"
-cat >/tmp/pocket-internet-wireguard-link/pocket-as2.conf <<'EOF'
-log stderr all;
-router id 172.20.2.1;
-
-protocol device {
-  scan time 1;
-}
-
-protocol direct direct_loopbacks {
-  ipv4;
-  interface "lo";
-}
-
-protocol kernel kernel_ipv4 {
-  ipv4 {
-    import none;
-    export all;
-  };
-  scan time 1;
-}
-
-filter pocket_import {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-filter pocket_export {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-protocol bgp to_as1 {
-  local as 4242420002;
-  neighbor 10.42.12.1 as 4242420001;
-  source address 10.42.12.2;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-
-protocol bgp to_as3 {
-  local as 4242420002;
-  neighbor 10.42.23.2 as 4242420003;
-  source address 10.42.23.1;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-EOF
-```
-
-The `to_as3` neighbor is the important change. AS2 peers with AS3 at `10.42.23.2`, which lives on AS3's `wg23` interface.
-
-Write the AS3 config:
-
-```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as3.conf"
-cat >/tmp/pocket-internet-wireguard-link/pocket-as3.conf <<'EOF'
-log stderr all;
-router id 172.20.3.1;
-
-protocol device {
-  scan time 1;
-}
-
-protocol direct direct_loopbacks {
-  ipv4;
-  interface "lo";
-}
-
-protocol kernel kernel_ipv4 {
-  ipv4 {
-    import none;
-    export all;
-  };
-  scan time 1;
-}
-
-filter pocket_import {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-filter pocket_export {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-protocol bgp to_as2 {
-  local as 4242420003;
-  neighbor 10.42.23.1 as 4242420002;
-  source address 10.42.23.2;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-
-protocol bgp to_as4 {
-  local as 4242420003;
-  neighbor 10.42.34.2 as 4242420004;
-  source address 10.42.34.1;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-EOF
-```
-
-AS3's `to_as2` block is the matching half of the WireGuard BGP session.
-
-Write the AS4 config:
-
-```sh title="Write /tmp/pocket-internet-wireguard-link/pocket-as4.conf"
-cat >/tmp/pocket-internet-wireguard-link/pocket-as4.conf <<'EOF'
-log stderr all;
-router id 172.20.4.1;
-
-protocol device {
-  scan time 1;
-}
-
-protocol direct direct_loopbacks {
-  ipv4;
-  interface "lo";
-}
-
-protocol kernel kernel_ipv4 {
-  ipv4 {
-    import none;
-    export all;
-  };
-  scan time 1;
-}
-
-filter pocket_import {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-filter pocket_export {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-protocol bgp to_as3 {
-  local as 4242420004;
-  neighbor 10.42.34.1 as 4242420003;
-  source address 10.42.34.2;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-
-protocol bgp to_as1 {
-  local as 4242420004;
-  neighbor 10.42.41.2 as 4242420001;
-  source address 10.42.41.1;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-EOF
-```
-
-Validate the configs before starting BIRD:
-
-```sh title="Validate BIRD configs from the root Linux shell"
-bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as1.conf
-bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as2.conf
-bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as3.conf
-bird -p -c /tmp/pocket-internet-wireguard-link/pocket-as4.conf
-```
-
-Start BIRD in each namespace:
-
-```sh title="Start BIRD in all four namespaces"
-ip netns exec pocket-as1 bird \
-  -c /tmp/pocket-internet-wireguard-link/pocket-as1.conf \
-  -s /tmp/pocket-internet-wireguard-link/pocket-as1.ctl \
-  -P /tmp/pocket-internet-wireguard-link/pocket-as1.pid
-
-ip netns exec pocket-as2 bird \
-  -c /tmp/pocket-internet-wireguard-link/pocket-as2.conf \
-  -s /tmp/pocket-internet-wireguard-link/pocket-as2.ctl \
-  -P /tmp/pocket-internet-wireguard-link/pocket-as2.pid
-
-ip netns exec pocket-as3 bird \
-  -c /tmp/pocket-internet-wireguard-link/pocket-as3.conf \
-  -s /tmp/pocket-internet-wireguard-link/pocket-as3.ctl \
-  -P /tmp/pocket-internet-wireguard-link/pocket-as3.pid
-
-ip netns exec pocket-as4 bird \
-  -c /tmp/pocket-internet-wireguard-link/pocket-as4.conf \
-  -s /tmp/pocket-internet-wireguard-link/pocket-as4.ctl \
-  -P /tmp/pocket-internet-wireguard-link/pocket-as4.pid
-```
-
-After BIRD starts, verify the AS2-AS3 BGP session:
-
-```sh title="Inspect BGP protocols across the WireGuard link"
-ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-wireguard-link/pocket-as2.ctl show protocols
-ip netns exec pocket-as3 birdc -s /tmp/pocket-internet-wireguard-link/pocket-as3.ctl show protocols
-```
-
-Expected observation:
-
-```text
-to_as3  BGP  ...  Established
-to_as2  BGP  ...  Established
-```
-
-If those sessions establish, BGP is running over WireGuard.
-
-## Step 10: Prove Existing Routing Still Works
-
-From AS1, ask how to reach AS3's service loopback:
-
-```sh title="Check service-loopback route from pocket-as1"
-ip -n pocket-as1 route get 172.20.3.1 from 172.20.1.1
-```
-
-At AS2, the path should cross `wg23`:
-
-```sh title="Check that AS2 crosses wg23 toward AS3"
-ip -n pocket-as2 route get 172.20.3.1 from 172.20.2.1
-```
-
-Expected output includes:
-
-```text
-via 10.42.23.2 dev wg23
-```
-
-Check the return path from AS3:
-
-```sh title="Check the return path from pocket-as3"
-ip -n pocket-as3 route get 172.20.1.1 from 172.20.3.1
-```
-
-In the validated transcript, AS3 also chooses the WireGuard side:
-
-```text
-via 10.42.23.1 dev wg23
-```
-
-The important habit is the check itself. In this four-router ring, AS3 may have more than one BGP-learned way back to AS1. If your output points through AS4 instead, do not treat that as a WireGuard failure by itself. AS2's route to `172.20.3.1`, the successful AS1-to-AS3 ping, and the WireGuard transfer counters are the evidence that the replaced AS2-AS3 link is carrying traffic.
-
-Now test traffic:
-
-```sh
-ip netns exec pocket-as1 ping -c 2 -W 1 -I 172.20.1.1 172.20.3.1
-```
-
-Finally, inspect WireGuard counters again:
-
-```sh title="Inspect WireGuard state inside pocket-as2"
-ip netns exec pocket-as2 wg show wg23
-```
-
-The transfer counters should be larger than before. That is evidence that Pocket Internet traffic crossed the WireGuard link.
+Both sides should show the same peer relationship from opposite directions.
 
 ## Troubleshooting Branches
 
@@ -834,6 +375,13 @@ ip netns exec pocket-as2 ping -c 1 -W 1 192.0.2.2
 ```
 
 fix the underlay before changing WireGuard. The tunnel cannot work if its carrier path is broken.
+
+Check that the underlay interfaces are up:
+
+```sh
+ip -n pocket-as2 link show as2-underlay
+ip -n pocket-as3 link show as3-underlay
+```
 
 ### No Handshake
 
@@ -852,48 +400,24 @@ ip netns exec pocket-as2 wg show wg23
 ip netns exec pocket-as3 wg show wg23
 ```
 
-### Handshake Works But BGP Fails
+### Handshake Works But Overlay Ping Fails
 
-Check overlay reachability:
+Check `AllowedIPs`.
 
-```sh
-ip netns exec pocket-as2 ping -c 1 -W 1 10.42.23.2
-ip netns exec pocket-as3 ping -c 1 -W 1 10.42.23.1
-```
+For this chapter:
 
-If overlay ping works, inspect BIRD:
+- AS2's peer for AS3 should allow `10.42.23.2/32`.
+- AS3's peer for AS2 should allow `10.42.23.1/32`.
 
-```sh title="Inspect the detailed AS2 to AS3 BGP session"
-ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-wireguard-link/pocket-as2.ctl show protocols all to_as3
-```
-
-### BGP Works But Service Prefix Traffic Fails
-
-Check WireGuard `AllowedIPs`.
-
-If AS2 will forward packets to `172.20.3.1`, AS2's WireGuard peer for AS3 must allow `172.20.3.1/32`.
-
-This is different from BGP import/export policy. BGP decides which routes are learned. WireGuard decides which peer is allowed to carry matching inner packets.
+If those entries are wrong, WireGuard may have a peer but still refuse to carry the inner packet you are trying to send.
 
 ## Rollback
-
-Stop lab BIRD processes if they are still running:
-
-```sh
-for ns in pocket-as1 pocket-as2 pocket-as3 pocket-as4; do
-  if [ -f "/tmp/pocket-internet-wireguard-link/${ns}.pid" ]; then
-    ip netns exec "$ns" kill "$(cat "/tmp/pocket-internet-wireguard-link/${ns}.pid")" 2>/dev/null || true
-  fi
-done
-```
 
 Delete namespaces and generated files:
 
 ```sh
-ip netns delete pocket-as1 2>/dev/null || true
 ip netns delete pocket-as2 2>/dev/null || true
 ip netns delete pocket-as3 2>/dev/null || true
-ip netns delete pocket-as4 2>/dev/null || true
 rm -rf /tmp/pocket-internet-wireguard-link
 ```
 
@@ -917,37 +441,36 @@ ip route get 1.1.1.1
 
 You can now explain:
 
-- the difference between an underlay and an overlay,
-- why WireGuard needs keys and endpoints,
-- why a handshake is necessary but not enough to prove routed traffic works,
-- why `AllowedIPs` must include inner destinations carried by the tunnel,
-- how BGP can run over a WireGuard interface the same way it ran over veth,
-- why this is still Pocket Internet work, not DN42 peering.
+- why WireGuard still needs an underlay path,
+- why the overlay address uses `wg23` while the endpoint address uses the underlay interface,
+- why WireGuard needs private keys, public keys, endpoints, and `AllowedIPs`,
+- what a handshake proves,
+- why a handshake is useful but does not yet prove BGP or service routing.
 
 ## Still Okay If Fuzzy
 
 It is okay if these are still fuzzy:
 
+- BGP over WireGuard,
+- WireGuard carrying service-loopback traffic,
 - MTU sizing,
 - NAT traversal and persistent keepalive,
 - `wg-quick`,
 - host-to-lab access,
 - real DN42 peer expectations.
 
-Those belong in later border and DN42 chapters. Here, the point is narrower: a tunnel can replace a link without changing the routing mental model.
+The next chapter adds BGP back on top of the tunnel.
 
 ## Next We Need
 
-At this point, the Pocket Internet draft is functionally complete:
+Now that the encrypted point-to-point link works, the next question is whether Pocket Internet can use it as an ordinary routed link.
 
-- hosts and routers,
-- static routes,
-- route selection,
-- BIRD and BGP,
-- services,
-- WireGuard as a link.
+That means:
 
-The next phase is cleanup and then the DN42 border: how a lab-built routing model approaches a living routing community without leaking routes or treating DN42 as a sandbox.
+1. rebuild the four-AS Pocket Internet shape,
+2. keep AS2-AS3 as WireGuard instead of veth,
+3. run BIRD and BGP across `wg23`,
+4. prove service-loopback traffic still crosses the tunnel.
 
 ## References
 

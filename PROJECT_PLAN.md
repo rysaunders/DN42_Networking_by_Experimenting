@@ -63,6 +63,7 @@ networking-by-experimenting-with-dn42/
       07-operate-a-service.md
       08-links-tunnels-underlays-overlays.md
       09-wireguard-as-a-link.md
+      10-bgp-over-wireguard.md
     part-02-first-dn42-node/
       index.md
       01-registry-objects.md
@@ -244,10 +245,13 @@ Chapters:
 1. **Links, Tunnels, Underlays, and Overlays**
    - Concept: a tunnel is a link-shaped thing carried inside another network.
 
-2. **Replace a Pocket Internet Link with WireGuard**
-   - Lab: replace one Pocket Internet veth link with WireGuard.
+2. **Build and Verify a WireGuard Link**
+   - Lab: build the AS2-AS3 WireGuard underlay and overlay without BGP noise.
 
-3. **Underlay, Overlay, and MTU**
+3. **Run BGP Over WireGuard**
+   - Lab: replace one Pocket Internet veth link with WireGuard and prove BGP-learned service-loopback reachability still works.
+
+4. **Underlay, Overlay, and MTU**
    - Concept: packets inside packets, endpoint reachability, and packet size limits.
    - Lab: observe clear overlay traffic and encrypted underlay traffic.
 
@@ -639,7 +643,7 @@ You know it works when:
 8. Build local namespace routing lab.
 9. Build Pocket Internet static routing topology.
 10. Add BIRD and BGP to Pocket Internet.
-11. Replace one Pocket Internet link with WireGuard.
+11. Build a WireGuard link and run BGP over it inside Pocket Internet.
 12. Draft addresses, prefixes, and longest match.
 13. Design the Pocket Internet to DN42 border.
 14. Draft safety page.
@@ -927,7 +931,8 @@ Included:
   - Addresses, Prefixes, and Longest Match.
   - Route selection and static route repair.
   - BIRD and BGP inside Pocket Internet.
-  - WireGuard as a replacement for one lab link.
+  - WireGuard link mechanics.
+  - BGP over a WireGuard replacement link.
 - Interconnect design:
   - Pocket Internet to DN42 border.
   - Outbound reachability.
@@ -969,7 +974,7 @@ Excluded from v0.1:
 14. Write and test Pocket Internet static routing lab.
 15. Write and test Pocket Internet route-selection lab.
 16. Write and test local BIRD/BGP lab.
-17. Replace one Pocket Internet link with WireGuard.
+17. Build and verify a WireGuard link, then run BGP over it inside Pocket Internet.
 18. Design the Pocket Internet to DN42 border.
 19. Add link checker and strict docs build CI.
 20. Run a source freshness review before tagging v0.1.
@@ -981,7 +986,7 @@ Excluded from v0.1:
 2. Draft `Addresses, Prefixes, and Longest Match`.
 3. Build the route-selection and longest-prefix lab.
 4. Add BIRD and BGP to Pocket Internet.
-5. Replace one Pocket Internet link with WireGuard.
+5. Build and verify a WireGuard link, then run BGP over it inside Pocket Internet.
 6. Design the Pocket Internet to DN42 border.
 7. Then implement real DN42 registry and peer chapters.
 

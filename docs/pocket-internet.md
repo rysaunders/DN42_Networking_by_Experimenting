@@ -66,10 +66,11 @@ Each namespace owns:
 6. Add longest-prefix match and route-selection experiments.
 7. Add BIRD and BGP so routers exchange reachability.
 8. Withdraw routes and observe convergence.
-9. Replace one veth link with WireGuard and keep the same routing model.
-10. Build a border between Pocket Internet and DN42.
-11. Route selected Pocket Internet traffic toward DN42.
-12. Operate services across the lab-to-real-network boundary when routing and policy allow.
+9. Build and verify a WireGuard point-to-point link.
+10. Run BGP over that WireGuard link and keep the same routing model.
+11. Build a border between Pocket Internet and DN42.
+12. Route selected Pocket Internet traffic toward DN42.
+13. Operate services across the lab-to-real-network boundary when routing and policy allow.
 
 ## Design Rule
 
@@ -80,6 +81,7 @@ This keeps the book from becoming a pile of unrelated recipes. Each chapter adds
 ## Validated Labs
 
 - [Pocket Internet with Static Routes](part-01-first-principles/03-pocket-internet-static-routing.md): four AS-shaped namespaces, service loopbacks, static routes, link failure, and manual route repair.
+- [Run BGP Over WireGuard](part-01-first-principles/10-bgp-over-wireguard.md): four AS-shaped namespaces, a local WireGuard AS2-AS3 link, BIRD/BGP over the overlay, and service-loopback traffic across the tunnel. The same transcript validates [Build and Verify a WireGuard Link](part-01-first-principles/09-wireguard-as-a-link.md) only as a subset; a standalone two-namespace transcript has not been added yet.
 
 ## Interconnect
 

@@ -255,7 +255,7 @@ Reader has not yet been taught:
 - real DN42 peer expectations,
 - DN42 registry objects.
 
-## After Part 1, Replace a Pocket Internet Link with WireGuard
+## After Part 1, Build and Verify a WireGuard Link
 
 Introduced by `docs/part-01-first-principles/09-wireguard-as-a-link.md`.
 
@@ -267,13 +267,39 @@ Reader has seen:
 - endpoint: the underlay IP and UDP port where a peer receives WireGuard packets,
 - handshake: evidence that WireGuard peers exchanged setup traffic,
 - AllowedIPs: WireGuard's peer-selection and packet-allow list,
-- in this raw `wg set` lab, AllowedIPs does not create the BGP-learned routes; later tools may also use AllowedIPs to install routes,
-- BGP running over WireGuard as a link,
-- WireGuard counters as evidence that routed traffic crossed the tunnel.
+- `AllowedIPs` limited to the overlay neighbor address in a raw `wg set` lab,
+- underlay and overlay route lookups as separate checks,
+- WireGuard counters as evidence that overlay traffic crossed the tunnel.
 
 Reader has only been lightly introduced to:
 
-- AllowedIPs as distinct from BGP policy,
+- WireGuard as a link that BGP can use later.
+
+Reader has not yet been taught:
+
+- BGP running over WireGuard,
+- broadening `AllowedIPs` for service-loopback traffic,
+- MTU sizing,
+- NAT traversal and persistent keepalive,
+- `wg-quick`,
+- real DN42 peer expectations,
+- DN42 registry objects.
+
+## After Part 1, Run BGP Over WireGuard
+
+Introduced by `docs/part-01-first-principles/10-bgp-over-wireguard.md`.
+
+Reader has seen:
+
+- WireGuard replacing the AS2-AS3 veth link in the four-AS Pocket Internet,
+- BGP running over WireGuard overlay addresses,
+- in this raw `wg set` lab, AllowedIPs does not create the BGP-learned routes; later tools may also use AllowedIPs to install routes,
+- `AllowedIPs` broadened to include service-loopback destinations carried through the tunnel,
+- BGP import/export policy as separate from WireGuard peer-selection rules,
+- route lookups and transfer counters as evidence that service-loopback traffic crossed the tunnel.
+
+Reader has only been lightly introduced to:
+
 - host-to-lab access as a later outside-path question.
 
 Reader has not yet been taught:

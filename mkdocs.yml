@@ -79,7 +79,8 @@ nav:
       - BGP Before DN42: part-01-first-principles/06-bgp-before-dn42.md
       - Operate a Service: part-01-first-principles/07-operate-a-service.md
       - Links, Tunnels, Underlays, and Overlays: part-01-first-principles/08-links-tunnels-underlays-overlays.md
-      - Replace a Pocket Internet Link with WireGuard: part-01-first-principles/09-wireguard-as-a-link.md
+      - Build and Verify a WireGuard Link: part-01-first-principles/09-wireguard-as-a-link.md
+      - Run BGP Over WireGuard: part-01-first-principles/10-bgp-over-wireguard.md
   - Later - DN42 Node:
       - Overview: part-02-first-dn42-node/index.md
       - Registry Objects: part-02-first-dn42-node/01-registry-objects.md

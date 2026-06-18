@@ -123,7 +123,7 @@ The same idea applies to service-loopback reachability. If AS1 sends a packet to
 172.20.3.1 via 10.42.23.2 dev wg23
 ```
 
-That means the next hop is AS3's overlay address, but the inner destination is still `172.20.3.1`. WireGuard must be willing to carry that inner destination through the AS3 peer. This is why the lab's `AllowedIPs` list includes service loopbacks, not only the tunnel neighbor address.
+That means the next hop is AS3's overlay address, but the inner destination is still `172.20.3.1`. WireGuard must be willing to carry that inner destination through the AS3 peer. This is why the BGP-over-WireGuard lab's `AllowedIPs` list includes service loopbacks, not only the tunnel neighbor address.
 
 ## A Small Note On Layers
 
@@ -219,13 +219,14 @@ It is okay if these are still fuzzy:
 - how BIRD is configured over the tunnel,
 - how this maps onto a real DN42 peer.
 
-Those are the job of the next lab.
+Those are the job of the next two labs.
 
 ## Next We Need
 
-Now that the two-layer model is named, we can build it:
+Now that the two-layer model is named, we can build it in two passes:
 
 1. create the underlay path,
 2. create the WireGuard overlay,
-3. run BGP over the overlay,
-4. prove routed service-loopback traffic crosses the tunnel.
+3. prove the tunnel works by itself,
+4. run BGP over the overlay,
+5. prove routed service-loopback traffic crosses the tunnel.
