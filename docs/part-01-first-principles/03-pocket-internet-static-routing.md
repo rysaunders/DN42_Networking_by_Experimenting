@@ -50,6 +50,10 @@ flowchart LR
   AS4 ---|"10.42.41.0/30"| AS1
 ```
 
+!!! note "Lab-only prefixes"
+
+    The `172.20.x.x` service loopbacks are local Pocket Internet examples. They are useful because they look like real routed service addresses, but they are not permission to announce anything outside this lab.
+
 Legend:
 
 ```text

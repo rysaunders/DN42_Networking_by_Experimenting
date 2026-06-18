@@ -27,6 +27,7 @@ These rules apply unless a chapter explicitly says otherwise and proves why the 
 - Do not accept a default route from a DN42 peer in beginner labs.
 - Do not export any route until the export filter is explicit and reviewed.
 - Do not announce prefixes you do not own or are not authorized to announce.
+- Treat Pocket Internet prefixes and AS labels as lab-only unless a DN42 chapter explicitly replaces them with authorized resources.
 - Do not leak public Internet routes into DN42.
 - Do not leak DN42 or lab-only routes to public interfaces.
 - Do not provide public Internet egress through DN42 unless that is the deliberate, secured service being built.
@@ -100,6 +101,8 @@ That command must not unexpectedly use a DN42 tunnel, WireGuard peer, or lab-onl
 ## Export Policy Checks
 
 Export policy is where a lab can become a route leak.
+
+Pocket Internet routes are not exported toward DN42 by default. Before any DN42-facing chapter changes that default, it must identify the authorized prefix being used and the filter that rejects everything else.
 
 Before any route is advertised to another router, write down:
 

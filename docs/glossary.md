@@ -7,7 +7,7 @@ When introducing a new term, add it here by default. Add it to global tooltips o
 For the beginner-facing map of Linux objects, see [Linux Networking Objects](linux-networking-objects.md).
 
 ASN
-: Autonomous System Number. A number identifying a routing domain in BGP.
+: Autonomous System Number. A number identifying a routing domain in BGP. Lab ASNs are local labels until a real network or registry authorizes their use.
 
 Address
 : One specific point in the IP address space, usually assigned to an interface or loopback.
@@ -23,6 +23,9 @@ AllowedIPs
 
 Autonomous system
 : One independently controlled network boundary. In real Internet routing, an autonomous system is identified by an ASN.
+
+Authorized prefix
+: An address block a network is allowed to originate or announce. In DN42-facing chapters, authorization must come from the relevant registry objects and peer expectations, not from a lab example.
 
 Bind address
 : The local address a service attaches to when it starts listening.
@@ -78,6 +81,9 @@ Listener
 Longest-prefix match
 : The route lookup rule that the most-specific matching route wins.
 
+Lab-only prefix
+: An address block used only inside the local lab. A lab-only prefix can teach routing behavior, but it is not permission to advertise that route to DN42 or any other external network.
+
 Loopback
 : The `lo` interface inside a network stack; traffic sent to loopback stays inside that stack.
 
@@ -124,7 +130,7 @@ Route advertisement
 : Telling another router that you can carry traffic for a prefix.
 
 Route leak
-: Accidentally announcing or accepting routes that should not cross a routing boundary.
+: Accidentally announcing or accepting routes that should not cross a routing boundary, such as sending a lab-only prefix toward DN42 or accepting a route where the chapter expected containment.
 
 Route lookup
 : Asking Linux which route it would use for a packet.

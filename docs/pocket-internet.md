@@ -34,6 +34,10 @@ flowchart LR
   AS4 --- AS1
 ```
 
+!!! note "Lab-only resources"
+
+    The `AS424242000x` labels and Pocket Internet service addresses are local teaching resources. They make the lab look like the routing systems used later, but they are not authorization to announce anything into DN42. Until a DN42 chapter explicitly replaces them with authorized resources and explicit filters, Pocket Internet routes stay inside the lab.
+
 Each namespace owns:
 
 - its own interfaces,
@@ -89,6 +93,7 @@ Pocket Internet eventually gets a border to DN42. That border must be explicit a
 
 - no accidental default route into DN42,
 - no unauthorized route advertisement into DN42,
+- no Pocket Internet route export by default,
 - outbound reachability before inbound exposure,
 - return path treated as a first-class requirement,
 - rollback tested before any real peering change.

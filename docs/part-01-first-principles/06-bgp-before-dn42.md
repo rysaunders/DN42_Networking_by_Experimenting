@@ -58,6 +58,10 @@ flowchart LR
   AS4 ---|"10.42.41.0/30<br/>BGP session"| AS1
 ```
 
+!!! note "Lab-only prefixes and ASNs"
+
+    The `172.20.x.x` service loopbacks and `AS424242000x` labels are Pocket Internet resources for this local lab. They are not DN42 authorization. The export filters in this chapter keep those routes inside the lab topology.
+
 The new part is the control plane:
 
 ```text
@@ -93,6 +97,7 @@ Safety level: routing-daemon lab.
 - The lab does not add host default routes.
 - The lab does not touch public DN42 peers.
 - BGP import and export filters allow only the four Pocket Internet service loopbacks.
+- Pocket Internet service loopbacks are not exported to DN42.
 - Rollback stops the lab BIRD processes and deletes the namespaces.
 
 Before the lab, capture the host baseline:

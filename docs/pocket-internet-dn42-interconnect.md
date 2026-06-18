@@ -6,6 +6,10 @@ The border is where local lab reasoning meets shared routing practice. It should
 
 This page is not a promise that the book will publish Pocket Internet routes into DN42 by default. The safer default is to keep Pocket Internet local, then use the border model to make real DN42 setup feel intuitive instead of magical.
 
+!!! note "Default export stance"
+
+    Pocket Internet prefixes and AS labels are lab-only unless a later DN42 chapter replaces them with authorized resources. The default border design sends no Pocket Internet routes into DN42. Any exception must name the authorized prefix, show the exact export filter, and include rollback.
+
 ## Reader Starting Point
 
 This is a later design page. It is here so the project has a clear destination, not because a new reader should implement it immediately.
@@ -33,6 +37,7 @@ For now, read this page as a map of where Pocket Internet is going.
 - Export filter: a rule for which routes you announce to a neighbor.
 - Route leak: accidentally announcing or accepting routes that should not cross the border.
 - Authorized prefix: an address block you are allowed to announce.
+- Lab-only prefix: an address block used only inside the local lab.
 
 ## Goal
 

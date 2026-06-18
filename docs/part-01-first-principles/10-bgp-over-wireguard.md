@@ -140,6 +140,10 @@ You will create the same four AS-shaped namespaces:
 | `pocket-as3` | `4242420003` | `172.20.3.1/32` |
 | `pocket-as4` | `4242420004` | `172.20.4.1/32` |
 
+!!! note "Lab-only prefixes and ASNs"
+
+    These ASNs and service loopbacks are local Pocket Internet resources. WireGuard changes one link into a tunnel, but it does not change the authorization rule: lab routes are not exported outside the lab by default.
+
 Three links remain veth routed links:
 
 | Link | Prefix |
