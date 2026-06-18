@@ -1,5 +1,8 @@
 # First WireGuard Peer
 
+!!! warning "Later draft - not implementation-ready"
+    This page is roadmap material. Current DN42 WireGuard peer expectations, MTU guidance, firewall behavior, and rollback checks must be refreshed before release.
+
 ## Concept
 
 A DN42 WireGuard peer creates the tunnel link used by BGP.

@@ -1,5 +1,8 @@
 # Registry Objects
 
+!!! warning "Later draft - not implementation-ready"
+    This page is roadmap material. Current DN42 registry practice must be refreshed before release, and the draft below is not a complete submission procedure.
+
 ## Concept
 
 DN42 registry objects describe maintainers, contacts, ASNs, prefixes, routes, and optional DNS delegations.

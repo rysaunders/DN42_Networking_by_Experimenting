@@ -1,5 +1,8 @@
 # First Service
 
+!!! warning "Later draft - not implementation-ready"
+    This page is roadmap material. Current DN42 service, firewall, source-address, return-path, and exposure guidance must be refreshed before release.
+
 ## Concept
 
 A reachable service proves more than a route exists. It proves forward path, return path, source address, firewall, and application binding are aligned.

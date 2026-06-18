@@ -1,5 +1,8 @@
 # Kernel Routes
 
+!!! warning "Later draft - not implementation-ready"
+    This page is roadmap material. Current DN42 route-installation, forwarding, firewall, and troubleshooting guidance must be refreshed before release.
+
 ## Concept
 
 BIRD can know routes that Linux does not use for forwarding until they are exported to the kernel.

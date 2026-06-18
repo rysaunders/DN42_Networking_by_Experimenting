@@ -1,5 +1,8 @@
 # First BIRD Session
 
+!!! warning "Later draft - not implementation-ready"
+    This page is roadmap material. Current DN42 BIRD 2 practice, registry-derived validation, import filters, and export filters must be refreshed before release.
+
 ## Concept
 
 BIRD establishes a BGP session with the DN42 peer and applies import/export policy.

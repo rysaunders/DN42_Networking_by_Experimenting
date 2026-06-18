@@ -1,5 +1,8 @@
 # DN42 DNS
 
+!!! warning "Later draft - not implementation-ready"
+    This page is roadmap material. Current DN42 DNS resolver recommendations and resolver-specific behavior must be refreshed before release.
+
 ## Concept
 
 Split DNS lets `.dn42` names resolve through DN42-aware resolvers while normal public DNS continues to work normally.
