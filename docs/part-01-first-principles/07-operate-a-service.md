@@ -90,7 +90,11 @@ ip route get 1.1.1.1
 
 ## Lab
 
-Build the BGP Pocket Internet from the previous chapter first. Stop after BGP has installed a route from `pocket-as1` to `172.20.3.1`.
+This lab is a dependent extension of the BGP Pocket Internet from the previous chapter, with one service added inside `pocket-as3`.
+
+That dependency is not ideal, but it is explicit: the lesson starts from a named checkpoint instead of hidden state. Every chapter should still leave a reader with rollback commands that remove the state it created.
+
+If you already have the BGP lab running, you can continue from it. The checkpoint is this: BGP has installed a route from `pocket-as1` to `172.20.3.1`.
 
 You should be able to run:
 
@@ -104,7 +108,9 @@ Expected observations:
 - `route show` includes `proto bird`,
 - `route get` sends traffic through one of `pocket-as1`'s neighbors.
 
-The repeatable validation script builds the whole lab from scratch:
+If those commands do not show a BGP-learned route, rebuild the BGP Pocket Internet before continuing.
+
+The repeatable validation script is standalone and builds the whole lab from scratch:
 
 ```text
 experiments/labs/pocket-internet-service/run.sh
@@ -194,12 +200,15 @@ Start the HTTP service inside `pocket-as3`, but bind it to `127.0.0.1`:
 ```sh
 ip netns exec pocket-as3 python3 -m http.server 8080 \
   --bind 127.0.0.1 \
-  --directory /tmp/pocket-internet-service/www
+  --directory /tmp/pocket-internet-service/www \
+  > /tmp/pocket-internet-service/service.log 2>&1 &
+echo "$!" > /tmp/pocket-internet-service/service.pid
+sleep 1
 ```
 
-Run that command in a shell you can leave open. It will keep running until you stop it with `Ctrl-C`.
+That starts the service in the background and saves its process ID. The log goes to `/tmp/pocket-internet-service/service.log`.
 
-In another shell, inspect the listener:
+Inspect the listener:
 
 ```sh
 ip netns exec pocket-as3 ss -ltnp 'sport = :8080'
@@ -250,7 +259,18 @@ Read that failure carefully:
 
 This is a common real-world shape. "The service is running" is not the same as "the service is reachable on the address the network is routing to."
 
-Stop the wrong listener before continuing. If you started it in the foreground as shown above, press `Ctrl-C` in that shell.
+Inspect the service log if you want to see the local request:
+
+```sh
+cat /tmp/pocket-internet-service/service.log
+```
+
+Stop the wrong listener before continuing:
+
+```sh
+ip netns exec pocket-as3 kill "$(cat /tmp/pocket-internet-service/service.pid)"
+rm -f /tmp/pocket-internet-service/service.pid
+```
 
 ## Step 4: Bind The Service To The Service Loopback
 
@@ -259,10 +279,13 @@ Start the HTTP service again, this time bound to `172.20.3.1`:
 ```sh
 ip netns exec pocket-as3 python3 -m http.server 8080 \
   --bind 172.20.3.1 \
-  --directory /tmp/pocket-internet-service/www
+  --directory /tmp/pocket-internet-service/www \
+  > /tmp/pocket-internet-service/service.log 2>&1 &
+echo "$!" > /tmp/pocket-internet-service/service.pid
+sleep 1
 ```
 
-As before, leave this command running while you test from another shell.
+As before, the service is running in the background while you test it.
 
 Inspect the listener:
 
@@ -313,7 +336,13 @@ Those two commands are the routing proof.
 
 The HTTP response is the application proof.
 
-If you can inspect the service log, you should see the client source address:
+Inspect the service log:
+
+```sh
+cat /tmp/pocket-internet-service/service.log
+```
+
+You should see the client source address:
 
 ```text
 172.20.1.1 - - [...] "GET / HTTP/1.1" 200 -
@@ -363,12 +392,13 @@ Packets need a way back. A forward route alone is not a working service path.
 
 ## Rollback
 
-Stop the HTTP service if it is still running. If it is running in the foreground, press `Ctrl-C`.
-
-If you need a command-based cleanup, stop the HTTP service from another shell:
+Stop the HTTP service if it is still running:
 
 ```sh
-ip netns exec pocket-as3 pkill -f 'python3 -m http.server 8080' 2>/dev/null || true
+if [ -f /tmp/pocket-internet-service/service.pid ]; then
+  ip netns exec pocket-as3 kill "$(cat /tmp/pocket-internet-service/service.pid)" 2>/dev/null || true
+  rm -f /tmp/pocket-internet-service/service.pid
+fi
 ```
 
 Stop the lab BIRD processes if they are still running:

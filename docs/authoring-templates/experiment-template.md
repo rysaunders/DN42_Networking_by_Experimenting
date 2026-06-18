@@ -48,6 +48,35 @@ For each command, explain what state it changes before showing the command.
 
 Experiments should be manual-first. A script can exist for repeatability and transcript capture, but the published lesson should teach the reader to build the important state directly in the shell.
 
+## Code Block Conventions
+
+Use code block titles for execution context and purpose:
+
+- `Run from the root Linux shell`
+- `Run inside pocket-as1`
+- `Write /tmp/example.conf`
+- `Expected output`
+
+Keep command blocks, config blocks, output blocks, and interpretation separate. For generated config blocks over about 20 lines, use sparse annotations for the few lines that teach the concept under test. Avoid annotating every setup command.
+
+## Lab State Continuity
+
+Declare whether the experiment is standalone, dependent on a named checkpoint, or an extension of a still-running prior lab.
+
+For now, prefer standalone experiments that rebuild their own required state and clean up afterward. This costs more commands, but it avoids hidden state and makes transcripts easier to trust.
+
+If an experiment uses a setup helper or checkpoint script, document that the helper restores known state; do not let it replace the manual teaching path for the concept under study.
+
+## Long-Running Processes
+
+If the experiment starts a service or daemon:
+
+- Prefer backgrounding it and recording a PID file under the lab temp directory.
+- Capture logs to a file when those logs are part of the evidence.
+- Show the command that proves the process is listening.
+- Show rollback that kills the process by PID before deleting namespaces.
+- Mention a second shell only as an optional workflow, not as a requirement.
+
 ## Predict Before Running
 
 Ask the reader to predict what should happen before at least one route lookup, packet test, or service check.

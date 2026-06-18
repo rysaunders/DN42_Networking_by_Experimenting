@@ -43,6 +43,10 @@ Review for:
 - weak or missing mental models,
 - weak or missing diagrams,
 - commands that can be copied without understanding,
+- hidden state assumptions between chapters or labs,
+- long-running processes that require unclear shell/process handling,
+- tooltip density that makes ordinary prose feel like a vocabulary quiz,
+- missing code block titles where execution context or generated config file names matter,
 - places where the draft assumes operational knowledge not yet taught,
 - misleading simplifications,
 - mismatch between the draft and the validated transcript or cited research.

@@ -22,6 +22,8 @@ Define every new term before using it as if the reader already knows it.
 
 Update `docs/reader-knowledge.md` for every term this chapter teaches for the first time.
 
+Add new terms to `docs/glossary.md` by default. Add a term to `includes/abbreviations.md` only when it should appear as a high-value global tooltip: acronyms, proper tools or protocols, safety-critical concepts, or ideas readers commonly confuse after introduction. Common nouns such as route, address, prefix, interface, service, and port should usually stay glossary-only after they have been taught.
+
 ## Why It Matters
 
 Explain what breaks if the reader does not understand this.
@@ -69,6 +71,42 @@ Ask the reader to predict one or more observable outcomes before running command
 Use commands only after they have been tested or clearly marked as research required. Explain what each command changes before showing the command.
 
 Labs should be manual-first. Show the reader the commands that build the state step by step. Scripts are allowed as repeatable validation and transcript capture, but they should not be the primary learning path unless the setup is too large or unsafe to type manually.
+
+### Code Block Conventions
+
+Use MkDocs Material code block features when they reduce reader confusion:
+
+- Add a title to command blocks when execution context matters, such as `Run from the root Linux shell` or `Run inside pocket-as1`.
+- Add a title to generated config blocks naming the file being written.
+- Keep commands, generated config, expected output, and interpretation in separate blocks.
+- For config blocks longer than about 20 lines, annotate only the lines that carry the new concept: router ID, local AS, neighbor address, peer AS, source address, import filter, export filter, or listener bind address.
+- Use line highlighting sparingly for values the reader must compare across namespaces.
+- Do not use formatting to hide manual-first commands. The reader should still build the important state directly.
+
+### Lab State Continuity
+
+State whether the lab is:
+
+- standalone: it builds all required state from a clean environment,
+- dependent: it starts from a clearly named prior checkpoint,
+- extension: it assumes the previous chapter's lab is still running.
+
+Prefer standalone labs for published chapters until the project has a durable checkpoint pattern. If a lab depends on prior state, include the exact checkpoint commands that prove the prerequisite state exists, and say what to do when it does not.
+
+Validation scripts should default to cleanup so they are safe to rerun. If a future helper intentionally leaves state running, it must be opt-in, clearly named, and include the matching cleanup command.
+
+### Long-Running Processes
+
+For beginner labs, prefer a command-based background process pattern over requiring a second shell:
+
+1. Start the process in the background.
+2. Write its PID to a file under the lab's temporary directory.
+3. Sleep briefly or poll until the listener is visible.
+4. Inspect listener state with commands such as `ss`.
+5. Inspect logs from a file when useful.
+6. Stop the process by PID during rollback.
+
+A second shell can be mentioned as an option, but it should not be the only path through the lesson.
 
 ## Expected Observations
 
