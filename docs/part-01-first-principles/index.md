@@ -9,4 +9,4 @@ By the end of this part, the reader should be able to:
 - Read route tables and identify connected, default, and blackhole routes.
 - Explain why explicit routes matter before dynamic routing is introduced.
 
-The first labs are local and disposable. BIRD, BGP, WireGuard, and public DN42 state come later.
+The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, and WireGuard before any public DN42 state enters the picture.

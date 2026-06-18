@@ -59,8 +59,9 @@ networking-by-experimenting-with-dn42/
       02-addressing-and-subnets.md
       03-pocket-internet-static-routing.md
       04-routing-tables.md
-      05-wireguard-as-a-link.md
       06-bgp-before-dn42.md
+      07-operate-a-service.md
+      08-wireguard-as-a-link.md
     part-02-first-dn42-node/
       index.md
       01-registry-objects.md

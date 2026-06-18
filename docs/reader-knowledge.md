@@ -222,3 +222,34 @@ Reader has not yet been taught:
 - DNS forwarding or delegation,
 - WireGuard cryptokey routing,
 - DN42 registry objects.
+
+## After Part 1, WireGuard as a Pocket Internet Link
+
+Introduced by `docs/part-01-first-principles/08-wireguard-as-a-link.md`.
+
+Reader has seen:
+
+- WireGuard: a VPN protocol that creates encrypted tunnel interfaces,
+- tunnel: a logical link carried inside another network path,
+- underlay: the network that carries tunnel packets,
+- overlay: the network interface the tunnel creates for routed traffic,
+- private key: a secret WireGuard key that stays local,
+- public key: the key given to a peer,
+- endpoint: the underlay IP and UDP port where a peer receives WireGuard packets,
+- handshake: evidence that WireGuard peers exchanged setup traffic,
+- AllowedIPs: WireGuard's peer-selection and packet-allow list,
+- BGP running over WireGuard as a link,
+- WireGuard counters as evidence that routed traffic crossed the tunnel.
+
+Reader has only been lightly introduced to:
+
+- AllowedIPs as distinct from BGP policy,
+- host-to-lab access as a later outside-path question.
+
+Reader has not yet been taught:
+
+- MTU sizing,
+- NAT traversal and persistent keepalive,
+- `wg-quick`,
+- real DN42 peer expectations,
+- DN42 registry objects.

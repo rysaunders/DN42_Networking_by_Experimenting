@@ -10,6 +10,9 @@ ASN
 Application traffic
 : Traffic for a real program instead of a routing probe such as ping.
 
+AllowedIPs
+: WireGuard's peer-selection and packet-allow list for tunnel traffic.
+
 Bind address
 : The local address a service attaches to when it starts listening.
 
@@ -25,17 +28,35 @@ Convergence
 DN42
 : A community overlay network used for learning and experimenting with routing, DNS, and network services.
 
+Endpoint
+: The underlay address and UDP port where a WireGuard peer receives tunnel packets.
+
+Handshake
+: Evidence that WireGuard peers exchanged setup traffic.
+
 HTTP
 : A simple request/response protocol used by web clients and servers.
 
 Listener
 : The address and port where a service waits for connections.
 
+Overlay
+: The logical network carried by an underlay.
+
 Port
 : A number identifying a service on an address.
 
+Private key
+: A secret key that stays local.
+
+Public key
+: A key that can be shared with a peer.
+
 Service
 : A program that listens for network connections and responds.
+
+Tunnel
+: A logical link carried inside another network path.
 
 FIB
 : Forwarding Information Base. The forwarding table used by the data plane.
