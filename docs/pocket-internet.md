@@ -8,7 +8,7 @@ The guiding question is:
 
 Pocket Internet answers that question in a controlled environment.
 
-The first version is simple: we fake several small computers and routers inside one Linux machine. They get links between them, addresses on those links, and route tables that decide where packets go.
+The first version is simple: we build several small computers and routers inside one Linux machine. They get links between them, addresses on those links, and route tables that decide where packets go.
 
 Later chapters add the pieces one at a time:
 
@@ -17,7 +17,7 @@ Later chapters add the pieces one at a time:
 - WireGuard, so one local lab link can become a tunnel,
 - DN42, so the lab can connect to a living network.
 
-DN42 is the bridge from this laboratory to a living network. The end game is not to build a small lab and stop. The end game is to understand every component well enough to connect the lab-built network to DN42, route across that boundary safely, and operate services on a real routed network.
+DN42 is the bridge from this laboratory to a living network. The end game is not to build a small lab and stop. The end game is to understand every component well enough to approach DN42 safely, reason about the boundary, and operate services on a real routed network.
 
 ## Mental Model
 

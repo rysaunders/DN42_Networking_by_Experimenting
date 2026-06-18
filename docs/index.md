@@ -1,16 +1,18 @@
 # Building a Small Internet
 
-Networking by Experimenting with DN42 is a hands-on book/site for learning networking by building, breaking, observing, and explaining a small Internet.
+Pocket Internet is a hands-on book/site for learning networking by building, breaking, observing, and explaining a small Internet on one Linux machine.
 
-This project is intentionally not a copy-and-paste setup guide. Each chapter should connect a lab observation to a networking concept, then explain how the same idea appears in DN42 and on the public Internet.
+This project is intentionally not a copy-and-paste setup guide. Each chapter should connect a lab observation to a networking concept, then show how the same idea appears in larger routed networks.
 
 The guiding question is:
 
 > How does an Internet emerge from a collection of computers exchanging routes?
 
+DN42 enters later as the bridge from the local laboratory to a living routing ecosystem. The first job is to build the model locally enough that real network peers, route rules, and services have somewhere to fit in your head.
+
 ## Current Scope
 
-The first release target is `v0.1`: Pocket Internet foundation, route-selection labs, BIRD/BGP inside the lab, one WireGuard-replaced lab link, and a safe DN42 border design.
+The first release target is `v0.1`: Pocket Internet foundation, route-selection labs, BIRD/BGP inside the lab, WireGuard link mechanics, and safe DN42 border preparation.
 
 The first version of the site focuses on:
 

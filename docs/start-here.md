@@ -2,6 +2,8 @@
 
 This book assumes curiosity and basic command-line comfort, not professional network engineering experience.
 
+The first arc is Pocket Internet: a local lab where Linux namespaces become small routers, veth pairs become links, loopbacks become service addresses, and routing tables decide where packets go. DN42 comes later, after those pieces are familiar enough to use safely on a real shared network.
+
 If the early Linux terms start to blur together, keep [Linux Networking Objects](linux-networking-objects.md) open as the visual map. It shows how namespaces, interfaces, addresses, routes, loopback, and forwarding fit together before the labs start combining them.
 
 ## Reader Path
