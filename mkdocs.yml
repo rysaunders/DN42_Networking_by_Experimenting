@@ -77,6 +77,7 @@ nav:
       - Pocket Internet Static Routing: part-01-first-principles/03-pocket-internet-static-routing.md
       - Pocket Internet Route Selection: part-01-first-principles/04-routing-tables.md
       - BGP Before DN42: part-01-first-principles/06-bgp-before-dn42.md
+      - Operate a Service: part-01-first-principles/07-operate-a-service.md
   - Later - DN42 Node:
       - Overview: part-02-first-dn42-node/index.md
       - Registry Objects: part-02-first-dn42-node/01-registry-objects.md

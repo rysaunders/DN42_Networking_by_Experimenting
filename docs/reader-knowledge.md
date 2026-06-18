@@ -193,3 +193,32 @@ Reader has not yet been taught:
 - WireGuard cryptokey routing,
 - DN42 registry objects,
 - DNS forwarding or delegation.
+
+## After Part 1, Operate a Service Inside Pocket Internet
+
+Introduced by `docs/part-01-first-principles/07-operate-a-service.md`.
+
+Reader has seen:
+
+- service: a program that listens for network connections and responds,
+- listener: the address and port where a service waits for connections,
+- bind address: the local address a service attaches to,
+- port: a number identifying a service on an address,
+- HTTP: a simple request/response protocol used by web servers and clients,
+- application traffic: traffic for a real program instead of a routing probe,
+- listener binding as separate from route reachability,
+- `ss` as a way to inspect listening sockets,
+- service logs as evidence of the source address reaching the application.
+
+Reader has only been lightly introduced to:
+
+- service troubleshooting as a layered routing, listener, source, and return-path problem.
+
+Reader has not yet been taught:
+
+- host-to-lab access,
+- firewall rules around services,
+- persistent service supervision,
+- DNS forwarding or delegation,
+- WireGuard cryptokey routing,
+- DN42 registry objects.
