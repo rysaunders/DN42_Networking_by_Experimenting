@@ -1,7 +1,7 @@
 *[address]: One specific point in the IP address space, usually assigned to an interface or loopback.
 *[address space]: The full set of addresses that can exist in an IP version or prefix.
 *[application traffic]: Traffic for a real program instead of a routing probe such as ping.
-*[AllowedIPs]: WireGuard's peer-selection and packet-allow list for tunnel traffic.
+*[AllowedIPs]: WireGuard's peer-selection and packet-allow list for tunnel traffic. Some tools also use it to install routes.
 *[autonomous system]: One independently controlled network boundary. In real Internet routing, an autonomous system is identified by an ASN.
 *[bind address]: The local address a service attaches to when it starts listening.
 *[BGP]: Border Gateway Protocol. Routers use BGP to exchange network reachability with other routers.
@@ -17,6 +17,7 @@
 *[handshake]: Evidence that WireGuard peers exchanged setup traffic.
 *[HTTP]: A simple request/response protocol used by web clients and servers.
 *[import filter]: A rule that decides which routes a router accepts from a neighbor.
+*[inner packet]: The packet the overlay network thinks it is sending before a tunnel wraps it.
 *[interface]: A place where packets enter or leave a network stack.
 *[listener]: The address and port where a service waits for connections.
 *[longest-prefix match]: The route lookup rule that the most-specific matching route wins.
@@ -26,6 +27,7 @@
 *[next hop]: The next router a packet should be sent to.
 *[on-link]: Reachable through a local interface without first sending the packet to another IP router.
 *[overlay]: The logical network carried by an underlay.
+*[outer packet]: The packet that carries a tunneled inner packet across the underlay.
 *[port]: A number identifying a service on an address.
 *[prefix]: A group of IP addresses written as a starting address plus a prefix length.
 *[prefix length]: The number after `/`; a larger number means a smaller, more-specific prefix.
@@ -43,4 +45,5 @@
 *[tunnel]: A logical link carried inside another network path.
 *[underlay]: The network that carries an overlay tunnel.
 *[veth pair]: A virtual Ethernet cable with two ends. A packet sent into one end comes out the other.
+*[VPN]: A tool that creates a private-looking network path across another network.
 *[WireGuard]: A VPN protocol commonly used to create encrypted tunnel links.

@@ -11,7 +11,7 @@ Application traffic
 : Traffic for a real program instead of a routing probe such as ping.
 
 AllowedIPs
-: WireGuard's peer-selection and packet-allow list for tunnel traffic.
+: WireGuard's peer-selection and packet-allow list for tunnel traffic. In `wg-quick` and some real peer examples, AllowedIPs may also be used to install routes.
 
 Bind address
 : The local address a service attaches to when it starts listening.
@@ -37,11 +37,17 @@ Handshake
 HTTP
 : A simple request/response protocol used by web clients and servers.
 
+Inner packet
+: The packet the overlay network thinks it is sending before a tunnel wraps it.
+
 Listener
 : The address and port where a service waits for connections.
 
 Overlay
 : The logical network carried by an underlay.
+
+Outer packet
+: The packet that carries a tunneled inner packet across the underlay.
 
 Port
 : A number identifying a service on an address.
@@ -57,6 +63,9 @@ Service
 
 Tunnel
 : A logical link carried inside another network path.
+
+VPN
+: A tool that creates a private-looking network path across another network.
 
 FIB
 : Forwarding Information Base. The forwarding table used by the data plane.

@@ -223,21 +223,51 @@ Reader has not yet been taught:
 - WireGuard cryptokey routing,
 - DN42 registry objects.
 
-## After Part 1, WireGuard as a Pocket Internet Link
+## After Part 1, Links, Tunnels, Underlays, and Overlays
 
-Introduced by `docs/part-01-first-principles/08-wireguard-as-a-link.md`.
+Introduced by `docs/part-01-first-principles/08-links-tunnels-underlays-overlays.md`.
+
+Reader has seen:
+
+- VPN: a tool that creates a private-looking network path across another network,
+- tunnel: a logical link carried inside another network path,
+- underlay: the network that carries tunnel packets,
+- overlay: the logical network created on top of an underlay,
+- inner packet: the packet the lab network thinks it is sending,
+- outer packet: the packet that carries the inner packet across the underlay,
+- veth as the local lab stand-in for a public carrier network,
+- `10.42.23.2` as an overlay neighbor and `192.0.2.2` as an underlay endpoint in the WireGuard lab shape,
+- BGP as a protocol that can run over any reachable link, including a tunnel.
+
+Reader has only been lightly introduced to:
+
+- WireGuard as the tool that will create the tunnel in the next lab.
+
+Reader has not yet been taught:
+
+- WireGuard key setup,
+- WireGuard endpoint configuration,
+- WireGuard `AllowedIPs`,
+- WireGuard handshakes,
+- MTU sizing,
+- NAT traversal and persistent keepalive,
+- `wg-quick`,
+- real DN42 peer expectations,
+- DN42 registry objects.
+
+## After Part 1, Replace a Pocket Internet Link with WireGuard
+
+Introduced by `docs/part-01-first-principles/09-wireguard-as-a-link.md`.
 
 Reader has seen:
 
 - WireGuard: a VPN protocol that creates encrypted tunnel interfaces,
-- tunnel: a logical link carried inside another network path,
-- underlay: the network that carries tunnel packets,
-- overlay: the network interface the tunnel creates for routed traffic,
 - private key: a secret WireGuard key that stays local,
 - public key: the key given to a peer,
 - endpoint: the underlay IP and UDP port where a peer receives WireGuard packets,
 - handshake: evidence that WireGuard peers exchanged setup traffic,
 - AllowedIPs: WireGuard's peer-selection and packet-allow list,
+- in this raw `wg set` lab, AllowedIPs does not create the BGP-learned routes; later tools may also use AllowedIPs to install routes,
 - BGP running over WireGuard as a link,
 - WireGuard counters as evidence that routed traffic crossed the tunnel.
 

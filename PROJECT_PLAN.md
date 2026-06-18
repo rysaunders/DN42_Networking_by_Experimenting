@@ -61,7 +61,8 @@ networking-by-experimenting-with-dn42/
       04-routing-tables.md
       06-bgp-before-dn42.md
       07-operate-a-service.md
-      08-wireguard-as-a-link.md
+      08-links-tunnels-underlays-overlays.md
+      09-wireguard-as-a-link.md
     part-02-first-dn42-node/
       index.md
       01-registry-objects.md
@@ -240,11 +241,13 @@ Reader outcome: the reader understands that routing stays the same when a local 
 
 Chapters:
 
-1. **WireGuard as a Link**
-   - Concept: encrypted overlay link over an underlay.
+1. **Links, Tunnels, Underlays, and Overlays**
+   - Concept: a tunnel is a link-shaped thing carried inside another network.
+
+2. **Replace a Pocket Internet Link with WireGuard**
    - Lab: replace one Pocket Internet veth link with WireGuard.
 
-2. **Underlay, Overlay, and MTU**
+3. **Underlay, Overlay, and MTU**
    - Concept: packets inside packets, endpoint reachability, and packet size limits.
    - Lab: observe clear overlay traffic and encrypted underlay traffic.
 
