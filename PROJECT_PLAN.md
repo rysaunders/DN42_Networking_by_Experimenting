@@ -59,6 +59,7 @@ networking-by-experimenting-with-dn42/
       02-addressing-and-subnets.md
       03-pocket-internet-static-routing.md
       04-routing-tables.md
+      05-bird-as-route-manager.md
       06-bgp-before-dn42.md
       07-operate-a-service.md
       08-links-tunnels-underlays-overlays.md
@@ -163,15 +164,16 @@ Every chapter should use the same visible structure:
 - How the real Internet does this
 - References and research notes
 
-### Part 1: From Host to Router
+### Part 1: Pocket Internet Foundations
 
-Reader outcome: the reader can explain what a Linux router is doing before DN42 enters the picture.
+Reader outcome: the reader can explain the local Pocket Internet routing model before DN42 enters the picture.
 
 You know it works when:
 
 - The reader can predict which interface a packet will leave.
 - The reader can explain source address selection at a basic level.
-- The reader can read a route table and identify default, connected, and blackhole routes.
+- The reader can read a route table and identify default, connected, static, and BGP-learned routes.
+- The reader can explain why BIRD becomes useful before public DN42 peers enter the story.
 
 Chapters:
 
@@ -927,6 +929,7 @@ Included:
   - Addresses and Prefixes.
   - Routing Tables.
   - Pocket Internet with Static Routes.
+  - BIRD as a Route Manager placeholder.
 - Pocket Internet foundation chapters:
   - Addresses, Prefixes, and Longest Match.
   - Route selection and static route repair.

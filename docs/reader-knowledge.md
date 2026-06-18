@@ -160,6 +160,14 @@ Reader has not yet been taught:
 - DN42 registry objects,
 - DNS forwarding or delegation.
 
+## After Part 1, BIRD as a Route Manager
+
+Introduced by `docs/part-01-first-principles/05-bird-as-route-manager.md`.
+
+This chapter is currently a planned bridge chapter. It does not yet add required reader knowledge.
+
+Beginner reviews for later chapters should continue to assume the reader has not been taught BIRD details until this chapter is drafted or until those details appear in `docs/part-01-first-principles/06-bgp-before-dn42.md`.
+
 ## After Part 1, BGP Before DN42
 
 Introduced by `docs/part-01-first-principles/06-bgp-before-dn42.md`.
