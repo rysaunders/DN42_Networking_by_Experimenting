@@ -164,9 +164,33 @@ Reader has not yet been taught:
 
 Introduced by `docs/part-01-first-principles/05-bird-as-route-manager.md`.
 
-This chapter is currently a planned bridge chapter. It does not yet add required reader knowledge.
+Reader has seen:
 
-Beginner reviews for later chapters should continue to assume the reader has not been taught BIRD details until this chapter is drafted or until those details appear in `docs/part-01-first-principles/06-bgp-before-dn42.md`.
+- routing daemon: a background program that manages routes,
+- BIRD: the routing daemon used by the Pocket Internet lab,
+- BIRD route table as separate from the Linux route table,
+- `protocol direct` learning a route from a local interface,
+- `protocol static` creating a configured route inside BIRD,
+- `protocol kernel` controlling route movement between BIRD and Linux,
+- kernel export as the boundary where selected BIRD routes enter Linux,
+- import and export filters as local control points before public peers exist,
+- `proto bird` in Linux route output as evidence that BIRD installed a route,
+- BIRD knowing a route as separate from Linux forwarding with that route.
+
+Reader has only been lightly introduced to:
+
+- BIRD route preference values,
+- blackhole routes as a safe observation tool.
+
+Reader has not yet been taught:
+
+- BGP sessions,
+- AS_PATH,
+- local preference,
+- BGP route import and export policy between neighbors,
+- WireGuard cryptokey routing,
+- DN42 registry objects,
+- DNS forwarding or delegation.
 
 ## After Part 1, BGP Before DN42
 
@@ -174,17 +198,14 @@ Introduced by `docs/part-01-first-principles/06-bgp-before-dn42.md`.
 
 Reader has seen:
 
-- routing daemon: a background program that manages routes,
-- BIRD: the routing daemon used in the Pocket Internet lab,
 - BGP: a protocol routers use to exchange reachability,
 - BGP session: one BGP conversation between two routers,
 - neighbor: the router on the other side of a BGP session,
 - local AS: the autonomous system number a router uses for itself,
 - peer AS: the autonomous system number expected from the neighbor,
 - route advertisement: telling a neighbor that a prefix is reachable,
-- import filter: a rule for deciding which received routes to accept,
-- export filter: a rule for deciding which routes to announce,
-- kernel protocol: the BIRD component that installs selected routes into Linux,
+- BGP import filter: a rule for deciding which received neighbor routes to accept,
+- BGP export filter: a rule for deciding which routes to announce to a neighbor,
 - convergence: the network settling on new routes after a change,
 - BIRD route state and Linux route state as related but separate views,
 - route withdrawal after BGP sessions lose reachability.

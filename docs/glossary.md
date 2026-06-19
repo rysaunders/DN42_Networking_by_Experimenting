@@ -36,11 +36,17 @@ BGP
 BIRD
 : A routing daemon commonly used in DN42 labs and deployments.
 
+BIRD route table
+: BIRD's own set of known and selected routes. It is separate from the Linux route table used for packet forwarding.
+
 Convergence
 : The network settling on usable routes after a routing change or failure.
 
 Connected route
 : A route Linux creates automatically for a prefix assigned directly to an interface.
+
+Direct protocol
+: A BIRD protocol that learns routes from local interfaces.
 
 Default route
 : The fallback route used when no more-specific route matches. In IPv4 it is also written as `0.0.0.0/0`.
@@ -52,7 +58,7 @@ Endpoint
 : The underlay address and UDP port where a WireGuard peer receives tunnel packets.
 
 Export filter
-: A rule that decides which routes a router announces to a neighbor.
+: A rule that decides which routes may leave a BIRD table toward a protocol. In BGP, that usually means deciding which routes to announce to a neighbor. In the kernel protocol, it means deciding which routes BIRD may install into Linux.
 
 Forwarding
 : Receiving a packet that is not addressed to this machine and sending it onward according to the route table.
@@ -67,7 +73,7 @@ HTTP
 : A simple request/response protocol used by web clients and servers.
 
 Import filter
-: A rule that decides which routes a router accepts from a neighbor.
+: A rule that decides which routes may enter a BIRD table from a protocol. In BGP, that usually means deciding which received neighbor routes to accept.
 
 Inner packet
 : The packet the overlay network thinks it is sending before a tunnel wraps it.
@@ -83,6 +89,9 @@ Longest-prefix match
 
 Lab-only prefix
 : An address block used only inside the local lab. A lab-only prefix can teach routing behavior, but it is not permission to advertise that route to DN42 or any other external network.
+
+Kernel protocol
+: A BIRD protocol that exchanges routes with the Linux kernel route table. In the Pocket Internet labs, it is the boundary where selected BIRD routes can become Linux forwarding routes.
 
 Loopback
 : The `lo` interface inside a network stack; traffic sent to loopback stays inside that stack.
@@ -136,7 +145,10 @@ Route lookup
 : Asking Linux which route it would use for a packet.
 
 Route table
-: The list of routes Linux uses when deciding where to send packets.
+: A list of routes used by a routing component. Linux has route tables for packet forwarding; BIRD has its own route table before selected routes are exported to Linux.
+
+Routing daemon
+: A background program that manages routes.
 
 Service
 : A program that listens for network connections and responds.
@@ -146,6 +158,9 @@ Service loopback
 
 Static route
 : A route written by hand.
+
+Static protocol
+: A BIRD protocol that creates configured routes inside BIRD.
 
 Tunnel
 : A logical link carried inside another network path.

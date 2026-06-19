@@ -2,15 +2,15 @@
 
 ## Reader Starting Point
 
-This chapter assumes you have completed Pocket Internet with Static Routes and Pocket Internet Route Selection. You should know what a namespace, interface, veth pair, address, prefix, route, next hop, connected route, route lookup, service loopback, static route, return path, forwarding, and longest-prefix match are.
+This chapter assumes you have completed Pocket Internet with Static Routes, Pocket Internet Route Selection, and BIRD as a Route Manager. You should know what a namespace, interface, veth pair, address, prefix, route, next hop, connected route, route lookup, service loopback, static route, return path, forwarding, longest-prefix match, routing daemon, BIRD route table, and kernel export are.
 
-You have not needed BIRD or BGP yet. That was deliberate.
+You have used BIRD locally, but you have not made routers exchange routes yet. That was deliberate.
 
 By now, the annoying part should be visible: the links are easy to create, but keeping every route correct by hand gets old quickly. A tiny four-router lab already needs forward routes, return routes, repairs, and enough mental bookkeeping to make mistakes likely.
 
-This chapter adds the missing worker:
+This chapter gives BIRD a new job:
 
-> BIRD learns routes from other routers, chooses usable routes, and asks Linux to install them.
+> BIRD learns routes from other routers, chooses usable routes, and asks Linux to install selected routes.
 
 BGP is the language BIRD will speak to other BIRD instances.
 
@@ -18,17 +18,14 @@ BGP is the language BIRD will speak to other BIRD instances.
 
 | Term | Plain-language meaning | Example in this lab |
 | --- | --- | --- |
-| Routing daemon | A background program that manages routes. | `bird` |
-| BIRD | A routing daemon often used in DN42. | One BIRD process in each namespace |
 | BGP | A protocol routers use to exchange reachability. | `pocket-as1` learns `172.20.3.1/32` from a neighbor |
 | BGP session | One BGP conversation between two routers. | `pocket-as1` talking to `pocket-as2` |
 | Neighbor | The router on the other side of a BGP session. | `10.42.12.2` from `pocket-as1` |
 | Local AS | The autonomous system number this router uses for itself. | `4242420001` |
 | Peer AS | The autonomous system number expected from the neighbor. | `4242420002` |
 | Route advertisement | Telling a neighbor that a prefix is reachable. | Advertising `172.20.1.1/32` |
-| Import filter | A rule for deciding which received routes to accept. | Accept only Pocket Internet service loopbacks |
-| Export filter | A rule for deciding which routes to announce. | Announce only Pocket Internet service loopbacks |
-| Kernel protocol | The BIRD component that installs selected routes into Linux. | BIRD adds a route visible in `ip route` |
+| BGP import filter | A rule for deciding which received neighbor routes to accept. | Accept only Pocket Internet service loopbacks |
+| BGP export filter | A rule for deciding which routes to announce to a neighbor. | Announce only Pocket Internet service loopbacks |
 | Convergence | The network settling on new routes after a change. | A route disappears after a link fails, then returns |
 
 ## Question

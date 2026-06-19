@@ -14,4 +14,4 @@ By the end of this part, the reader should be able to:
 
 The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, and WireGuard before any public DN42 state enters the picture.
 
-Chapter 05 is currently a planned bridge chapter. It exists to make the structure honest: the book needs to teach BIRD as a local route manager before asking readers to absorb the full BGP lab. The tested BGP lab remains in Chapter 06.
+Chapter 05 teaches BIRD as a local route manager before Chapter 06 asks it to speak BGP. That sequence matters: first BIRD learns and exports routes locally, then BIRD exchanges reachability with other routers.

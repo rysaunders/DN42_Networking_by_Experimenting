@@ -1,0 +1,185 @@
+
+## Environment
+
+$ uname -a
+Linux pocket-internet-lab 7.0.11-orbstack-00360-gc9bc4d96ac70 #1 SMP PREEMPT Thu Jun  4 16:40:25 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ ip -V
+ip utility, iproute2-6.1.0, libbpf 1.3.0
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+
+$ bird --version
+BIRD version 2.14
+
+Transcript: experiments/transcripts/bird-route-manager-20260619T144400Z.txt
+
+## Rollback before setup
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^birdlab\(\ \|\$\)\'\ \|\|\ true
+
+## Create one namespace
+
+$ mkdir -p /tmp/bird-route-manager
+
+$ ip netns add birdlab
+
+$ ip -n birdlab link set lo up
+
+$ ip -n birdlab link add svc0 type dummy
+
+$ ip -n birdlab addr add 172.20.50.1/32 dev svc0
+
+$ ip -n birdlab link set svc0 up
+
+## Inspect Linux before BIRD
+
+$ ip -n birdlab addr show svc0
+2: svc0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/ether 62:97:a2:9a:30:a0 brd ff:ff:ff:ff:ff:ff
+    inet 172.20.50.1/32 scope global svc0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::6097:a2ff:fe9a:30a0/64 scope link 
+       valid_lft forever preferred_lft forever
+
+$ ip -n birdlab route show
+
+$ ip -n birdlab route show 172.20.99.0/24
+
+$ ip -n birdlab route get 172.20.99.1
+RTNETLINK answers: Network is unreachable
+
+## Write BIRD config without kernel export
+
+$ cat /tmp/bird-route-manager/bird-no-export.conf
+log stderr all;
+router id 172.20.50.1;
+
+protocol device {
+  scan time 1;
+}
+
+protocol direct direct_service {
+  ipv4;
+  interface "svc0";
+}
+
+protocol static static_lab {
+  ipv4;
+  route 172.20.99.0/24 blackhole;
+}
+
+protocol kernel kernel_ipv4 {
+  ipv4 {
+    import none;
+    export none;
+  };
+  scan time 1;
+}
+
+$ bird -p -c /tmp/bird-route-manager/bird-no-export.conf
+
+$ ip netns exec birdlab bird -c /tmp/bird-route-manager/bird-no-export.conf -s /tmp/bird-route-manager/bird.ctl -P /tmp/bird-route-manager/bird.pid
+
+## Inspect BIRD routes before kernel export
+
+$ ip netns exec birdlab birdc -s /tmp/bird-route-manager/bird.ctl show protocols
+BIRD 2.14 ready.
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     10:43:56.914  
+direct_service Direct     ---        up     10:43:56.914  
+static_lab Static     master4    up     10:43:56.914  
+kernel_ipv4 Kernel     master4    up     10:43:56.914  
+
+$ ip netns exec birdlab birdc -s /tmp/bird-route-manager/bird.ctl show route all
+BIRD 2.14 ready.
+Table master4:
+172.20.50.1/32       unicast [direct_service 10:43:56.914] * (240)
+	dev svc0
+	Type: device univ
+172.20.99.0/24       blackhole [static_lab 10:43:56.914] * (200)
+	Type: static univ
+
+$ ip -n birdlab route show 172.20.99.0/24
+
+$ ip -n birdlab route get 172.20.99.1
+RTNETLINK answers: Network is unreachable
+
+## Reload BIRD with explicit kernel export
+
+$ cat /tmp/bird-route-manager/bird-export.conf
+log stderr all;
+router id 172.20.50.1;
+
+protocol device {
+  scan time 1;
+}
+
+protocol direct direct_service {
+  ipv4;
+  interface "svc0";
+}
+
+protocol static static_lab {
+  ipv4;
+  route 172.20.99.0/24 blackhole;
+}
+
+filter kernel_export_lab {
+  if net = 172.20.99.0/24 then accept;
+  reject;
+}
+
+protocol kernel kernel_ipv4 {
+  ipv4 {
+    import none;
+    export filter kernel_export_lab;
+  };
+  scan time 1;
+}
+
+$ bird -p -c /tmp/bird-route-manager/bird-export.conf
+
+$ cp /tmp/bird-route-manager/bird-export.conf /tmp/bird-route-manager/bird-no-export.conf
+
+$ ip netns exec birdlab birdc -s /tmp/bird-route-manager/bird.ctl configure
+BIRD 2.14 ready.
+Reading configuration from /tmp/bird-route-manager/bird-no-export.conf
+Reconfigured
+
+## Inspect Linux after kernel export
+
+$ ip netns exec birdlab birdc -s /tmp/bird-route-manager/bird.ctl show protocols
+BIRD 2.14 ready.
+Name       Proto      Table      State  Since         Info
+device1    Device     ---        up     10:43:56.914  
+direct_service Direct     ---        up     10:43:56.914  
+static_lab Static     master4    up     10:43:56.914  
+kernel_ipv4 Kernel     master4    up     10:43:56.914  
+
+$ ip netns exec birdlab birdc -s /tmp/bird-route-manager/bird.ctl show route 172.20.99.0/24 all
+BIRD 2.14 ready.
+Table master4:
+172.20.99.0/24       blackhole [static_lab 10:43:56.914] * (200)
+	Type: static univ
+
+$ ip -n birdlab route show 172.20.99.0/24
+blackhole 172.20.99.0/24 proto bird metric 32 
+
+$ ip -n birdlab route get 172.20.99.1
+RTNETLINK answers: Invalid argument
+
+## Rollback
+
+$ ip netns exec birdlab kill 3102
+
+$ ip netns delete birdlab
+
+$ rm -rf /tmp/bird-route-manager
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^birdlab\(\ \|\$\)\'\ \|\|\ true
+
+## Result
+Lab complete. Temporary namespace and BIRD state removed.
+Transcript saved to: experiments/transcripts/bird-route-manager-20260619T144400Z.txt
