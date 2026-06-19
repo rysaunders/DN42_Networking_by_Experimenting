@@ -293,7 +293,7 @@ mkdir -p /tmp/pocket-internet-bgp
 
 BIRD needs a config file per namespace because each namespace has a different router ID, local AS, and neighbor list.
 
-## Step 4: Read One BIRD Config Before Writing Four
+## Step 4: Read One Full BIRD Config
 
 The first config is for `pocket-as1`.
 
@@ -306,10 +306,16 @@ Read the main blocks before typing it:
 - `pocket_export` rejects unexpected announced prefixes.
 - each `protocol bgp` block defines one neighbor session.
 
-Here is the shape with the important lines called out:
+Write the full `pocket-as1` config:
 
-```text title="Read the BIRD config shape"
+```sh title="Write /tmp/pocket-internet-bgp/pocket-as1.conf"
+cat >/tmp/pocket-internet-bgp/pocket-as1.conf <<'EOF'
+log stderr all;
 router id 172.20.1.1;                 # (1)
+
+protocol device {
+  scan time 1;
+}
 
 protocol direct direct_loopbacks {    # (2)
   ipv4;
@@ -319,71 +325,12 @@ protocol direct direct_loopbacks {    # (2)
 protocol kernel kernel_ipv4 {         # (3)
   ipv4 {
     import none;
-    export all;
-  };
-}
-
-filter pocket_import {                # (4)
-  if net = 172.20.3.1/32 then accept;
-  reject;
-}
-
-filter pocket_export {                # (5)
-  if net = 172.20.1.1/32 then accept;
-  reject;
-}
-
-protocol bgp to_as2 {                 # (6)
-  local as 4242420001;                # (7)
-  neighbor 10.42.12.2 as 4242420002;  # (8)
-  source address 10.42.12.1;          # (9)
-}
-```
-
-1. `router id` is BIRD's stable ID for this router.
-2. `protocol direct` learns the service loopback from `lo`.
-3. `protocol kernel` writes selected BIRD routes into Linux.
-4. `pocket_import` decides which received prefixes are accepted.
-5. `pocket_export` decides which local prefixes are announced.
-6. Each `protocol bgp` block is one neighbor session.
-7. `local as` is this namespace's AS number.
-8. `neighbor` names the peer address and peer AS number.
-9. `source address` is the local address BIRD uses for that session.
-
-One word needs care here: **export**.
-
-BIRD uses export in more than one direction:
-
-- BGP export means "which routes may I announce to this neighbor?"
-- kernel export means "which selected BIRD routes may I write into Linux?"
-
-The BGP export filter below is narrow: it allows only the four service loopbacks. The kernel protocol uses `export all` because, after BIRD has already applied import filters and selected routes, this lab wants Linux to receive those selected routes.
-
-Write the config:
-
-```sh title="Write /tmp/pocket-internet-bgp/pocket-as1.conf"
-cat >/tmp/pocket-internet-bgp/pocket-as1.conf <<'EOF'
-log stderr all;
-router id 172.20.1.1;
-
-protocol device {
-  scan time 1;
-}
-
-protocol direct direct_loopbacks {
-  ipv4;
-  interface "lo";
-}
-
-protocol kernel kernel_ipv4 {
-  ipv4 {
-    import none;
-    export all;
+    export all;                       # (4)
   };
   scan time 1;
 }
 
-filter pocket_import {
+filter pocket_import {                # (5)
   if net = 172.20.1.1/32 then accept;
   if net = 172.20.2.1/32 then accept;
   if net = 172.20.3.1/32 then accept;
@@ -391,7 +338,7 @@ filter pocket_import {
   reject;
 }
 
-filter pocket_export {
+filter pocket_export {                # (6)
   if net = 172.20.1.1/32 then accept;
   if net = 172.20.2.1/32 then accept;
   if net = 172.20.3.1/32 then accept;
@@ -399,14 +346,14 @@ filter pocket_export {
   reject;
 }
 
-protocol bgp to_as2 {
-  local as 4242420001;
-  neighbor 10.42.12.2 as 4242420002;
-  source address 10.42.12.1;
+protocol bgp to_as2 {                 # (7)
+  local as 4242420001;                # (8)
+  neighbor 10.42.12.2 as 4242420002;  # (9)
+  source address 10.42.12.1;          # (10)
   check link yes;
   ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
+    import filter pocket_import;      # (11)
+    export filter pocket_export;      # (12)
   };
 }
 
@@ -423,16 +370,83 @@ protocol bgp to_as4 {
 EOF
 ```
 
-The important mental shift is that the export filter is not "send everything I know." It is "send only the prefixes this lab allows."
+Read the annotations:
 
-## Step 5: Write the Other Three BIRD Configs
+1. `router id` is BIRD's stable ID for this router.
+2. `protocol direct` learns the service loopback from `lo`.
+3. `protocol kernel` is the BIRD-to-Linux boundary.
+4. `export all` writes selected BIRD routes into Linux. This is lab-only convenience, not a DN42 policy.
+5. `pocket_import` decides which BGP-learned prefixes are accepted.
+6. `pocket_export` decides which prefixes may be announced to BGP neighbors.
+7. Each `protocol bgp` block is one neighbor session.
+8. `local as` is this namespace's AS number.
+9. `neighbor` names the peer address and peer AS number.
+10. `source address` is the local address BIRD uses for that session.
+11. BGP import applies the received-route safety filter.
+12. BGP export applies the announced-route safety filter.
 
-`pocket-as2`:
+!!! warning "Lab-only kernel export"
+    `protocol kernel export all` is acceptable here because the lab accepts only four service loopbacks and runs inside temporary namespaces. Do not read it as "export everything to DN42." BGP export policy and kernel export policy are different boundaries.
 
-```sh title="Write /tmp/pocket-internet-bgp/pocket-as2.conf"
-cat >/tmp/pocket-internet-bgp/pocket-as2.conf <<'EOF'
+The important mental shift is that the BGP export filter is not "send everything I know." It is "send only the prefixes this lab allows."
+
+## Step 5: Keep the Route Boundaries Separate
+
+The config has four different decision points. Keep them separate in your head:
+
+| Boundary | Config line or command | Question it answers |
+| --- | --- | --- |
+| BGP import filter | `import filter pocket_import` inside `protocol bgp` | Which neighbor routes may enter BIRD? |
+| BIRD route table selection | `birdc show route ... all` | Which accepted route is active for this prefix? |
+| BIRD-to-kernel export | `export all` inside `protocol kernel` | Which selected BIRD routes may become Linux routes? |
+| Linux route lookup and forwarding | `ip route get ...` | How would Linux forward a packet now? |
+
+```mermaid
+flowchart LR
+  Peer["BGP neighbor"] --> Import["BGP import filter"]
+  Import --> BirdTable["BIRD route table<br/>selection"]
+  BirdTable --> KernelExport["kernel export"]
+  KernelExport --> LinuxTable["Linux route table"]
+  LinuxTable --> Forward["packet forwarding"]
+
+  BirdTable --> BgpExport["BGP export filter"]
+  BgpExport --> OtherPeer["BGP neighbor"]
+```
+
+Two words repeat across these boundaries: **import** and **export**.
+
+- BGP import/export controls routes exchanged with a neighbor.
+- Kernel import/export controls routes exchanged with Linux.
+
+The same words do not mean the same neighbor.
+
+BIRD may know more than one accepted route for the same prefix. In the route output, the active route is the one BIRD selected for use and possible export to Linux.
+
+## Step 6: Write the Other Three BIRD Configs
+
+The other configs have the same structure as `pocket-as1`. The values that change are:
+
+| Namespace | Router ID | Local AS | BGP sessions |
+| --- | --- | --- | --- |
+| `pocket-as2` | `172.20.2.1` | `4242420002` | `to_as1`: neighbor `10.42.12.1`, peer AS `4242420001`, source `10.42.12.2`<br>`to_as3`: neighbor `10.42.23.2`, peer AS `4242420003`, source `10.42.23.1` |
+| `pocket-as3` | `172.20.3.1` | `4242420003` | `to_as2`: neighbor `10.42.23.1`, peer AS `4242420002`, source `10.42.23.2`<br>`to_as4`: neighbor `10.42.34.2`, peer AS `4242420004`, source `10.42.34.1` |
+| `pocket-as4` | `172.20.4.1` | `4242420004` | `to_as3`: neighbor `10.42.34.1`, peer AS `4242420003`, source `10.42.34.2`<br>`to_as1`: neighbor `10.42.41.2`, peer AS `4242420001`, source `10.42.41.1` |
+
+Use the same template to write the remaining configs:
+
+```sh title="Define a small config writer for the repeated BIRD shape"
+write_bird_config() {
+  ns="$1"
+  router_id="$2"
+  local_as="$3"
+  shift 3
+
+  config="/tmp/pocket-internet-bgp/${ns}.conf"
+
+  {
+    cat <<EOF
 log stderr all;
-router id 172.20.2.1;
+router id ${router_id};
 
 protocol device { scan time 1; }
 
@@ -464,22 +478,21 @@ filter pocket_export {
   if net = 172.20.4.1/32 then accept;
   reject;
 }
+EOF
 
-protocol bgp to_as1 {
-  local as 4242420002;
-  neighbor 10.42.12.1 as 4242420001;
-  source address 10.42.12.2;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
+    while [ "$#" -gt 0 ]; do
+      protocol_name="$1"
+      neighbor_ip="$2"
+      neighbor_as="$3"
+      source_ip="$4"
+      shift 4
 
-protocol bgp to_as3 {
-  local as 4242420002;
-  neighbor 10.42.23.2 as 4242420003;
-  source address 10.42.23.1;
+      cat <<EOF
+
+protocol bgp ${protocol_name} {
+  local as ${local_as};
+  neighbor ${neighbor_ip} as ${neighbor_as};
+  source address ${source_ip};
   check link yes;
   ipv4 {
     import filter pocket_import;
@@ -487,133 +500,28 @@ protocol bgp to_as3 {
   };
 }
 EOF
+    done
+  } >"${config}"
+}
 ```
 
-`pocket-as3`:
+Now write `pocket-as2`, `pocket-as3`, and `pocket-as4`:
 
-```sh title="Write /tmp/pocket-internet-bgp/pocket-as3.conf"
-cat >/tmp/pocket-internet-bgp/pocket-as3.conf <<'EOF'
-log stderr all;
-router id 172.20.3.1;
+```sh title="Write the remaining BIRD configs"
+write_bird_config pocket-as2 172.20.2.1 4242420002 \
+  to_as1 10.42.12.1 4242420001 10.42.12.2 \
+  to_as3 10.42.23.2 4242420003 10.42.23.1
 
-protocol device { scan time 1; }
+write_bird_config pocket-as3 172.20.3.1 4242420003 \
+  to_as2 10.42.23.1 4242420002 10.42.23.2 \
+  to_as4 10.42.34.2 4242420004 10.42.34.1
 
-protocol direct direct_loopbacks {
-  ipv4;
-  interface "lo";
-}
-
-protocol kernel kernel_ipv4 {
-  ipv4 {
-    import none;
-    export all;
-  };
-  scan time 1;
-}
-
-filter pocket_import {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-filter pocket_export {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-protocol bgp to_as2 {
-  local as 4242420003;
-  neighbor 10.42.23.1 as 4242420002;
-  source address 10.42.23.2;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-
-protocol bgp to_as4 {
-  local as 4242420003;
-  neighbor 10.42.34.2 as 4242420004;
-  source address 10.42.34.1;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-EOF
+write_bird_config pocket-as4 172.20.4.1 4242420004 \
+  to_as3 10.42.34.1 4242420003 10.42.34.2 \
+  to_as1 10.42.41.2 4242420001 10.42.41.1
 ```
 
-`pocket-as4`:
-
-```sh title="Write /tmp/pocket-internet-bgp/pocket-as4.conf"
-cat >/tmp/pocket-internet-bgp/pocket-as4.conf <<'EOF'
-log stderr all;
-router id 172.20.4.1;
-
-protocol device { scan time 1; }
-
-protocol direct direct_loopbacks {
-  ipv4;
-  interface "lo";
-}
-
-protocol kernel kernel_ipv4 {
-  ipv4 {
-    import none;
-    export all;
-  };
-  scan time 1;
-}
-
-filter pocket_import {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-filter pocket_export {
-  if net = 172.20.1.1/32 then accept;
-  if net = 172.20.2.1/32 then accept;
-  if net = 172.20.3.1/32 then accept;
-  if net = 172.20.4.1/32 then accept;
-  reject;
-}
-
-protocol bgp to_as3 {
-  local as 4242420004;
-  neighbor 10.42.34.1 as 4242420003;
-  source address 10.42.34.2;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-
-protocol bgp to_as1 {
-  local as 4242420004;
-  neighbor 10.42.41.2 as 4242420001;
-  source address 10.42.41.1;
-  check link yes;
-  ipv4 {
-    import filter pocket_import;
-    export filter pocket_export;
-  };
-}
-EOF
-```
-
-The repetition is useful. You can see the pattern changing:
+This is not hiding the config. It is reducing visual noise after you have read one complete version. The table shows the values that actually change:
 
 - router ID,
 - local AS,
@@ -623,7 +531,7 @@ The repetition is useful. You can see the pattern changing:
 
 Those five values are the heart of a first BGP session.
 
-## Step 6: Validate the Configs
+## Step 7: Validate the Configs
 
 Before starting BIRD, ask BIRD to parse each config:
 
@@ -638,7 +546,7 @@ No output means the syntax is valid.
 
 This catches a large class of mistakes before any route can be installed.
 
-## Step 7: Start One BIRD Process Per Namespace
+## Step 8: Start One BIRD Process Per Namespace
 
 Start BIRD in `pocket-as1`:
 
@@ -670,11 +578,11 @@ ip netns exec pocket-as4 bird \
 
 The `-s` option gives each namespace a separate control socket. That lets `birdc` talk to the right BIRD process.
 
-## Step 8: Watch BGP Sessions Establish
+## Step 9: Watch BGP Sessions Establish
 
 Ask `pocket-as1` what its protocols are doing:
 
-```sh title="Watch route withdrawal from pocket-as1"
+```sh title="Inspect BGP protocols inside pocket-as1"
 ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols
 ```
 
@@ -693,7 +601,7 @@ The names and timestamps may differ. The important word is `Established`.
 
 Check the other namespaces:
 
-```sh title="Watch BGP recover after restoring AS3 links"
+```sh title="Inspect BGP protocols inside the other namespaces"
 ip netns exec pocket-as2 birdc -s /tmp/pocket-internet-bgp/pocket-as2.ctl show protocols
 ip netns exec pocket-as3 birdc -s /tmp/pocket-internet-bgp/pocket-as3.ctl show protocols
 ip netns exec pocket-as4 birdc -s /tmp/pocket-internet-bgp/pocket-as4.ctl show protocols
@@ -701,7 +609,7 @@ ip netns exec pocket-as4 birdc -s /tmp/pocket-internet-bgp/pocket-as4.ctl show p
 
 If a session is not established yet, wait a few seconds and run the command again. BGP is a conversation, not a one-shot route command.
 
-## Step 9: Observe Routes in BIRD
+## Step 10: Observe Routes in BIRD
 
 Ask `pocket-as1` what BIRD knows about `pocket-as3`'s service loopback:
 
@@ -736,7 +644,7 @@ This is the control-plane view. It answers:
 
 > What reachability did BIRD learn?
 
-## Step 10: Observe Routes in Linux
+## Step 11: Observe Routes in Linux
 
 Now ask Linux:
 
@@ -767,7 +675,7 @@ ip netns exec pocket-as1 ping -c 2 -W 1 -I 172.20.1.1 172.20.3.1
 
 This is the same kind of ping as the static-routing lab. The difference is who maintained the route table.
 
-## Step 11: Isolate One AS And Watch The Route Withdraw
+## Step 12: Isolate One AS And Watch The Route Withdraw
 
 Bring down both links into `pocket-as3`:
 
@@ -788,7 +696,7 @@ The route to `172.20.3.1/32` should disappear from BIRD and from Linux. You did 
 
 That is convergence: the routing system reacting to a topology change.
 
-## Step 12: Bring The Links Back
+## Step 13: Bring The Links Back
 
 Bring the links back up:
 
