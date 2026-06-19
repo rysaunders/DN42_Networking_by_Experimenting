@@ -12,6 +12,8 @@ What will this experiment prove or disprove?
 
 State how this experiment helps answer the guiding question: how does an Internet emerge from a collection of computers exchanging routes?
 
+Apply `docs/authoring-templates/internet-readiness-standard.md`. State what this experiment does not prove about DN42, public routing, services, policy, or operations.
+
 ## Hypothesis
 
 If the relevant network state is correct, what should happen?
@@ -108,6 +110,8 @@ Explain the before/after state in the kernel, daemon, registry, or service being
 
 Map the lab result to later Pocket Internet, interconnect, or DN42 work. Identify what this experiment teaches that WireGuard, BIRD, registry objects, or DNS will reuse.
 
+Name any real-network topic this experiment intentionally leaves out, such as DNS, TCP/UDP service behavior, firewall policy, IPv6, authorization, monitoring, or rollback.
+
 ## Evidence to Capture
 
 - Commands.
@@ -134,6 +138,7 @@ After regenerating a checked-in transcript, update any chapter reference that na
 ## Beginner Review
 
 - [ ] Reviewer received this experiment, the relevant transcript, the authoring template, and `docs/reader-knowledge.md`.
+- [ ] Reviewer considered the Internet-readiness standard.
 - [ ] Accepted findings are addressed.
 - [ ] Deferred findings have follow-up issues or notes.
 - [ ] Rejected findings include a reason.

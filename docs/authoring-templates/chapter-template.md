@@ -12,6 +12,8 @@ Explain the stable networking idea in plain language. Use concrete nouns before 
 
 State how this chapter helps answer the guiding question: how does an Internet emerge from a collection of computers exchanging routes?
 
+Apply `docs/authoring-templates/internet-readiness-standard.md`. State what Internet concept this chapter teaches, what capability the reader gains, and what real-network gap remains.
+
 ## New Terms
 
 Define every new term before using it as if the reader already knows it.
@@ -153,12 +155,15 @@ Map this chapter's small lab to later Pocket Internet, interconnect, or DN42 con
 
 Compare the lab to public Internet practice without pretending DN42 is identical.
 
+Name at least one thing the chapter does not yet prepare the reader to do safely on DN42 or the public Internet.
+
 ## Verify Before Proceeding
 
 - [ ] Safety level and lab boundary are stated.
 - [ ] Route lookup matches the expected interface.
 - [ ] No unintended default route exists.
 - [ ] Export policy is explicit.
+- [ ] Internet-readiness gaps are named rather than hidden.
 - [ ] New concepts are added to `docs/reader-knowledge.md`.
 - [ ] Beginner review has been run, or deferral is recorded with a reason.
 - [ ] Accepted beginner-review findings are addressed.

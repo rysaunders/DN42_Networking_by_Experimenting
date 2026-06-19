@@ -7,12 +7,13 @@ This is an editorial process, not a CI gate. The goal is to make first-principle
 ## Workflow
 
 1. Draft the chapter or lab from validated experiments and reviewed sources.
-2. Update `docs/reader-knowledge.md` with any concepts the draft introduces.
-3. Spawn a beginner-review subagent.
-4. Give the reviewer the required inputs listed below.
-5. Revise the draft or record why a finding is deferred or rejected.
-6. Run normal verification.
-7. Close the issue only after the review happened or was explicitly deferred.
+2. Apply `docs/authoring-templates/internet-readiness-standard.md`.
+3. Update `docs/reader-knowledge.md` with any concepts the draft introduces.
+4. Spawn a beginner-review subagent.
+5. Give the reviewer the required inputs listed below.
+6. Revise the draft or record why a finding is deferred or rejected.
+7. Run normal verification.
+8. Close the issue only after the review happened or was explicitly deferred.
 
 ## Reviewer Inputs
 
@@ -24,6 +25,7 @@ Give the reviewer:
 - the relevant transcript under `experiments/transcripts/`,
 - the relevant research note under `research/notes/`,
 - the relevant authoring template,
+- `docs/authoring-templates/internet-readiness-standard.md`,
 - any issue acceptance criteria.
 
 Do not tell the reviewer what you think is weak. The review is more useful when it is not anchored by the drafter's opinion.
@@ -50,6 +52,13 @@ Review for:
 - places where the draft assumes operational knowledge not yet taught,
 - misleading simplifications,
 - mismatch between the draft and the validated transcript or cited research.
+
+Also review for Internet readiness:
+- whether the chapter reduces or increases false confidence,
+- whether lab-only behavior is clearly labeled,
+- whether packet movement, service behavior, routing control plane, and policy are separated,
+- whether real-network gaps are named instead of hidden,
+- whether the reader would still be lost at the DN42 or public-routing boundary.
 
 Return:
 1. Findings ordered by severity.
@@ -85,6 +94,7 @@ For now, use existing labels such as `chapter`, `experiment`, `conceptual`, and 
 A chapter or lab issue is not done until:
 
 - the draft follows the relevant authoring template,
+- the Internet-readiness standard has been considered,
 - `docs/reader-knowledge.md` is updated when new concepts are introduced,
 - a beginner review has been run or explicitly deferred,
 - accepted review findings have been addressed,
