@@ -20,6 +20,12 @@ This repository is in v0.1 hardening. The first milestone focuses on the Pocket 
 
 ## Immediate Commands
 
+Run the lab environment preflight from the repository root inside Linux before starting namespace labs:
+
+```sh
+./scripts/preflight_lab_env.sh
+```
+
 Build the site strictly:
 
 ```sh

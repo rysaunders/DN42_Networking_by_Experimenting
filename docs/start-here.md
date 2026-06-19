@@ -6,6 +6,16 @@ The first arc is Pocket Internet: a local lab where Linux namespaces become smal
 
 If the early Linux terms start to blur together, keep [Linux Networking Objects](linux-networking-objects.md) open as the visual map. It shows how namespaces, interfaces, addresses, routes, loopback, and forwarding fit together before the labs start combining them.
 
+Before running labs, check the Linux environment from the repository root:
+
+```sh
+./scripts/preflight_lab_env.sh
+```
+
+On macOS, enter an OrbStack Linux shell first.
+
+See [Lab Environment](appendices/lab-environment.md) for known-good and likely-problematic environments.
+
 ## Reader Path
 
 1. Learn what Linux does with interfaces, addresses, routes, and forwarding.
