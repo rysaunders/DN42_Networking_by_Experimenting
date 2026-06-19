@@ -857,11 +857,13 @@ On macOS with OrbStack:
 orb bash experiments/labs/pocket-internet-static-routing/run.sh
 ```
 
-The script follows the same state changes and saves a transcript under:
+The script follows the same state changes. Local reruns save transcripts under the ignored directory:
 
 ```text
-experiments/transcripts/
+experiments/transcripts/local/
 ```
+
+Maintainers can intentionally refresh a checked-in validation transcript by setting `LAB_TRANSCRIPT_PATH` to the exact tracked transcript path before running the script.
 
 ## What Changed
 

@@ -21,4 +21,4 @@ Requirements:
 - BIRD 2 and `birdc`
 - `iproute2`
 
-The script records a transcript under `experiments/transcripts/`.
+The script records a transcript under ignored `experiments/transcripts/local/` by default.

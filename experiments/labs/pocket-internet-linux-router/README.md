@@ -21,7 +21,7 @@ The middle namespace forwards traffic between the two edge namespaces. The lab d
 - Root privileges are required to create namespaces and veth interfaces.
 - The script uses `sudo` when it is not already running as root.
 - macOS users should run the lab inside an OrbStack Linux machine.
-- The transcript is written under `experiments/transcripts/`.
+- The transcript is written under ignored `experiments/transcripts/local/` by default.
 
 Run from the repository root on a Linux host or OrbStack Linux machine:
 

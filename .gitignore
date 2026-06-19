@@ -222,5 +222,10 @@ __marimo__/
 research/cache/*
 !research/cache/README.md
 
+# Local lab transcript output. Checked-in validation transcripts live directly
+# under experiments/transcripts/ and are created intentionally with
+# LAB_TRANSCRIPT_PATH.
+experiments/transcripts/local/
+
 # Local operating-system/editor files
 .DS_Store

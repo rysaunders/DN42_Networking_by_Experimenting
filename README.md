@@ -26,6 +26,8 @@ Run the lab environment preflight from the repository root inside Linux before s
 ./scripts/preflight_lab_env.sh
 ```
 
+Lab scripts write local transcripts under the ignored `experiments/transcripts/local/` directory by default. To intentionally refresh a checked-in validation transcript, set `LAB_TRANSCRIPT_PATH` to the exact tracked path before running the script.
+
 Build the site strictly:
 
 ```sh

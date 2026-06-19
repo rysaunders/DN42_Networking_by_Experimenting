@@ -116,6 +116,21 @@ Map the lab result to later Pocket Internet, interconnect, or DN42 work. Identif
 - Environment metadata.
 - Safety baseline and rollback verification.
 
+## Transcript Convention
+
+Checked-in validation transcripts live directly under `experiments/transcripts/` and are referenced by chapters.
+
+Local script runs write to `experiments/transcripts/local/` by default. That directory is ignored so readers and maintainers can rerun labs without polluting Git status.
+
+To intentionally regenerate a checked-in transcript, run the lab with `LAB_TRANSCRIPT_PATH` set to the exact tracked path:
+
+```sh
+LAB_TRANSCRIPT_PATH=experiments/transcripts/<lab-name>-<timestamp>.txt \
+  experiments/labs/<lab-name>/run.sh
+```
+
+After regenerating a checked-in transcript, update any chapter reference that names the old transcript.
+
 ## Beginner Review
 
 - [ ] Reviewer received this experiment, the relevant transcript, the authoring template, and `docs/reader-knowledge.md`.

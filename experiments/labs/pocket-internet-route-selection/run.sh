@@ -5,7 +5,10 @@ LAB_NAME="pocket-internet-route-selection"
 EDGE="pocket-rs-edge"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-TRANSCRIPT_DIR="${REPO_ROOT}/experiments/transcripts"
+TRANSCRIPT_DIR="${REPO_ROOT}/experiments/transcripts/local"
+# Local runs write to the ignored local transcript directory. Set
+# LAB_TRANSCRIPT_PATH to a checked-in path when intentionally regenerating
+# a validation transcript referenced by a chapter.
 
 if [[ "${LAB_TRANSCRIPT_STARTED:-}" != "1" ]]; then
   mkdir -p "${TRANSCRIPT_DIR}"

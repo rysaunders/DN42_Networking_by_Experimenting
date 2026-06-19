@@ -27,7 +27,7 @@ The lab demonstrates:
 - `iproute2` is required for the `ip` command.
 - Root privileges are required; the script uses `sudo` when it is not already running as root.
 - macOS users should run the lab inside an OrbStack Linux machine.
-- The transcript is written under `experiments/transcripts/`.
+- The transcript is written under ignored `experiments/transcripts/local/` by default.
 
 Run from the repository root on a Linux host or OrbStack Linux machine:
 
@@ -41,4 +41,4 @@ On macOS with OrbStack:
 orb bash experiments/labs/pocket-internet-static-routing/run.sh
 ```
 
-The script uses `sudo` for namespace operations when it is not already running as root. It writes a transcript to `experiments/transcripts/`.
+The script uses `sudo` for namespace operations when it is not already running as root. It writes a transcript to ignored `experiments/transcripts/local/` by default.
