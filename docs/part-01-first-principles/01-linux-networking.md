@@ -311,6 +311,12 @@ ping: connect: Network is unreachable
 
 This is a good failure. It proves Linux is using the route table rather than guessing.
 
+!!! success "What this proves"
+    `pocket-left` has no selected route to `10.10.2.2`, so Linux refuses to send the packet.
+
+!!! warning "What this does not prove"
+    It does not prove the veth links are broken. The connected links can be fine while the route table is still missing an instruction.
+
 ## Step 5: Add the Missing Routes
 
 Left needs an instruction for the right-side subnet:
@@ -378,6 +384,12 @@ ip -n pocket-right route get 10.10.1.2
 
 Route lookup predicts packet path before a packet is sent. Use it often.
 
+!!! success "What this proves"
+    Linux has selected a next hop, outgoing interface, and source address for this destination.
+
+!!! warning "What this does not prove"
+    It does not prove the packet will be delivered. A later hop can still drop traffic, and the return path can still be missing.
+
 ## Step 6: Prove Routes Are Not Forwarding
 
 Routes on the edge namespaces are necessary, but they are not enough.
@@ -410,6 +422,12 @@ This is the second useful failure in the lab:
 
 - before static routes, left did not know where to send the packet;
 - after static routes but before forwarding, left knows where to send it, but the middle namespace drops transit traffic.
+
+!!! success "What this proves"
+    The edge route is not enough by itself. The middle namespace must be willing to forward transit packets.
+
+!!! warning "What this does not prove"
+    It does not prove the static routes are wrong. In this step, the route lookup is correct but forwarding is disabled.
 
 ## Step 7: Enable Forwarding
 
@@ -475,6 +493,12 @@ The transcript shows two replies again:
 ```
 
 The `ttl=63` is supporting evidence in this lab. Linux commonly starts IPv4 ping packets with TTL 64, and crossing one router decrements the TTL by one. That makes `ttl=63` consistent with one router hop here. Do not treat a single TTL value as universal proof on every operating system or every network.
+
+!!! success "What this proves"
+    Packets can now travel from one edge namespace to the other and receive replies.
+
+!!! warning "What this does not prove"
+    It does not prove every future destination is reachable. It proves this route, return route, and forwarding path work for this pair of addresses.
 
 ## Step 10: Inspect the Router
 

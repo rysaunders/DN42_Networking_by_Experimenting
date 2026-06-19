@@ -437,6 +437,12 @@ orb bash experiments/labs/pocket-internet-route-selection/run.sh
 - Removing a more-specific route can move traffic to a broader fallback exit.
 - `ip route get` shows the route and exit Linux would actually use.
 
+!!! success "What this proves"
+    Route lookup exposes Linux's selected route for a specific destination at that moment.
+
+!!! warning "What this does not prove"
+    It does not prove packets will complete an end-to-end conversation. Route lookup is a forwarding decision, not a delivery receipt.
+
 ## Before You Continue
 
 You can now explain:

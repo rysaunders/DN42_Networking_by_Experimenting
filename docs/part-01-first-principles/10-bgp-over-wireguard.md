@@ -366,6 +366,12 @@ ip netns exec pocket-as2 ping -c 2 -W 1 10.42.23.2
 ip netns exec pocket-as2 wg show wg23
 ```
 
+!!! success "What this proves"
+    The underlay reaches the endpoint, the overlay neighbor is reachable, and WireGuard has traffic on `wg23`.
+
+!!! warning "What this does not prove"
+    It does not prove BGP has learned service-loopback routes yet. This is the link layer for the lab path, not the routing control plane.
+
 ## Step 5: Start BIRD Over The New Link
 
 Use the same BIRD pattern as the BGP chapter, with one change: AS2 and AS3 now peer over `wg23` addresses:
@@ -757,6 +763,12 @@ ip netns exec pocket-as2 wg show wg23
 ```
 
 The transfer counters should be larger than before. That is evidence that Pocket Internet traffic crossed the WireGuard link.
+
+!!! success "What this proves"
+    The BGP-maintained service-loopback traffic can cross the WireGuard-replaced link.
+
+!!! warning "What this does not prove"
+    It does not prove WireGuard alone provided reachability. BGP route exchange and Linux route lookup still decide which packets use the tunnel.
 
 ## Troubleshooting Branches
 

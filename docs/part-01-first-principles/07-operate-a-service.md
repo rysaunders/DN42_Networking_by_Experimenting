@@ -193,6 +193,12 @@ Expected result: it fails.
 
 That failure is useful. The route can exist while the service does not. Routing gets you to the destination address; it does not create a program listening there.
 
+!!! success "What this proves"
+    A route to the service address can exist while no application is reachable there.
+
+!!! warning "What this does not prove"
+    It does not prove routing is broken. The failure is expected because no listener exists on `172.20.3.1:8080` yet.
+
 ## Step 3: Bind The Service To The Wrong Address
 
 Start the HTTP service inside `pocket-as3`, but bind it to `127.0.0.1`:
@@ -238,6 +244,12 @@ hello from pocket-as3 service loopback
 
 The service is alive. But it is alive only on `127.0.0.1` inside `pocket-as3`.
 
+!!! success "What this proves"
+    The HTTP process is running and reachable from inside the same namespace on loopback.
+
+!!! warning "What this does not prove"
+    It does not prove other namespaces can reach the service address. A listener bound to `127.0.0.1` is local to `pocket-as3`.
+
 Try from `pocket-as1`:
 
 ```sh title="Try HTTP from pocket-as1 while the listener is bound to the wrong address"
@@ -258,6 +270,12 @@ Read that failure carefully:
 - the service is bound to the wrong address for remote clients.
 
 This is a common real-world shape. "The service is running" is not the same as "the service is reachable on the address the network is routing to."
+
+!!! success "What this proves"
+    Binding matters. A running service can still be unreachable from the network when it listens on the wrong address.
+
+!!! warning "What this does not prove"
+    It does not prove the BGP route disappeared. The route can still be correct while the listener is wrong.
 
 Inspect the service log if you want to see the local request:
 
@@ -317,6 +335,12 @@ hello from pocket-as3 service loopback
 ```
 
 The `--interface 172.20.1.1` option tells `curl` to use `pocket-as1`'s service loopback as the source address. That makes the return path explicit: `pocket-as3` must know how to reply to `172.20.1.1`.
+
+!!! success "What this proves"
+    Routing, listener binding, and the return path are all sufficient for this HTTP request.
+
+!!! warning "What this does not prove"
+    It does not prove every port or every service on `pocket-as3` is reachable. It proves this listener on this address and port works.
 
 ## Step 5: Verify Forward Path And Return Path
 

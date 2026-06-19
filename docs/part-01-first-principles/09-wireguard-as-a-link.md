@@ -212,6 +212,12 @@ Expected route lookup:
 
 If this fails, stop here. WireGuard has nowhere to send encrypted packets.
 
+!!! success "What this proves"
+    The underlay path between the two namespaces is working.
+
+!!! warning "What this does not prove"
+    It does not prove WireGuard is working yet. At this point, only the network that will carry encrypted packets has been tested.
+
 ## Step 4: Generate WireGuard Keys
 
 Each side gets a private key and a public key:
@@ -350,6 +356,12 @@ transfer: ...
 ```
 
 A handshake says the peers exchanged WireGuard setup traffic. The transfer counters should increase after ping.
+
+!!! success "What this proves"
+    The WireGuard peers can exchange tunnel setup traffic, and packets are crossing `wg23`.
+
+!!! warning "What this does not prove"
+    It does not prove BGP or service-loopback routing is working. This step proves the tunnel link, not the whole Pocket Internet.
 
 Inspect AS3 too:
 

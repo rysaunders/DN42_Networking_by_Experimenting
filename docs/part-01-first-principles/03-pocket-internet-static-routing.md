@@ -472,6 +472,12 @@ Expected output includes:
 
 Route lookup explains why the packet test fails: `pocket-as1` has no selected route to `172.20.3.1` yet.
 
+!!! success "What this proves"
+    Connected point-to-point links are not enough to reach service loopbacks. Linux still needs an installed route for the destination.
+
+!!! warning "What this does not prove"
+    It does not prove the ring topology is broken. It proves `pocket-as1` has no route to that service address yet.
+
 ## Step 8: Add Clockwise Static Routes
 
 Create the forward path from `pocket-as1` to `pocket-as3` through `pocket-as2`:
@@ -591,6 +597,12 @@ Expected output includes:
 
 The `-I 172.20.1.1` option tells ping to use the service loopback as the source address. That makes the reply-route lesson visible: `pocket-as3` must know how to reach `172.20.1.1`.
 
+!!! success "What this proves"
+    The selected forward path and the selected return path both work for the two service loopbacks.
+
+!!! warning "What this does not prove"
+    It does not prove the network can recover from a failed link. Static routes keep following the path you wrote until you change them.
+
 ## Step 11: Observe Transit Counters
 
 Look at packet counters on `pocket-as2`, the transit namespace in the selected path:
@@ -646,6 +658,12 @@ Destination Net Unreachable
 The useful lesson is not merely "a link broke." The useful lesson is:
 
 > A possible alternate path does not matter until route tables point at it.
+
+!!! success "What this proves"
+    Static routes do not automatically move traffic to an alternate path when a link fails.
+
+!!! warning "What this does not prove"
+    It does not prove the alternate path is unusable. It proves the current route tables are not selecting it.
 
 State snapshot:
 
@@ -811,6 +829,12 @@ Expected output includes:
 ```text
 2 packets transmitted, 2 received, 0% packet loss
 ```
+
+!!! success "What this proves"
+    The repaired route tables now select a working path again.
+
+!!! warning "What this does not prove"
+    It does not prove the repair was automatic. You changed the static routes by hand.
 
 Observe counters on the new transit namespace:
 

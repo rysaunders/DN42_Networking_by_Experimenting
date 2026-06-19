@@ -83,6 +83,20 @@ Use MkDocs Material code block features when they reduce reader confusion:
 - Use line highlighting sparingly for values the reader must compare across namespaces.
 - Do not use formatting to hide manual-first commands. The reader should still build the important state directly.
 
+### Evidence Callouts
+
+After major inspection commands, add a concise paired callout when readers might overread the result:
+
+```md
+!!! success "What this proves"
+    State the narrow claim the command output supports.
+
+!!! warning "What this does not prove"
+    State the stronger claim the command output does not support.
+```
+
+Use these callouts sparingly. Good places include `ip route get`, `ping`, `birdc show route`, `ip route show ... proto bird`, `wg show`, and `curl` when the command distinguishes route lookup, route-table state, BIRD state, tunnel state, packet delivery, or service reachability.
+
 ### Lab State Continuity
 
 State whether the lab is:

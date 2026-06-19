@@ -644,6 +644,12 @@ This is the control-plane view. It answers:
 
 > What reachability did BIRD learn?
 
+!!! success "What this proves"
+    BIRD accepted a BGP-learned route and selected an active route for `172.20.3.1/32`.
+
+!!! warning "What this does not prove"
+    It does not prove Linux is forwarding with that route yet. That requires checking the Linux route table after kernel export.
+
 ## Step 11: Observe Routes in Linux
 
 Now ask Linux:
@@ -667,6 +673,12 @@ The `route show` output should include `proto bird`, similar to:
 
 That `proto bird` marker is the proof that the route in Linux came from BIRD. The `route get` command then shows how Linux would actually forward a packet using that installed route.
 
+!!! success "What this proves"
+    BIRD exported a selected route into Linux, and Linux has a forwarding decision for the destination.
+
+!!! warning "What this does not prove"
+    It does not prove an application is reachable. It proves route installation and route lookup, not service behavior.
+
 Now test actual reachability:
 
 ```sh
@@ -674,6 +686,12 @@ ip netns exec pocket-as1 ping -c 2 -W 1 -I 172.20.1.1 172.20.3.1
 ```
 
 This is the same kind of ping as the static-routing lab. The difference is who maintained the route table.
+
+!!! success "What this proves"
+    The BGP-maintained route can carry packets between the two service loopbacks.
+
+!!! warning "What this does not prove"
+    It does not prove BGP policy is production-safe. This is still a contained lab with lab-only prefixes and narrow filters.
 
 ## Step 12: Isolate One AS And Watch The Route Withdraw
 
