@@ -3,6 +3,8 @@
 !!! warning "Later draft - not implementation-ready"
     This page is roadmap material. Current DN42 DNS resolver recommendations and resolver-specific behavior must be refreshed before release.
 
+    Before this becomes an implementation chapter, it must satisfy the [mandatory border checklist](../pocket-internet-dn42-interconnect.md#mandatory-border-checklist).
+
 ## Concept
 
 Split DNS lets `.dn42` names resolve through DN42-aware resolvers while normal public DNS continues to work normally.

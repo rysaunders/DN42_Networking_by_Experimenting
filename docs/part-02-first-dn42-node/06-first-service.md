@@ -3,6 +3,8 @@
 !!! warning "Later draft - not implementation-ready"
     This page is roadmap material. Current DN42 service, firewall, source-address, return-path, and exposure guidance must be refreshed before release.
 
+    Before this becomes an implementation chapter, it must satisfy the [mandatory border checklist](../pocket-internet-dn42-interconnect.md#mandatory-border-checklist).
+
 ## Concept
 
 A reachable service proves more than a route exists. It proves forward path, return path, source address, firewall, and application binding are aligned.

@@ -3,6 +3,8 @@
 !!! warning "Later draft - not implementation-ready"
     This page is roadmap material. Current DN42 route-installation, forwarding, firewall, and troubleshooting guidance must be refreshed before release.
 
+    Before this becomes an implementation chapter, it must satisfy the [mandatory border checklist](../pocket-internet-dn42-interconnect.md#mandatory-border-checklist).
+
 ## Concept
 
 BIRD can know routes that Linux does not use for forwarding until they are exported to the kernel.

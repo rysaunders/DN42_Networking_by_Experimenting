@@ -1,5 +1,8 @@
 # Pocket Internet to DN42 Border
 
+!!! warning "Design page - not a beginner lab"
+    This page is a mandatory safety contract for later DN42 chapters. It is not an implementation guide, and it does not contain a complete peering procedure. Real DN42 commands must be refreshed against current sources, technically reviewed, tested, and paired with rollback before publication.
+
 Pocket Internet is the lab. DN42 is the living network beyond the lab.
 
 The border is where local lab reasoning meets shared routing practice. It should teach containment before connection.
@@ -97,6 +100,66 @@ Keeping those roles visible makes route leaks easier to reason about.
 - Treat return path as a first-class concept.
 - Prefer explicit import and export filters over permissive examples.
 - Include rollback and "what could leak?" checks in every border chapter.
+
+## Mandatory Border Checklist
+
+Every later DN42-facing chapter must satisfy this checklist before it shows commands that touch a real peer, route table, tunnel, resolver path, or service exposure.
+
+| Check | Required proof |
+| --- | --- |
+| No default route into DN42 | Show `ip route get 1.1.1.1` before and after the change, and confirm it still uses the normal public Internet path. |
+| No Pocket Internet lab prefix export | Show that lab-only prefixes such as `172.20.0.0/16` and lab AS labels are absent from DN42-facing export policy. |
+| Authorized prefix identified | Name the exact DN42 prefix or address being used and the registry/source that authorizes it. |
+| Import filter default deny or constrained accept | Show the import policy rejects unexpected routes, especially default routes, unless a chapter explicitly proves why an exception is safe. |
+| Export filter default deny | Show the export policy rejects everything by default and permits only the authorized prefix or route under discussion. |
+| Route export dry-run shown | Show what the routing daemon would export before relying on it. |
+| Rollback command shown | Show the exact command or config restore that stops the export, disables the session, or removes the route. |
+| Public Internet sanity check shown | Show normal public Internet routing still avoids DN42 after the change. |
+
+The checklist is intentionally repetitive. At a real border, repetition is cheaper than a route leak.
+
+## Required Evidence Shapes
+
+The exact commands will depend on the later chapter's environment and must be technically reviewed. The chapter must still include evidence with these shapes.
+
+Public Internet route sanity check:
+
+```sh title="Confirm public Internet traffic does not use DN42"
+ip route get 1.1.1.1
+```
+
+Expected interpretation:
+
+- the selected route uses the normal public Internet interface,
+- the selected route does not use a DN42 tunnel,
+- the selected route does not use a Pocket Internet lab interface.
+
+Route export dry-run or export inspection:
+
+```sh title="Inspect routes selected for export to the DN42 peer"
+birdc show route export <dn42_bgp_protocol_name>
+```
+
+Expected interpretation:
+
+- only authorized prefixes appear,
+- lab-only prefixes do not appear,
+- default routes do not appear unless the chapter explicitly proves and justifies that exception.
+
+Rollback shape:
+
+```sh title="Rollback shape - replace placeholders in real chapters"
+birdc disable <dn42_bgp_protocol_name>
+ip route get 1.1.1.1
+```
+
+Expected interpretation:
+
+- the DN42-facing session or export path is stopped,
+- normal public Internet routing remains normal,
+- no unexpected DN42, public, or lab-only routes remain installed.
+
+These are evidence shapes, not a complete procedure. A later chapter may use different commands if the platform or routing daemon differs, but it must prove the same things.
 
 ## Return Path
 

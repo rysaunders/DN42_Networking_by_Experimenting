@@ -123,6 +123,39 @@ reject everything else
 
 Never use a permissive example as a temporary shortcut in a real DN42-facing chapter.
 
+## DN42 Border Checklist
+
+The Pocket Internet to DN42 border checklist is mandatory for later DN42-facing chapters. See [Pocket Internet to DN42 Border](pocket-internet-dn42-interconnect.md#mandatory-border-checklist).
+
+Before a chapter touches a real DN42 peer, tunnel, route table, resolver path, or exposed service, it must show:
+
+- no default route into DN42,
+- no Pocket Internet lab prefix export,
+- the exact authorized prefix or address being used,
+- import policy that is default-deny or constrained-accept,
+- export policy that is default-deny,
+- route export dry-run or export inspection before relying on the route,
+- rollback commands that stop the export, session, tunnel, route, resolver change, or service exposure,
+- public Internet route sanity checks before and after the change.
+
+The minimum public-route sanity check is:
+
+```sh
+ip route get 1.1.1.1
+```
+
+That route must not unexpectedly use DN42, a lab tunnel, or a Pocket Internet interface.
+
+For BIRD-based DN42 chapters, the route export inspection should use the equivalent of:
+
+```sh
+birdc show route export <dn42_bgp_protocol_name>
+```
+
+The exact protocol name and expected output belong in the chapter. The important rule is that export is inspected before it is trusted.
+
+Rollback must be equally concrete. A BIRD chapter might disable the peer protocol while a WireGuard chapter might remove or bring down the tunnel. The published chapter must show the exact rollback for the state it changes.
+
 ## Reusable Verification Checklist
 
 Use the parts that match the lab.
@@ -134,6 +167,7 @@ Use the parts that match the lab.
 - [ ] Forward path and return path are both explained.
 - [ ] No unintended default route exists.
 - [ ] `ip route get 1.1.1.1` still uses normal public Internet routing when the lab touches WireGuard or DN42.
+- [ ] DN42-facing chapters satisfy the mandatory border checklist.
 - [ ] BIRD imports only routes accepted by the current filter.
 - [ ] BIRD exports only expected and authorized prefixes.
 - [ ] Firewall rules allow required lab traffic without opening unrelated forwarding.

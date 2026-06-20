@@ -5,6 +5,8 @@
 
 These chapters are later-phase drafts. They should follow the Pocket Internet foundation and the Pocket Internet to DN42 border design.
 
+Before any page in this section becomes an implementation chapter, it must satisfy the [mandatory border checklist](../pocket-internet-dn42-interconnect.md#mandatory-border-checklist).
+
 The goal is still one safe public DN42 peer, but the reader should reach it after they can explain local route lookup, return path, WireGuard-as-link, BIRD, BGP, and export policy in the lab.
 
 By the end of this part, the reader should have:
