@@ -432,6 +432,38 @@ Reader has not yet been taught:
 - real DN42 service exposure policy,
 - real host firewall integration.
 
+## After Part 1, DNS And Naming Foundation
+
+Introduced by `docs/part-01-first-principles/14-dns-and-naming-foundation.md`.
+
+Reader has seen:
+
+- DNS as the naming system that maps names to data such as IP addresses,
+- name resolution as separate from route lookup,
+- resolver as the client-side component that asks DNS questions for programs,
+- nameserver as the server answering DNS questions,
+- authoritative answer as a direct local answer for a known lab name,
+- recursive resolver as a role not used by the local lab,
+- split DNS as a later shape where some names use a special resolver,
+- namespace-specific resolver configuration under `/etc/netns/NAME/resolv.conf`,
+- `dnsmasq` answering one local lab name,
+- a route working while an unknown name fails,
+- a name resolving while the HTTP service listener is stopped.
+
+Reader has only been lightly introduced to:
+
+- DNS record types,
+- DNS server logs,
+- split DNS as preparation for `.dn42`.
+
+Reader has not yet been taught:
+
+- DNS delegation,
+- reverse DNS,
+- DNSSEC,
+- real DN42 resolver choices,
+- production recursive resolver operation.
+
 ## After Pocket Internet to DN42 Border
 
 Introduced by `docs/pocket-internet-dn42-interconnect.md`.

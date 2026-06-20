@@ -30,6 +30,9 @@ Autonomous system
 Authorized prefix
 : An address block a network is allowed to originate or announce. In DN42-facing chapters, authorization must come from the relevant registry objects and peer expectations, not from a lab example.
 
+Authoritative answer
+: A DNS answer from the place configured to know a name directly.
+
 Asymmetric routing
 : A path shape where request traffic and reply traffic do not use the same routers or links.
 
@@ -65,6 +68,9 @@ Default route
 
 DN42
 : A community overlay network used for learning and experimenting with routing, DNS, and network services.
+
+DNS
+: Domain Name System. The naming system that maps names to data such as IP addresses.
 
 Endpoint
 : The underlay address and UDP port where a WireGuard peer receives tunnel packets.
@@ -132,6 +138,12 @@ Network stack
 MTU
 : Maximum Transmission Unit. The largest packet size a link can carry without fragmentation at that layer.
 
+Name resolution
+: Turning a name into an address or other DNS answer.
+
+Nameserver
+: A server that answers DNS questions.
+
 Next hop
 : The next router a packet should be sent to.
 
@@ -177,6 +189,12 @@ Private key
 Public key
 : A key that can be shared with a peer.
 
+Recursive resolver
+: A resolver that can chase DNS answers through the wider DNS system instead of only answering from local configuration.
+
+Resolver
+: The client-side component that asks DNS questions for programs.
+
 Return path
 : The route a reply packet uses to get back to the original sender.
 
@@ -212,6 +230,9 @@ Service loopback
 
 Static route
 : A route written by hand.
+
+Split DNS
+: Using different DNS resolvers or answers depending on where a query is made.
 
 Static protocol
 : A BIRD protocol that creates configured routes inside BIRD.

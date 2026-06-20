@@ -208,6 +208,50 @@ sources:
     status: reviewed-for-planning
     notes: "Use for nftables concepts, tables, chains, rules, hooks, counters, and simple packet-filter examples."
 
+  - id: rfc-1034
+    title: "RFC 1034: Domain Names - Concepts and Facilities"
+    url: https://www.rfc-editor.org/rfc/rfc1034
+    category: dns
+    authority: standards
+    volatility: low
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for stable DNS conceptual grounding: domain names, resolvers, and name servers."
+
+  - id: rfc-1035
+    title: "RFC 1035: Domain Names - Implementation and Specification"
+    url: https://www.rfc-editor.org/rfc/rfc1035
+    category: dns
+    authority: standards
+    volatility: low
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for stable DNS implementation concepts and record behavior at a high level."
+
+  - id: rfc-6761
+    title: "RFC 6761: Special-Use Domain Names"
+    url: https://www.rfc-editor.org/rfc/rfc6761
+    category: dns
+    authority: standards
+    volatility: low
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for reserved testing names such as .test in local lab examples."
+
+  - id: dnsmasq-docs
+    title: dnsmasq Documentation
+    url: https://thekelleys.org.uk/dnsmasq/doc.html
+    category: dns
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for dnsmasq local lab options such as address overrides, no-resolv mode, logging, and interface binding."
+
   - id: rfc-4271
     title: "RFC 4271: A Border Gateway Protocol 4"
     url: https://www.rfc-editor.org/rfc/rfc4271

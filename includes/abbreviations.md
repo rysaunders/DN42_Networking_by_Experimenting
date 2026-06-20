@@ -4,6 +4,7 @@
 *[BGP]: Border Gateway Protocol. Routers use BGP to exchange network reachability with other routers.
 *[BIRD]: A routing daemon that can learn, select, filter, and install routes.
 *[convergence]: The network settling on usable routes after a routing change or failure.
+*[DNS]: Domain Name System. The naming system that maps names to data such as IP addresses.
 *[DN42]: A community overlay network used for learning and experimenting with routing, DNS, and network services.
 *[endpoint]: The underlay address and UDP port where a WireGuard peer receives tunnel packets.
 *[export filter]: A rule that decides which routes a router announces to a neighbor.
@@ -20,6 +21,7 @@
 *[return path]: The route a reply packet uses to get back to the original sender.
 *[route advertisement]: Telling another router that you can carry traffic for a prefix.
 *[route leak]: Accidentally announcing or accepting routes that should not cross a routing boundary.
+*[split DNS]: Using different DNS resolvers or answers depending on where a query is made.
 *[underlay]: The network that carries an overlay tunnel.
 *[ULA]: Unique Local Address. IPv6 private addressing intended for local networks.
 *[VPN]: A tool that creates a private-looking network path across another network.
