@@ -1,5 +1,33 @@
 # Chapter Template
 
+## Chapter Metadata
+
+Start each substantive chapter with a short metadata block before the reader-facing content. Keep values plain and explicit so future maintainers and review agents can reason about the chapter without reconstructing context from prose.
+
+```yaml
+chapter_id: part-01-xx-short-slug
+status: draft | reviewed | published | later-draft
+safety_level: conceptual | local-lab | local-routing-daemon | tunnel-lab | dn42-facing
+lab_id: none | experiments/labs/<lab-name>
+depends_on:
+  - prior chapter or named checkpoint
+transcript: none | experiments/transcripts/<tracked-transcript>.txt
+source_ids:
+  - source-id-from-research-sources
+tested_environment:
+  host: "macOS + OrbStack | Linux VM | research required"
+  distro: "Ubuntu 24.04 | research required"
+  kernel: "recorded value or research required"
+  bird: "recorded value | not used | research required"
+  wireguard_tools: "recorded value | not used | research required"
+technical_review:
+  required: true | false
+  reviewer: pending | reviewer-name
+  status: pending | deferred | complete
+```
+
+Use `required: true` for BIRD, WireGuard, DN42, firewall, DNS, routing-policy, or real-network operational chapters. For purely editorial or mechanical changes, set `required: false` and explain the reason in the issue closeout.
+
 ## Reader Starting Point
 
 State what the reader is expected to know before this chapter. If a required idea has not already been introduced, introduce it here instead of assuming it.
@@ -52,6 +80,8 @@ flowchart LR
 
 Use `docs/safety.md` to identify the lab safety level, boundary, state changes, and rollback checks.
 
+If the chapter includes commands, state whether the lab is standalone, dependent on a named checkpoint, or an extension of a still-running prior lab before the first command appears.
+
 ### Goal
 
 State the observable outcome.
@@ -59,6 +89,17 @@ State the observable outcome.
 ### Setup
 
 List assumptions and required packages.
+
+List required capabilities explicitly:
+
+- root or `sudo`,
+- `CAP_NET_ADMIN` when namespaces, links, routes, or WireGuard interfaces are created,
+- `iproute2`,
+- BIRD version when BIRD config appears,
+- WireGuard tooling when tunnel commands appear,
+- Python or other runtime when services are started.
+
+If a capability is optional, say what part of the chapter can still be read or performed without it.
 
 ### Predict Before Running
 
@@ -128,6 +169,15 @@ A second shell can be mentioned as an option, but it should not be the only path
 
 Describe what the reader should see and why.
 
+For lab chapters, include the expected state shape:
+
+- expected namespaces,
+- expected interfaces and addresses,
+- expected route-table entries,
+- expected daemon/process state,
+- expected listener/socket state,
+- expected cleanup state after rollback.
+
 ## What Changed
 
 Explain the before/after state:
@@ -157,9 +207,27 @@ Compare the lab to public Internet practice without pretending DN42 is identical
 
 Name at least one thing the chapter does not yet prepare the reader to do safely on DN42 or the public Internet.
 
+## Technical Review
+
+Use this section when `technical_review.required` is true in the metadata block.
+
+Record:
+
+- reviewer or review source,
+- date,
+- files or configs reviewed,
+- accepted findings,
+- deferred findings and linked issues,
+- rejected findings with reasons.
+
+Technical review is different from beginner review. Beginner review asks whether the reader can follow the material. Technical review asks whether commands, configs, safety claims, current-practice claims, and simplifications are technically defensible.
+
 ## Verify Before Proceeding
 
 - [ ] Safety level and lab boundary are stated.
+- [ ] Metadata block is complete.
+- [ ] Required capabilities are listed.
+- [ ] Expected route/interface/process state is stated for labs.
 - [ ] Route lookup matches the expected interface.
 - [ ] No unintended default route exists.
 - [ ] Export policy is explicit.
@@ -167,6 +235,8 @@ Name at least one thing the chapter does not yet prepare the reader to do safely
 - [ ] New concepts are added to `docs/reader-knowledge.md`.
 - [ ] Beginner review has been run, or deferral is recorded with a reason.
 - [ ] Accepted beginner-review findings are addressed.
+- [ ] Technical review has been run, or deferral is recorded with a reason, when `technical_review.required` is true.
+- [ ] Validation commands are listed and pass.
 
 ## Rollback
 

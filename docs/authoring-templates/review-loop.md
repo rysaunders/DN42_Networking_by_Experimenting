@@ -4,16 +4,23 @@ Every chapter or lab draft should pass through a local Draft -> Beginner Review 
 
 This is an editorial process, not a CI gate. The goal is to make first-principles teaching repeatable without pretending that a script can judge comprehension.
 
+Some chapters also need technical review. Beginner review and technical review are separate checks:
+
+- Beginner review asks whether the intended reader can follow the material with only the knowledge already taught.
+- Technical review asks whether commands, configs, safety claims, tool behavior, current-practice claims, and simplifications are correct enough to publish.
+
 ## Workflow
 
 1. Draft the chapter or lab from validated experiments and reviewed sources.
-2. Apply `docs/authoring-templates/internet-readiness-standard.md`.
-3. Update `docs/reader-knowledge.md` with any concepts the draft introduces.
-4. Spawn a beginner-review subagent.
-5. Give the reviewer the required inputs listed below.
-6. Revise the draft or record why a finding is deferred or rejected.
-7. Run normal verification.
-8. Close the issue only after the review happened or was explicitly deferred.
+2. Fill in the metadata block from the chapter or experiment template.
+3. Apply `docs/authoring-templates/internet-readiness-standard.md`.
+4. Update `docs/reader-knowledge.md` with any concepts the draft introduces.
+5. Spawn a beginner-review subagent for substantive explanatory content.
+6. Give the beginner reviewer the required inputs listed below.
+7. Run technical review when the metadata says it is required.
+8. Revise the draft or record why each finding is deferred or rejected.
+9. Run normal verification.
+10. Close the issue only after required reviews happened or were explicitly deferred with reasons.
 
 ## Reviewer Inputs
 
@@ -29,6 +36,38 @@ Give the reviewer:
 - any issue acceptance criteria.
 
 Do not tell the reviewer what you think is weak. The review is more useful when it is not anchored by the drafter's opinion.
+
+## Technical Review Triggers
+
+Technical review is required when a chapter or experiment includes any of these:
+
+- BIRD configuration,
+- WireGuard configuration,
+- DN42-current guidance,
+- real peer or registry work,
+- DNS resolver or authoritative DNS configuration,
+- firewall or packet-filtering changes,
+- route export/import policy,
+- host-wide sysctl guidance,
+- non-lab network changes,
+- security, privacy, abuse, or operational safety claims.
+
+Technical review may be deferred only when the issue is explicitly non-operational, such as a roadmap note, metadata update, or mechanical rename. Record the reason in the issue closeout.
+
+## Technical Reviewer Inputs
+
+Give the technical reviewer:
+
+- the chapter or lab file,
+- the lab script or config templates,
+- the relevant transcript,
+- the metadata block with tested environment and expected state,
+- source IDs and research notes,
+- `docs/safety.md`,
+- `docs/authoring-templates/internet-readiness-standard.md`,
+- issue acceptance criteria.
+
+Ask the reviewer to focus on correctness, safety boundaries, stale assumptions, untested commands, lab-only shortcuts, and whether the stated verification proves the intended claim.
 
 ## Reusable Reviewer Prompt
 
@@ -81,7 +120,8 @@ Do not close the chapter or experiment issue with untriaged beginner-review find
 
 Use issue comments to record:
 
-- reviewer date,
+- beginner reviewer date,
+- technical reviewer date when applicable,
 - reviewed files,
 - accepted findings,
 - deferred findings and linked issues,
@@ -94,9 +134,11 @@ For now, use existing labels such as `chapter`, `experiment`, `conceptual`, and 
 A chapter or lab issue is not done until:
 
 - the draft follows the relevant authoring template,
+- the metadata block is complete,
 - the Internet-readiness standard has been considered,
 - `docs/reader-knowledge.md` is updated when new concepts are introduced,
 - a beginner review has been run or explicitly deferred,
+- technical review has been run or explicitly deferred when required,
 - accepted review findings have been addressed,
 - deferred review findings have follow-up issues or clear notes,
 - normal verification commands pass.

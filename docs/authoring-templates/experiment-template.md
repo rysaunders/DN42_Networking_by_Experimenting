@@ -1,5 +1,51 @@
 # Experiment Template
 
+## Experiment Metadata
+
+Start each experiment or lab script design with a small metadata block.
+
+```yaml
+experiment_id: experiments/labs/<lab-name>
+status: draft | validated | published
+safety_level: local-lab | local-routing-daemon | tunnel-lab | dn42-facing
+chapter: docs/path/to/chapter.md
+standalone: true | false
+requires_capabilities:
+  - root-or-sudo
+  - CAP_NET_ADMIN
+  - iproute2
+  - bird2
+  - wireguard-tools
+setup_assumptions:
+  - clean lab namespace names are available
+  - required packages are already installed
+cleanup_guarantees:
+  - deletes all namespaces named by this lab
+  - stops lab-scoped processes by PID file
+  - removes temporary config directory
+expected_state:
+  namespaces:
+    - name-or-pattern
+  interfaces:
+    - namespace:interface address/prefix
+  routes:
+    - namespace destination via/dev expectation
+  processes:
+    - process name, socket, or PID file expectation
+  listeners:
+    - optional address:port expectation
+validation_commands:
+  - bash -n experiments/labs/<lab-name>/run.sh
+  - lab execution command
+  - cleanup verification command
+transcript: experiments/transcripts/<tracked-transcript>.txt | local-only
+technical_review:
+  required: true | false
+  status: pending | deferred | complete
+```
+
+Keep this block current when the lab changes. If a script and chapter disagree, the script is not "probably fine"; the mismatch must be resolved or called out before publication.
+
 ## Reader Starting Point
 
 What does the reader need to know before this experiment? List any idea that must be explained first.
@@ -38,6 +84,20 @@ Use `docs/safety.md` to choose the lab safety level and required checks.
 - No unintended export.
 - No persistent state without rollback.
 
+State exactly what the experiment mutates:
+
+- namespaces,
+- interfaces,
+- addresses,
+- routes,
+- sysctls,
+- daemon processes,
+- temporary files,
+- firewall rules,
+- real network peers.
+
+If the experiment touches anything outside disposable namespaces or temporary files, explain why and identify rollback before the command appears.
+
 ## Procedure
 
 1. Prepare the environment.
@@ -49,6 +109,8 @@ Use `docs/safety.md` to choose the lab safety level and required checks.
 For each command, explain what state it changes before showing the command.
 
 Experiments should be manual-first. A script can exist for repeatability and transcript capture, but the published lesson should teach the reader to build the important state directly in the shell.
+
+If the script creates setup state for a later manual section, list that setup state by object name. Do not make readers infer hidden namespace, interface, route, or process state from a helper script.
 
 ## Code Block Conventions
 
@@ -88,6 +150,17 @@ Ask the reader to predict what should happen before at least one route lookup, p
 List the specific command outputs or state transitions expected.
 
 For every important output, explain why it happened.
+
+Include expected state checks, not just successful packet tests:
+
+- namespace list,
+- interface/address list,
+- route lookup,
+- daemon protocol state,
+- kernel route state,
+- listener state,
+- process/PID state,
+- rollback cleanup state.
 
 If the experiment is intentionally repetitive or annoying, name that friction in plain language. The point is not to entertain the reader; the point is to make the learning arc visible. Say what the manual work teaches, and name the later tool or concept that will reduce the pain.
 
@@ -139,6 +212,18 @@ After regenerating a checked-in transcript, update any chapter reference that na
 
 - [ ] Reviewer received this experiment, the relevant transcript, the authoring template, and `docs/reader-knowledge.md`.
 - [ ] Reviewer considered the Internet-readiness standard.
+- [ ] Accepted findings are addressed.
+- [ ] Deferred findings have follow-up issues or notes.
+- [ ] Rejected findings include a reason.
+
+## Technical Review
+
+Required for BIRD, WireGuard, DN42-facing, DNS, firewall, routing-policy, or real-network operational experiments.
+
+- [ ] Reviewer received the script, chapter draft, transcript, source IDs, and expected-state metadata.
+- [ ] Commands/configs were checked against current tool behavior or source-reviewed where live testing is not possible.
+- [ ] Lab-only shortcuts are labeled.
+- [ ] Dangerous defaults, default routes, export filters, sysctls, and firewall changes are reviewed.
 - [ ] Accepted findings are addressed.
 - [ ] Deferred findings have follow-up issues or notes.
 - [ ] Rejected findings include a reason.

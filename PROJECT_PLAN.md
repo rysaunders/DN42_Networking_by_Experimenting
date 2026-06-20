@@ -656,147 +656,41 @@ You know it works when:
 
 ### Chapter Template
 
-```markdown
----
-title: "Chapter Title"
-status: draft
-claim_types:
-  - conceptual
-  - implementation
-  - dn42-current
-tested_on:
-  distro: "research required"
-  kernel: "research required"
-  bird: "research required"
-  wireguard_tools: "research required"
----
+The maintained chapter template lives at `docs/authoring-templates/chapter-template.md`. Use that file as the source of truth for new work.
 
-# Chapter Title
+Every substantive chapter should now start with a compact metadata block that names:
 
-## Concept
+- chapter ID,
+- status,
+- safety level,
+- lab ID,
+- dependencies,
+- transcript path,
+- source IDs,
+- tested environment,
+- technical review requirement and status.
 
-Explain the stable networking idea in plain language.
+This metadata is intentionally plain. It should make chapter state obvious to future maintainers and review agents without requiring them to infer context from the prose.
 
-## Why It Matters
-
-Explain what breaks if the reader does not understand this.
-
-## Lab / Experiment
-
-### Goal
-
-State the observable outcome.
-
-### Setup
-
-List assumptions and required packages.
-
-### Steps
-
-Use commands only after they have been tested or clearly marked as research required.
-
-## Expected Observations
-
-Describe what the reader should see and why.
-
-## Troubleshooting Notes
-
-Use branches:
-
-- If you see X, check Y.
-- If command A succeeds but command B fails, suspect Z.
-
-## How the Real Internet Does This
-
-Compare the lab to public Internet practice without pretending DN42 is identical.
-
-## Verify Before Proceeding
-
-- [ ] Route lookup matches the expected interface.
-- [ ] No unintended default route exists.
-- [ ] Export policy is explicit.
-
-## Rollback
-
-List exact rollback commands.
-
-## References
-
-- source-id: short reason used
-```
+Do not copy stale examples from this planning document. When creating or revising a chapter, start from `docs/authoring-templates/chapter-template.md`.
 
 ### Experiment Template
 
-```markdown
----
-experiment_id: exp-first-bird-session
-status: draft
-risk: medium
-requires_public_dn42_peer: true
-tested: false
----
+The maintained experiment template lives at `docs/authoring-templates/experiment-template.md`. Use that file as the source of truth for new labs and lab-script revisions.
 
-# Experiment: First BIRD Session
+Every experiment should state:
 
-## Question
+- setup assumptions,
+- required capabilities,
+- cleanup guarantees,
+- expected namespace/interface/route/process/listener state,
+- validation commands,
+- transcript convention,
+- technical review requirement.
 
-Can this router establish one BGP session over WireGuard and import DN42 routes without exporting anything unintended?
+Scripts are allowed for repeatability and transcript capture, but the published learning path remains manual-first unless a chapter explicitly justifies a helper.
 
-## Hypothesis
-
-If WireGuard is up, BIRD has the correct neighbor address and ASN, and TCP/179 is allowed, the session should reach Established.
-
-## Safety Boundaries
-
-- No default route accepted.
-- Export only owned prefixes.
-- Reject invalid origin routes.
-- Keep a rollback copy of BIRD config.
-
-## Procedure
-
-1. Confirm WireGuard handshake.
-2. Start BIRD with peer disabled.
-3. Validate config.
-4. Enable peer.
-5. Inspect BIRD protocol state.
-6. Inspect imported routes.
-7. Inspect kernel routes.
-
-## Expected Observations
-
-- `birdc show protocols` shows the peer Established.
-- `birdc show route` shows accepted routes.
-- `ip route` shows only routes exported to kernel.
-
-## Troubleshooting Branches
-
-- No WireGuard handshake: check endpoint, keys, NAT, firewall.
-- BGP Active: check neighbor address and TCP/179.
-- Established but no routes: check import filter and ROA table.
-- Routes in BIRD but not kernel: check kernel protocol and next-hop reachability.
-
-## Rollback
-
-1. Disable peer in BIRD config.
-2. Reload BIRD.
-3. Bring down WireGuard interface if needed.
-4. Confirm no unexpected DN42 routes remain in kernel.
-
-## Evidence to Capture
-
-- `wg show`
-- `birdc show protocols all`
-- `birdc show route count`
-- `ip route get <dn42-service>`
-- `ip route get 1.1.1.1`
-
-## References
-
-- dn42-getting-started
-- bird-docs
-- wireguard-quickstart
-```
+Do not copy stale examples from this planning document. When creating or revising an experiment, start from `docs/authoring-templates/experiment-template.md`.
 
 ### Research Note Template
 
@@ -844,6 +738,14 @@ claim_type: dn42-current
 - Commands that require public DN42 state must be marked `dn42-current` and tested before release.
 - Store command transcripts in `experiments/transcripts/<lab-id>/`.
 - Do not publish commands copied from the wiki without local validation or a research-required marker.
+
+### Review and Metadata Conventions
+
+- Use `docs/authoring-templates/review-loop.md` for Draft -> Beginner Review -> Technical Review -> Revise decisions.
+- Beginner review is required for substantive explanatory content unless explicitly deferred with a reason.
+- Technical review is required for BIRD, WireGuard, DN42-facing, DNS, firewall, routing-policy, host-wide sysctl, or real-network operational guidance.
+- Metadata updates do not require immediate retrofits across all old chapters. Apply the new metadata pattern to new chapters and to existing chapters when they are next substantively revised.
+- Issue closeouts should record which reviews were run, deferred, or not required.
 
 ### Separating Current Practice From Principles
 
