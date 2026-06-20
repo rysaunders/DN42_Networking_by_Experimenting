@@ -20,11 +20,11 @@
       wireguard_tools: not used
     beginner_review:
       status: complete
-      note: Beginner-review pass completed when the chapter was drafted.
+      note: Beginner-review pass completed when drafted; config-anatomy flow reviewed again during issue #65 hardening.
     technical_review:
       required: true
       status: deferred
-      note: Local BGP behavior validated; real-network policy guidance requires later technical review.
+      note: Local BGP behavior validated; DN42-grade policy remains deferred until source-refresh and DN42-facing chapters.
     ```
 
 ## Reader Starting Point
@@ -206,6 +206,89 @@ Each BIRD process will:
 - install accepted routes into the Linux kernel route table.
 
 The AS numbers are lab-only numbers. They are shaped like DN42 ASNs, but they are not registry claims.
+
+## BIRD Config Anatomy
+
+The first BGP config is longer than the earlier BIRD route-manager config. That is not accidental. BGP makes routing less repetitive, but it asks for very explicit wiring up front.
+
+Before writing the full file, read it as five smaller decisions.
+
+```text title="1. Router identity"
+router id 172.20.1.1;
+```
+
+This gives BIRD a stable identifier for this router. In the lab, each router uses its service loopback as the router ID because that address is unique and easy to recognize.
+
+```text title="2. Learn local connected routes"
+protocol device {
+  scan time 1;
+}
+
+protocol direct direct_loopbacks {
+  ipv4;
+  interface "lo";
+}
+```
+
+`protocol device` lets BIRD notice interfaces. `protocol direct` tells BIRD to learn routes that are directly connected to `lo`, which is where each namespace's service loopback lives.
+
+```text title="3. Export selected BIRD routes into Linux"
+protocol kernel kernel_ipv4 {
+  ipv4 {
+    import none;
+    export all;
+  };
+  scan time 1;
+}
+```
+
+This is the BIRD-to-Linux boundary. BIRD may learn and select a route, but Linux cannot forward with that route until the kernel protocol installs it into the Linux route table.
+
+`export all` is deliberately broad here because the lab has a separate prefix allowlist and runs inside temporary namespaces. In a real peer-facing router, broad export rules need much stricter surrounding policy.
+
+```text title="4. Keep lab routes inside the lab"
+filter pocket_import {
+  if net = 172.20.1.1/32 then accept;
+  if net = 172.20.2.1/32 then accept;
+  if net = 172.20.3.1/32 then accept;
+  if net = 172.20.4.1/32 then accept;
+  reject;
+}
+
+filter pocket_export {
+  if net = 172.20.1.1/32 then accept;
+  if net = 172.20.2.1/32 then accept;
+  if net = 172.20.3.1/32 then accept;
+  if net = 172.20.4.1/32 then accept;
+  reject;
+}
+```
+
+These filters are lab-only prefix allowlists. They answer one narrow question:
+
+> Is this one of the four Pocket Internet service loopbacks?
+
+They do not prove that an AS is allowed to originate a prefix. They do not check registry objects. They do not replace DN42 import/export policy. They only keep this local lab from accepting or announcing prefixes outside the four expected service loopbacks.
+
+```text title="5. Define one BGP neighbor session"
+protocol bgp to_as2 {
+  local as 4242420001;
+  neighbor 10.42.12.2 as 4242420002;
+  source address 10.42.12.1;
+  check link yes;
+  ipv4 {
+    import filter pocket_import;
+    export filter pocket_export;
+  };
+}
+```
+
+This is one BGP conversation. The local AS says who this router is. The neighbor line says which address and AS should be on the other side. The source address says which local link address to use for the session.
+
+If you feel the config is a lot for four tiny routers, that is the point. Static routes made you tired one way. BGP config makes you tired a different way. The payoff is that once the sessions are correct, routes can appear, disappear, and recover without hand-editing every route table.
+
+!!! warning "Prefix allowlist, not real peer policy"
+    The `pocket_import` and `pocket_export` filters in this chapter are narrow lab allowlists. They are useful for learning the mechanics of BIRD policy, but they are not sufficient for DN42 or public-Internet peering. Later DN42-facing chapters must add registry-backed authorization, prefix limits, explicit bogon filtering, operational rollback, and peer-specific policy.
 
 ## Step 1: Clean Up Any Old Lab State
 
