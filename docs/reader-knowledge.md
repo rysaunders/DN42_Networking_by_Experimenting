@@ -338,3 +338,35 @@ Reader has not yet been taught:
 - `wg-quick`,
 - real DN42 peer expectations,
 - DN42 registry objects.
+
+## After Pocket Internet to DN42 Border
+
+Introduced by `docs/pocket-internet-dn42-interconnect.md`.
+
+Reader has seen:
+
+- border router: the router where Pocket Internet meets DN42,
+- outbound reachability: Pocket Internet sending traffic toward DN42,
+- inbound reachability: DN42 sending traffic toward a selected service behind the border,
+- authorized prefix: a prefix that may be advertised because registry/source authority permits it,
+- route leak: a route crossing a boundary where it should not,
+- default-deny export posture: reject everything unless a later chapter permits a specific authorized route,
+- return path as a requirement for cross-boundary reachability,
+- route export dry-run as evidence before trusting an export policy,
+- public Internet route sanity check as evidence that ordinary Internet traffic still avoids DN42.
+
+Reader has only been lightly introduced to:
+
+- import and export filtering as real DN42 border safety controls,
+- outbound-only reachability as a safer first border posture.
+
+Reader has not yet been taught:
+
+- real DN42 registry objects,
+- real DN42 WireGuard peer setup,
+- real DN42 BIRD session setup,
+- IPv6 and ULA behavior,
+- firewall policy at a real border,
+- split DNS for `.dn42`,
+- monitoring or looking-glass operation,
+- abuse handling and operational responsibility.
