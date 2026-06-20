@@ -1,0 +1,128 @@
+
+## Environment
+
+$ uname -a
+Linux pocket-link-lab-0620 7.0.11-orbstack-00360-gc9bc4d96ac70 #1 SMP PREEMPT Thu Jun  4 16:40:25 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ ip -V
+ip utility, iproute2-6.1.0, libbpf 1.3.0
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+
+$ tcpdump --version
+tcpdump version 4.99.4
+libpcap version 1.10.4 (with TPACKET_V3)
+OpenSSL 3.0.13 30 Jan 2024
+
+Transcript: experiments/transcripts/local-link-observation-20260620T000000Z.txt
+
+## Rollback before setup
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(pocket-link-a\|pocket-link-b\)\(\ \|\$\)\'\ \|\|\ true
+
+## Create namespaces and link
+
+$ ip netns add pocket-link-a
+
+$ ip netns add pocket-link-b
+
+$ ip link add a0 type veth peer name b0
+
+$ ip link set a0 netns pocket-link-a
+
+$ ip link set b0 netns pocket-link-b
+
+## Add addresses and bring the link up
+
+$ ip -n pocket-link-a addr add 10.77.0.1/30 dev a0
+
+$ ip -n pocket-link-b addr add 10.77.0.2/30 dev b0
+
+$ ip -n pocket-link-a link set lo up
+
+$ ip -n pocket-link-a link set a0 up
+
+$ ip -n pocket-link-b link set lo up
+
+$ ip -n pocket-link-b link set b0 up
+
+## Inspect connected routes
+
+$ ip -n pocket-link-a route
+10.77.0.0/30 dev a0 proto kernel scope link src 10.77.0.1 
+
+$ ip -n pocket-link-b route
+10.77.0.0/30 dev b0 proto kernel scope link src 10.77.0.2 
+
+$ ip -n pocket-link-a route get 10.77.0.2
+10.77.0.2 dev a0 src 10.77.0.1 uid 0 
+    cache 
+
+## Inspect neighbor tables before traffic
+
+$ ip -n pocket-link-a neigh show
+
+$ ip -n pocket-link-b neigh show
+
+## Capture first packet exchange
+
+$ mkdir -p /tmp/local-link-observation
+
+$ ip netns exec pocket-link-b timeout 8 tcpdump -n -e -i b0 -c 4 arp\ or\ icmp -l -U -w /tmp/local-link-observation/first-ping.pcap
+tcpdump: listening on b0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+$ ip netns exec pocket-link-a ping -c 1 -W 2 10.77.0.2
+PING 10.77.0.2 (10.77.0.2) 56(84) bytes of data.
+64 bytes from 10.77.0.2: icmp_seq=1 ttl=64 time=0.183 ms
+
+--- 10.77.0.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.183/0.183/0.183/0.000 ms
+4 packets captured
+4 packets received by filter
+0 packets dropped by kernel
+
+$ ip netns exec pocket-link-b tcpdump -n -e -r /tmp/local-link-observation/first-ping.pcap
+reading from file /tmp/local-link-observation/first-ping.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+08:38:29.791761 9e:21:04:34:84:01 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42: Request who-has 10.77.0.2 tell 10.77.0.1, length 28
+08:38:29.791792 56:82:05:1d:77:3d > 9e:21:04:34:84:01, ethertype ARP (0x0806), length 42: Reply 10.77.0.2 is-at 56:82:05:1d:77:3d, length 28
+08:38:29.791798 9e:21:04:34:84:01 > 56:82:05:1d:77:3d, ethertype IPv4 (0x0800), length 98: 10.77.0.1 > 10.77.0.2: ICMP echo request, id 2376, seq 1, length 64
+08:38:29.791850 56:82:05:1d:77:3d > 9e:21:04:34:84:01, ethertype IPv4 (0x0800), length 98: 10.77.0.2 > 10.77.0.1: ICMP echo reply, id 2376, seq 1, length 64
+
+## Inspect neighbor tables after traffic
+
+$ ip -n pocket-link-a neigh show
+10.77.0.2 dev a0 lladdr 56:82:05:1d:77:3d REACHABLE 
+
+$ ip -n pocket-link-b neigh show
+10.77.0.1 dev b0 lladdr 9e:21:04:34:84:01 DELAY 
+
+## Capture warm-neighbor ICMP only
+
+$ ip netns exec pocket-link-b timeout 8 tcpdump -n -e -i b0 -c 2 icmp -l -U -w /tmp/local-link-observation/second-ping.pcap
+tcpdump: listening on b0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+$ ip netns exec pocket-link-a ping -c 1 -W 2 10.77.0.2
+PING 10.77.0.2 (10.77.0.2) 56(84) bytes of data.
+64 bytes from 10.77.0.2: icmp_seq=1 ttl=64 time=0.049 ms
+
+--- 10.77.0.2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.049/0.049/0.049/0.000 ms
+2 packets captured
+2 packets received by filter
+0 packets dropped by kernel
+
+$ ip netns exec pocket-link-b tcpdump -n -e -r /tmp/local-link-observation/second-ping.pcap
+reading from file /tmp/local-link-observation/second-ping.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+08:38:30.830681 9e:21:04:34:84:01 > 56:82:05:1d:77:3d, ethertype IPv4 (0x0800), length 98: 10.77.0.1 > 10.77.0.2: ICMP echo request, id 2384, seq 1, length 64
+08:38:30.830710 56:82:05:1d:77:3d > 9e:21:04:34:84:01, ethertype IPv4 (0x0800), length 98: 10.77.0.2 > 10.77.0.1: ICMP echo reply, id 2384, seq 1, length 64
+
+## Rollback
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(pocket-link-a\|pocket-link-b\)\(\ \|\$\)\'\ \|\|\ true
+
+## Result
+Lab complete. Temporary namespaces and capture files removed.
+Transcript saved to: experiments/transcripts/local-link-observation-20260620T000000Z.txt

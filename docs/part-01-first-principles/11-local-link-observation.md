@@ -3,24 +3,24 @@
 ??? info "Maintainer metadata"
     ```yaml
     chapter_id: part-01-11-local-link-observation
-    status: draft
+    status: published-draft
     safety_level: local-lab
     lab_id: experiments/labs/local-link-observation
     depends_on:
       - part-01-01-linux-router
       - part-01-02-addressing-prefixes-longest-match
-    transcript: "pending; OrbStack validation blocked by VM start timeout"
+    transcript: experiments/transcripts/local-link-observation-20260620T000000Z.txt
     source_ids:
       - linux-ip-route
     tested_environment:
       host: macOS + OrbStack
-      distro: pending validation transcript
-      kernel: pending validation transcript
+      distro: Ubuntu 24.04 noble
+      kernel: 7.0.11-orbstack-00360-gc9bc4d96ac70
       bird: not used
       wireguard_tools: not used
     beginner_review:
       status: deferred
-      note: Deferred until the lab can be validated and transcript-backed.
+      note: Deferred in this pass; chapter is now transcript-backed and ready for the next beginner review loop.
     technical_review:
       required: false
       status: not_required
@@ -139,9 +139,11 @@ The repeatable validation script lives at:
 experiments/labs/local-link-observation/run.sh
 ```
 
-The validation transcript for this experiment is pending.
+The validated transcript for this experiment is:
 
-The current blocker is an OrbStack VM startup timeout while recreating `pocket-internet-lab`. Maintainers should replace this note with a tracked transcript path after the lab runs successfully.
+```text
+experiments/transcripts/local-link-observation-20260620T000000Z.txt
+```
 
 ## What You Will Build
 

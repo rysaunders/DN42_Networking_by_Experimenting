@@ -4,7 +4,7 @@
 
 ```yaml
 experiment_id: experiments/labs/local-link-observation
-status: draft
+status: validated
 safety_level: local-lab
 chapter: docs/part-01-first-principles/11-local-link-observation.md
 standalone: true
@@ -31,7 +31,7 @@ validation_commands:
   - bash -n experiments/labs/local-link-observation/run.sh
   - experiments/labs/local-link-observation/run.sh
   - ip netns list | grep -E 'pocket-link-(a|b)' returns no match after cleanup
-transcript: "pending; OrbStack validation blocked by VM start timeout"
+transcript: experiments/transcripts/local-link-observation-20260620T000000Z.txt
 technical_review:
   required: false
   status: not_required
