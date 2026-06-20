@@ -277,15 +277,20 @@ You will test reachability from `pocket-as1`'s service loopback to `pocket-as3`'
 
 State snapshot:
 
-```text
-Physical links still exist. Each namespace now also has a service address.
-No service routes exist yet.
+```mermaid
+flowchart LR
+  AS1["pocket-as1<br/>service 172.20.1.1/32"]
+  AS2["pocket-as2<br/>service 172.20.2.1/32"]
+  AS3["pocket-as3<br/>service 172.20.3.1/32"]
+  AS4["pocket-as4<br/>service 172.20.4.1/32"]
 
-pocket-as1[172.20.1.1/32] --- pocket-as2[172.20.2.1/32]
-          |                                  |
-          |                                  |
-pocket-as4[172.20.4.1/32] --- pocket-as3[172.20.3.1/32]
+  AS1 --- AS2
+  AS2 --- AS3
+  AS3 --- AS4
+  AS4 --- AS1
 ```
+
+Physical links exist and each namespace has a service address. No service routes exist yet.
 
 ## Step 5: Add Link Addresses
 
@@ -381,22 +386,26 @@ The service loopback addresses exist too, but the plain `ip route` view is focus
 
 State snapshot:
 
-```text
+```mermaid
+flowchart LR
+  AS1["pocket-as1"]
+  AS2["pocket-as2"]
+  AS3["pocket-as3"]
+  AS4["pocket-as4"]
+
+  AS1 ---|"10.42.12.0/30"| AS2
+  AS2 ---|"10.42.23.0/30"| AS3
+  AS3 ---|"10.42.34.0/30"| AS4
+  AS4 ---|"10.42.41.0/30"| AS1
+```
+
 The links are usable now. Service routes still do not exist.
 
-              10.42.12.0/30
-pocket-as1 ------------------ pocket-as2
-    |                              |
-    | 10.42.41.0/30                | 10.42.23.0/30
-    |                              |
-pocket-as4 ------------------ pocket-as3
-              10.42.34.0/30
+Known to `pocket-as1`:
 
-Known to pocket-as1:
-- 10.42.12.0/30 is directly connected
-- 10.42.41.0/30 is directly connected
-- 172.20.3.1/32 is still unknown
-```
+- `10.42.12.0/30` is directly connected,
+- `10.42.41.0/30` is directly connected,
+- `172.20.3.1/32` is still unknown.
 
 ## Step 7: Enable Forwarding
 
@@ -564,22 +573,22 @@ If any one of those entries is missing, ping can fail.
 
 State snapshot:
 
-```text
-Selected static routes now use the clockwise path.
+```mermaid
+flowchart LR
+  AS1["pocket-as1<br/>172.20.1.1/32"]
+  AS2["pocket-as2<br/>transit"]
+  AS3["pocket-as3<br/>172.20.3.1/32"]
+  AS4["pocket-as4<br/>alternate transit"]
 
-Physical links:
-pocket-as1 --- pocket-as2 --- pocket-as3
-    |                         |
-    +------ pocket-as4 -------+
-
-Selected forward request:
-pocket-as1 ==> pocket-as2 ==> pocket-as3
-172.20.1.1                  172.20.3.1
-
-Selected reply:
-pocket-as3 ==> pocket-as2 ==> pocket-as1
-172.20.3.1                  172.20.1.1
+  AS1 == "selected forward route" ==> AS2
+  AS2 == "selected forward route" ==> AS3
+  AS3 -. "selected reply route" .-> AS2
+  AS2 -. "selected reply route" .-> AS1
+  AS1 --- AS4
+  AS4 --- AS3
 ```
+
+Selected static routes now use the clockwise path. The physical path through `pocket-as4` exists, but no selected service route uses it yet.
 
 ## Step 10: Test Service Reachability
 
@@ -667,22 +676,20 @@ The useful lesson is not merely "a link broke." The useful lesson is:
 
 State snapshot:
 
-```text
-The route still points clockwise, but the AS2-AS3 link is down.
+```mermaid
+flowchart LR
+  AS1["pocket-as1<br/>route still points clockwise"]
+  AS2["pocket-as2"]
+  AS3["pocket-as3"]
+  AS4["pocket-as4<br/>unused alternate path"]
 
-Physical links:
-pocket-as1 --- pocket-as2 =X= pocket-as3
-    |                         |
-    +------ pocket-as4 -------+
-
-Selected forward route still says:
-pocket-as1 ==> pocket-as2 =X= pocket-as3
-
-Unused physical path still exists:
-pocket-as1 --- pocket-as4 --- pocket-as3
-
-Static routing does not move to the alternate path by itself.
+  AS1 == "selected forward route" ==> AS2
+  AS2 -. "broken AS2-AS3 link" .- AS3
+  AS1 --- AS4
+  AS4 --- AS3
 ```
+
+Static routing does not move to the alternate path by itself. The AS1-AS4-AS3 path is still physically present, but no selected service route points at it yet.
 
 ## Step 13: Prove the Alternate Physical Path Exists
 
@@ -799,22 +806,22 @@ Repaired reply path:
 
 State snapshot:
 
-```text
-Selected static routes now use the alternate path through pocket-as4.
+```mermaid
+flowchart LR
+  AS1["pocket-as1<br/>172.20.1.1/32"]
+  AS2["pocket-as2"]
+  AS3["pocket-as3<br/>172.20.3.1/32"]
+  AS4["pocket-as4<br/>new transit"]
 
-Physical links:
-pocket-as1 --- pocket-as2 =X= pocket-as3
-    |                         |
-    +------ pocket-as4 -------+
-
-Selected forward request:
-pocket-as1 ==> pocket-as4 ==> pocket-as3
-172.20.1.1                  172.20.3.1
-
-Selected reply:
-pocket-as3 ==> pocket-as4 ==> pocket-as1
-172.20.3.1                  172.20.1.1
+  AS1 --- AS2
+  AS2 -. "broken AS2-AS3 link" .- AS3
+  AS1 == "repaired forward route" ==> AS4
+  AS4 == "repaired forward route" ==> AS3
+  AS3 -. "repaired reply route" .-> AS4
+  AS4 -. "repaired reply route" .-> AS1
 ```
+
+Selected static routes now use the alternate path through `pocket-as4`.
 
 ## Step 15: Verify the Repaired Path
 

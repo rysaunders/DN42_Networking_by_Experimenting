@@ -449,6 +449,21 @@ Without this setting, the router namespace can talk to both connected networks i
 
 After routes and forwarding are in place, a ping from left to right has a concrete path:
 
+```mermaid
+sequenceDiagram
+  participant L as pocket-left 10.10.1.2
+  participant RL as router left side 10.10.1.1
+  participant RR as router right side 10.10.2.1
+  participant R as pocket-right 10.10.2.2
+
+  L->>RL: echo request out left0 via 10.10.1.1
+  RL->>RR: router forwards because ip_forward=1
+  RR->>R: deliver on right link
+  R-->>RR: echo reply via 10.10.2.1
+  RR-->>RL: router forwards reply
+  RL-->>L: deliver on left link
+```
+
 1. `pocket-left` creates an ICMP echo request from `10.10.1.2` to `10.10.2.2`.
 2. Left looks up `10.10.2.2` in its route table.
 3. Left matches `10.10.2.0/30 via 10.10.1.1 dev left0`.

@@ -45,10 +45,24 @@ you type ip route add -> Linux route table -> packets move
 
 BIRD adds another route table in front of Linux:
 
-```text
-local interface -> protocol direct -> BIRD route table
-configured route -> protocol static -> BIRD route table
-BIRD route table -> protocol kernel -> Linux route table -> packets move
+```mermaid
+flowchart LR
+  Interface["local interface<br/>svc0 172.20.50.1/32"]
+  Direct["protocol direct"]
+  StaticConfig["configured route<br/>172.20.99.0/24"]
+  Static["protocol static"]
+  BirdTable["BIRD route table"]
+  Kernel["protocol kernel<br/>export policy"]
+  LinuxTable["Linux route table"]
+  Forwarding["packet forwarding"]
+
+  Interface --> Direct
+  Direct --> BirdTable
+  StaticConfig --> Static
+  Static --> BirdTable
+  BirdTable --> Kernel
+  Kernel --> LinuxTable
+  LinuxTable --> Forwarding
 ```
 
 BIRD knowing a route is not the same thing as Linux using a route.
@@ -292,6 +306,18 @@ Expected result:
 !!! warning "What this does not prove"
     This does not prove BGP is working. There are no neighbors, no ASNs, and no route advertisements yet. This only proves that BIRD has its own route table and that `protocol kernel` controls whether selected BIRD routes enter Linux.
 
+At this point, the diagram looks like this:
+
+```mermaid
+flowchart LR
+  BirdTable["BIRD route table<br/>knows 172.20.99.0/24"]
+  Kernel["protocol kernel<br/>export none"]
+  LinuxTable["Linux route table<br/>no 172.20.99.0/24 route"]
+
+  BirdTable -. "route withheld" .-> Kernel
+  Kernel -. "nothing exported" .-> LinuxTable
+```
+
 ## Step 6: Add an Explicit Kernel Export Filter
 
 Now change only the kernel boundary.
@@ -396,6 +422,18 @@ Because this is a blackhole route, Linux may answer with an error such as `Inval
 
 !!! warning "What this does not prove"
     This does not prove traffic can reach a real service. A blackhole route intentionally drops traffic. This also does not prove that a route is safe to export to another router. Route export is a boundary, and every boundary needs a policy.
+
+After the export filter, the route crosses the kernel boundary:
+
+```mermaid
+flowchart LR
+  BirdTable["BIRD route table<br/>172.20.99.0/24 selected"]
+  Filter["kernel_export_lab<br/>accepts only 172.20.99.0/24"]
+  LinuxTable["Linux route table<br/>blackhole 172.20.99.0/24 proto bird"]
+
+  BirdTable --> Filter
+  Filter --> LinuxTable
+```
 
 ## Step 8: Roll Back
 

@@ -72,14 +72,22 @@ Use a dedicated border namespace or router.
 
 ```mermaid
 flowchart LR
-  PI["Pocket Internet routers and services"]
-  BORDER["Pocket Internet border router"]
+  PI["Pocket Internet<br/>lab routers and services"]
+  BORDER["Dedicated border router"]
+  IMPORT["DN42 import filter<br/>constrained accept"]
+  EXPORT["DN42 export filter<br/>default deny"]
   WG["WireGuard link"]
-  DN42["DN42 peer and routes"]
+  DN42["DN42 peer<br/>living routing ecosystem"]
+  AUTH["Authorized DN42 prefix<br/>later chapter only"]
+  LAB["Lab-only Pocket Internet prefixes<br/>not exported"]
 
   PI --> BORDER
-  BORDER --> WG
-  WG --> DN42
+  DN42 --> WG
+  WG --> IMPORT
+  IMPORT --> BORDER
+  AUTH --> EXPORT
+  EXPORT --> WG
+  LAB -. "rejected by export policy" .-> EXPORT
 ```
 
 The border has two jobs:
@@ -88,6 +96,8 @@ The border has two jobs:
 - speak the DN42 side of the real peer.
 
 Keeping those roles visible makes route leaks easier to reason about.
+
+The important asymmetry is deliberate: DN42-facing import and export policy live at the border. Lab-only Pocket Internet prefixes do not cross the export filter by default.
 
 ## Design Principles
 

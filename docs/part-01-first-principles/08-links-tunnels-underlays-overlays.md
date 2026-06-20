@@ -85,6 +85,24 @@ So there are two layers:
 | Underlay | The carrier network for encrypted tunnel packets. | `192.0.2.1`, `192.0.2.2` | WireGuard endpoints |
 | Overlay | The logical routed link created by WireGuard. | `10.42.23.1`, `10.42.23.2` | Linux routing and BGP |
 
+```mermaid
+flowchart TB
+  subgraph Overlay["Overlay: the link Linux routing and BGP use"]
+    AS2WG["pocket-as2<br/>wg23 10.42.23.1"]
+    AS3WG["pocket-as3<br/>wg23 10.42.23.2"]
+    AS2WG ===|"WireGuard link"| AS3WG
+  end
+
+  subgraph Underlay["Underlay: the carrier path WireGuard packets use"]
+    AS2Under["pocket-as2<br/>as2-underlay 192.0.2.1"]
+    AS3Under["pocket-as3<br/>as3-underlay 192.0.2.2"]
+    AS2Under ---|"veth carrier path"| AS3Under
+  end
+
+  AS2WG -. "encrypted UDP packets leave through" .-> AS2Under
+  AS3Under -. "decrypted packets return to" .-> AS3WG
+```
+
 That is why the lab still creates a veth pair. We are not using it as the AS2-AS3 Pocket Internet link. We are using it as the ground the tunnel stands on.
 
 ## Packet Inside Packet
@@ -116,6 +134,20 @@ delivered inner packet:
 ```
 
 The inner packet is what the overlay sees. The outer packet is what the underlay carries.
+
+```mermaid
+flowchart LR
+  InnerOut["inner packet<br/>10.42.23.1 -> 10.42.23.2"]
+  Wrap["WireGuard wraps and encrypts"]
+  Outer["outer packet<br/>192.0.2.1 -> 192.0.2.2<br/>UDP 51824"]
+  Unwrap["WireGuard unwraps"]
+  InnerIn["delivered inner packet<br/>10.42.23.1 -> 10.42.23.2"]
+
+  InnerOut --> Wrap
+  Wrap --> Outer
+  Outer --> Unwrap
+  Unwrap --> InnerIn
+```
 
 The same idea applies to service-loopback reachability. If AS1 sends a packet toward AS3's service loopback, the packet eventually reaches AS2. AS2's route can say:
 
