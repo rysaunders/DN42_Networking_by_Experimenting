@@ -1,5 +1,31 @@
 # Pocket Internet with Static Routes
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-03-pocket-internet-static-routing
+    status: published-draft
+    safety_level: local-lab
+    lab_id: experiments/labs/pocket-internet-static-routing
+    depends_on:
+      - part-01-02-addressing-prefixes-longest-match
+    transcript: experiments/transcripts/pocket-internet-static-routing-20260616T192307Z.txt
+    source_ids:
+      - linux-ip-route
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: not used
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Reader feedback incorporated; future diagram pass remains tracked separately.
+    technical_review:
+      required: false
+      status: not_required
+      note: Local static-routing lab; transcript validated.
+    ```
+
 ## Reader Starting Point
 
 This experiment assumes you have completed Linux as a Router and Addresses, Prefixes, and Longest Match. You should know what a namespace, interface, veth pair, route, next hop, route lookup, local link, prefix, connected route, host route, `/32`, and forwarding are.

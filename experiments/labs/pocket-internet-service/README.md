@@ -1,5 +1,43 @@
 # Pocket Internet Service
 
+## Lab Metadata
+
+```yaml
+experiment_id: experiments/labs/pocket-internet-service
+status: validated
+safety_level: local-routing-daemon
+chapter: docs/part-01-first-principles/07-operate-a-service.md
+standalone: true
+requires_capabilities:
+  - root-or-sudo
+  - CAP_NET_ADMIN
+  - iproute2
+  - bird2
+  - birdc
+  - python3
+  - curl
+setup_assumptions:
+  - temporary namespace names pocket-as1 through pocket-as4 are available
+  - Python 3 HTTP server module is available
+cleanup_guarantees:
+  - stops lab-scoped BIRD and Python HTTP processes
+  - deletes all pocket-as* namespaces named by the lab
+  - removes temporary web root, BIRD config, socket, and PID files
+expected_state:
+  - four BGP-speaking namespaces
+  - Python HTTP listener bound to 172.20.3.1:8080 inside pocket-as3
+  - curl from pocket-as1 reaches the service using explicit source address
+  - no host-exposed listener remains after cleanup
+validation_commands:
+  - bash -n experiments/labs/pocket-internet-service/run.sh
+  - experiments/labs/pocket-internet-service/run.sh
+  - ip netns list | grep -E 'pocket-as[1-4]' returns no match after cleanup
+transcript: experiments/transcripts/pocket-internet-service-20260618T103858Z.txt
+technical_review:
+  required: true
+  status: deferred
+```
+
 This lab validates the service chapter for Pocket Internet.
 
 It builds the four-namespace Pocket Internet ring with BIRD/BGP, starts an HTTP

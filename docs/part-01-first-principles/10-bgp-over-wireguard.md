@@ -1,5 +1,35 @@
 # Run BGP Over WireGuard
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-10-bgp-over-wireguard
+    status: published-draft
+    safety_level: tunnel-lab
+    lab_id: experiments/labs/pocket-internet-wireguard-link
+    depends_on:
+      - part-01-09-wireguard-as-a-link
+      - part-01-06-bgp-before-dn42
+    transcript: experiments/transcripts/pocket-internet-wireguard-link-20260618T112938Z.txt
+    source_ids:
+      - bird-docs
+      - wireguard-quickstart
+      - wireguard-netns
+      - linux-ip-route
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: recorded in transcript
+      wireguard_tools: recorded in transcript
+    beginner_review:
+      status: complete
+      note: Beginner-review pass recorded for the chapter before publication.
+    technical_review:
+      required: true
+      status: deferred
+      note: Local BGP-over-WireGuard behavior validated; real-network tunnel policy requires later review.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you have completed the WireGuard link lab. You should know what a namespace, service loopback, route lookup, return path, BIRD, BGP session, route advertisement, underlay, overlay, WireGuard endpoint, handshake, and `AllowedIPs` are.

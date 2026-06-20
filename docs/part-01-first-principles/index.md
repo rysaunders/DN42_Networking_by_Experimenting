@@ -1,5 +1,30 @@
 # Part 1: Pocket Internet Foundations
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-index
+    status: published-overview
+    safety_level: conceptual
+    lab_id: none
+    depends_on:
+      - pocket-internet-overview
+    transcript: none
+    source_ids: []
+    tested_environment:
+      host: not applicable
+      distro: not applicable
+      kernel: not applicable
+      bird: not used
+      wireguard_tools: not used
+    beginner_review:
+      status: deferred
+      note: Overview page; no formal beginner review record for this metadata pass.
+    technical_review:
+      required: false
+      status: not_required
+      note: Conceptual section index; no commands or real-network procedure.
+    ```
+
 Part 1 builds the local model for Pocket Internet before any public DN42 state enters the picture.
 
 !!! note "IPv4-only foundation"

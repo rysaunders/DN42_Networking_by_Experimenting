@@ -1,5 +1,31 @@
 # Pocket Internet Route Selection
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-04-route-selection
+    status: published-draft
+    safety_level: local-lab
+    lab_id: experiments/labs/pocket-internet-route-selection
+    depends_on:
+      - part-01-02-addressing-prefixes-longest-match
+    transcript: experiments/transcripts/pocket-internet-route-selection-20260616T185554Z.txt
+    source_ids:
+      - linux-ip-route
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: not used
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Beginner-review feedback incorporated during route-selection refinement.
+    technical_review:
+      required: false
+      status: not_required
+      note: Local route-selection lab; transcript validated.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you have completed Pocket Internet with Static Routes. You should know what a namespace, interface, address, prefix, connected route, next hop, route lookup, service loopback, and static route are.

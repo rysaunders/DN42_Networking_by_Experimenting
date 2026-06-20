@@ -1,5 +1,31 @@
 # Linux as a Router
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-01-linux-router
+    status: published-draft
+    safety_level: local-lab
+    lab_id: experiments/labs/pocket-internet-linux-router
+    depends_on:
+      - part-01-index
+    transcript: experiments/transcripts/pocket-internet-linux-router-20260617T183713Z.txt
+    source_ids:
+      - linux-ip-route
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: not used
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Reader feedback incorporated during the Pocket Internet reframing pass.
+    technical_review:
+      required: false
+      status: not_required
+      note: Local namespace and iproute2 lab; transcript validated.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you can run shell commands, but it does not assume you have used Linux network namespaces before.

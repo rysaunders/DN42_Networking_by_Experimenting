@@ -1,5 +1,36 @@
 # Pocket Internet to DN42 Border
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: pocket-internet-dn42-border
+    status: design-page
+    safety_level: dn42-facing
+    lab_id: none
+    depends_on:
+      - part-01-pocket-internet-foundations
+      - later dn42 current-source refresh
+    transcript: none
+    source_ids:
+      - dn42-getting-started
+      - dn42-registry
+      - dn42-network-settings
+      - dn42-wireguard
+      - dn42-bird2
+    tested_environment:
+      host: not applicable
+      distro: not applicable
+      kernel: not applicable
+      bird: research required before implementation
+      wireguard_tools: research required before implementation
+    beginner_review:
+      status: deferred
+      note: Safety/design page; beginner review required before converting into procedure.
+    technical_review:
+      required: true
+      status: pending
+      note: Required before any DN42-facing commands, filters, or advertisements are published.
+    ```
+
 !!! warning "Design page - not a beginner lab"
     This page is a mandatory safety contract for later DN42 chapters. It is not an implementation guide, and it does not contain a complete peering procedure. Real DN42 commands must be refreshed against current sources, technically reviewed, tested, and paired with rollback before publication.
 

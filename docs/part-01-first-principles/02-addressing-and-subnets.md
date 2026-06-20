@@ -1,5 +1,31 @@
 # Addresses, Prefixes, and Longest Match
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-02-addressing-prefixes-longest-match
+    status: published-draft
+    safety_level: local-lab
+    lab_id: experiments/labs/addresses-longest-match
+    depends_on:
+      - part-01-01-linux-router
+    transcript: experiments/transcripts/addresses-longest-match-20260616T124649Z.txt
+    source_ids:
+      - linux-ip-route
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: not used
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Reader feedback on address/prefix and connected-route confusion incorporated.
+    technical_review:
+      required: false
+      status: not_required
+      note: Local route-lookup lab; transcript validated.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you have completed Linux as a Router. You should know what an address, interface, prefix, route, next hop, and route lookup are.

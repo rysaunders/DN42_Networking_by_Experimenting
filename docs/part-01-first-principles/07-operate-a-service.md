@@ -1,5 +1,31 @@
 # Operate a Service Inside Pocket Internet
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-07-operate-service
+    status: published-draft
+    safety_level: local-routing-daemon
+    lab_id: experiments/labs/pocket-internet-service
+    depends_on:
+      - part-01-06-bgp-before-dn42
+    transcript: experiments/transcripts/pocket-internet-service-20260618T103858Z.txt
+    source_ids:
+      - bird-docs
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: recorded in transcript
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Reader feedback recorded; tooltip and lab-continuity concerns tracked for follow-up.
+    technical_review:
+      required: true
+      status: deferred
+      note: Local service lab validated; service-exposure guidance requires later technical review.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you have completed BGP Before DN42. You should know what a namespace, service loopback, route lookup, return path, BIRD, BGP session, route advertisement, import filter, export filter, kernel protocol, and convergence are.

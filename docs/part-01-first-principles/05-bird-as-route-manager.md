@@ -1,5 +1,32 @@
 # BIRD as a Route Manager
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-05-bird-route-manager
+    status: published-draft
+    safety_level: local-routing-daemon
+    lab_id: experiments/labs/bird-route-manager
+    depends_on:
+      - part-01-04-route-selection
+    transcript: experiments/transcripts/bird-route-manager-20260619T144400Z.txt
+    source_ids:
+      - bird-docs
+      - linux-ip-route
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: recorded in transcript
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Beginner-review pass incorporated in the BIRD chapter hardening sequence.
+    technical_review:
+      required: true
+      status: deferred
+      note: Lab commands validated locally; production BIRD guidance still requires technical review.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you have completed Pocket Internet with Static Routes and Pocket Internet Route Selection. You should know what a namespace, interface, address, prefix, connected route, static route, route table, route lookup, and longest-prefix match are.

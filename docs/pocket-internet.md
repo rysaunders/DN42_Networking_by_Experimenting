@@ -1,5 +1,30 @@
 # Pocket Internet
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: pocket-internet-overview
+    status: published-foundation
+    safety_level: conceptual
+    lab_id: none
+    depends_on:
+      - none
+    transcript: none
+    source_ids: []
+    tested_environment:
+      host: not applicable
+      distro: not applicable
+      kernel: not applicable
+      bird: not used
+      wireguard_tools: not used
+    beginner_review:
+      status: deferred
+      note: Overview page; no formal beginner review record for this metadata pass.
+    technical_review:
+      required: false
+      status: not_required
+      note: Conceptual overview; no commands or real-network procedure.
+    ```
+
 Pocket Internet is the laboratory for this book. It is not the destination.
 
 The guiding question is:

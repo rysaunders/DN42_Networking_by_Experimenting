@@ -1,5 +1,32 @@
 # BGP Before DN42
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-06-bgp-before-dn42
+    status: published-draft
+    safety_level: local-routing-daemon
+    lab_id: experiments/labs/pocket-internet-bgp
+    depends_on:
+      - part-01-05-bird-route-manager
+    transcript: experiments/transcripts/pocket-internet-bgp-20260617T191953Z.txt
+    source_ids:
+      - bird-docs
+      - rfc-4271
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: recorded in transcript
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Beginner-review pass completed when the chapter was drafted.
+    technical_review:
+      required: true
+      status: deferred
+      note: Local BGP behavior validated; real-network policy guidance requires later technical review.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you have completed Pocket Internet with Static Routes, Pocket Internet Route Selection, and BIRD as a Route Manager. You should know what a namespace, interface, veth pair, address, prefix, route, next hop, connected route, route lookup, service loopback, static route, return path, forwarding, longest-prefix match, routing daemon, BIRD route table, and kernel export are.

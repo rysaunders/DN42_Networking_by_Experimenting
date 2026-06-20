@@ -1,5 +1,32 @@
 # Links, Tunnels, Underlays, and Overlays
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-08-links-tunnels-underlays-overlays
+    status: published-draft
+    safety_level: conceptual
+    lab_id: none
+    depends_on:
+      - part-01-07-operate-service
+    transcript: none
+    source_ids:
+      - wireguard-quickstart
+      - wireguard-netns
+    tested_environment:
+      host: not applicable
+      distro: not applicable
+      kernel: not applicable
+      bird: not used
+      wireguard_tools: not used
+    beginner_review:
+      status: complete
+      note: Reader feedback on underlay/overlay confusion incorporated by splitting concept from lab.
+    technical_review:
+      required: false
+      status: not_required
+      note: Conceptual chapter only; real tunnel commands live in later reviewed labs.
+    ```
+
 ## Reader Starting Point
 
 You have already built Pocket Internet with visible links. A veth pair felt like a cable because it had two ends:

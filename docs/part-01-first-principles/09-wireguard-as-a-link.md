@@ -1,5 +1,33 @@
 # Build and Verify a WireGuard Link
 
+??? info "Maintainer metadata"
+    ```yaml
+    chapter_id: part-01-09-wireguard-as-a-link
+    status: published-draft
+    safety_level: tunnel-lab
+    lab_id: experiments/labs/wireguard-point-to-point
+    depends_on:
+      - part-01-08-links-tunnels-underlays-overlays
+    transcript: experiments/transcripts/wireguard-point-to-point-20260618T213251Z.txt
+    source_ids:
+      - wireguard-quickstart
+      - wireguard-netns
+      - linux-ip-route
+    tested_environment:
+      host: macOS + OrbStack
+      distro: recorded in transcript
+      kernel: recorded in transcript
+      bird: not used
+      wireguard_tools: recorded in transcript
+    beginner_review:
+      status: complete
+      note: Reader feedback on VPN, underlay, and overlay confusion incorporated.
+    technical_review:
+      required: true
+      status: deferred
+      note: Local WireGuard lab validated; real DN42 WireGuard guidance requires current-source technical review.
+    ```
+
 ## Reader Starting Point
 
 This chapter assumes you have completed the tunnel-model chapter. You should know what a namespace, interface, address, prefix, route lookup, VPN, tunnel, underlay, overlay, inner packet, and outer packet are.
