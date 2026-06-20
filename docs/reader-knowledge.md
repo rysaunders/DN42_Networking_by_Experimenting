@@ -99,6 +99,36 @@ Reader has not yet been taught:
 - DN42 registry objects,
 - DNS forwarding or delegation.
 
+## After Part 1, Local Link Discovery and Packet Observation
+
+Introduced by `docs/part-01-first-principles/11-local-link-observation.md`.
+
+Reader has seen:
+
+- ARP as IPv4 local-link discovery,
+- neighbor table as Linux's cache of local-link IP-to-link-layer mappings,
+- MAC address as an Ethernet-like link-layer address,
+- packet capture as evidence from one observed interface,
+- ICMP as the protocol used by `ping` echo requests and replies,
+- `tcpdump` as a packet observation tool,
+- route lookup as separate from local-link discovery,
+- local-link discovery as separate from application success,
+- packet capture as useful evidence that can still be overread.
+
+Reader has only been lightly introduced to:
+
+- NDP as the IPv6 counterpart to ARP for local-link neighbor discovery.
+
+Reader has not yet been taught:
+
+- service loopbacks,
+- static route maintenance across multiple routers,
+- detailed IPv6 addressing,
+- IPv6 NDP message types,
+- firewall rules around services,
+- DNS forwarding or delegation,
+- real DN42 registry objects.
+
 ## After Part 1, Pocket Internet with Static Routes
 
 Introduced by `docs/part-01-first-principles/03-pocket-internet-static-routing.md`.
@@ -338,34 +368,6 @@ Reader has not yet been taught:
 - `wg-quick`,
 - real DN42 peer expectations,
 - DN42 registry objects.
-
-## After Part 1, Local Link Discovery and Packet Observation
-
-Introduced by `docs/part-01-first-principles/11-local-link-observation.md`.
-
-Reader has seen:
-
-- ARP as IPv4 local-link discovery,
-- neighbor table as Linux's cache of local-link IP-to-link-layer mappings,
-- MAC address as an Ethernet-like link-layer address,
-- packet capture as evidence from one observed interface,
-- ICMP as the protocol used by `ping` echo requests and replies,
-- `tcpdump` as a packet observation tool,
-- route lookup as separate from local-link discovery,
-- local-link discovery as separate from application success,
-- packet capture as useful evidence that can still be overread.
-
-Reader has only been lightly introduced to:
-
-- NDP as the IPv6 counterpart to ARP for local-link neighbor discovery.
-
-Reader has not yet been taught:
-
-- detailed IPv6 addressing,
-- IPv6 NDP message types,
-- firewall rules around services,
-- DNS forwarding or delegation,
-- real DN42 registry objects.
 
 ## After Part 1, IPv6 and ULA Foundation
 

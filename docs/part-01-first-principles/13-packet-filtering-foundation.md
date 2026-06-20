@@ -8,7 +8,7 @@
     lab_id: experiments/labs/packet-filtering-foundation
     depends_on:
       - part-01-07-operate-service
-      - part-01-11-local-link-observation
+      - part-01-local-link-observation
     transcript: experiments/transcripts/packet-filtering-foundation-20260620T000000Z.txt
     source_ids:
       - linux-ip-route

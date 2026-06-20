@@ -686,6 +686,7 @@ You can now explain:
 Still okay if fuzzy:
 
 - the exact address math behind `/30`,
+- what "send directly on a local link" does below route lookup,
 - why Linux chooses one route over another when several routes match,
 - source address selection in `ip route get` output.
 
@@ -693,6 +694,7 @@ Next we need:
 
 - a clearer way to think about addresses and prefixes,
 - a rule for predicting which route wins when more than one route could match.
+- a closer look at what happens on a local link after route lookup chooses an interface.
 
 ## References
 

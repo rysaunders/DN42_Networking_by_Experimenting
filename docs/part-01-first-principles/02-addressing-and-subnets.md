@@ -538,6 +538,18 @@ For now, keep the simple version:
 
 Later Pocket Internet chapters will make the return path visible.
 
+## Connection to Local Links and Pocket Internet
+
+This chapter still stops at route lookup. It can tell you that Linux selected an interface, but it has not yet shown what has to happen on that local link before a packet crosses it.
+
+Before the four-namespace Pocket Internet topology gets larger, the next chapter slows down on that missing layer:
+
+```text
+route lookup -> local-link discovery -> packet observed on an interface
+```
+
+That keeps connected routes and "on-link" behavior from becoming magic later.
+
 ## Connection to Pocket Internet
 
 The next Pocket Internet lab uses service loopbacks like:
@@ -594,7 +606,8 @@ Still okay if fuzzy:
 
 Next we need:
 
-- to use these ideas in Pocket Internet,
+- to observe what happens on a local link after route lookup chooses an interface,
+- then to use these ideas in Pocket Internet,
 - to make service loopbacks reachable across multiple namespaces,
 - to feel why writing routes by hand gets tiring,
 - to come back to route selection later inside a Pocket Internet edge router.

@@ -8,7 +8,7 @@
     lab_id: experiments/labs/ipv6-ula-foundation
     depends_on:
       - part-01-02-addressing-prefixes-longest-match
-      - part-01-11-local-link-observation
+      - part-01-local-link-observation
     transcript: experiments/transcripts/ipv6-ula-foundation-20260620T000000Z.txt
     source_ids:
       - linux-ip-route

@@ -8,6 +8,7 @@
     lab_id: experiments/labs/pocket-internet-static-routing
     depends_on:
       - part-01-02-addressing-prefixes-longest-match
+      - part-01-local-link-observation
     transcript: experiments/transcripts/pocket-internet-static-routing-20260616T192307Z.txt
     source_ids:
       - linux-ip-route
@@ -28,7 +29,7 @@
 
 ## Reader Starting Point
 
-This experiment assumes you have completed Linux as a Router and Addresses, Prefixes, and Longest Match. You should know what a namespace, interface, veth pair, route, next hop, route lookup, local link, prefix, connected route, host route, `/32`, and forwarding are.
+This experiment assumes you have completed Linux as a Router, Addresses, Prefixes, and Longest Match, and Local Link Discovery and Packet Observation. You should know what a namespace, interface, veth pair, route, next hop, route lookup, local link, prefix, connected route, host route, `/32`, forwarding, ARP, neighbor table, and packet capture are.
 
 This experiment does not assume you understand BGP, BIRD, real DN42 registry objects, or real autonomous system numbers yet.
 
@@ -36,7 +37,7 @@ The goal is to expand from one router to a small local Internet.
 
 This lab combines most of the objects from [Linux Networking Objects](../linux-networking-objects.md): namespaces, veth pairs, route tables, loopback addresses, connected routes, next hops, and forwarding.
 
-You have already seen one Linux namespace forward packets between two links, and you have seen how Linux chooses the most specific matching route. Now you will build four namespaces, give each one a stable service address, and write the route tables by hand.
+You have already seen one Linux namespace forward packets between two links, how Linux chooses the most specific matching route, and how local-link discovery sits below route lookup. Now you will build four namespaces, give each one a stable service address, and write the route tables by hand.
 
 ## New Terms
 

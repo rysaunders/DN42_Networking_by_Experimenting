@@ -78,6 +78,7 @@ nav:
       - Overview: part-01-first-principles/index.md
       - Linux as a Router: part-01-first-principles/01-linux-networking.md
       - Addresses, Prefixes, and Longest Match: part-01-first-principles/02-addressing-and-subnets.md
+      - Local Link Discovery and Packet Observation: part-01-first-principles/11-local-link-observation.md
       - Pocket Internet Static Routing: part-01-first-principles/03-pocket-internet-static-routing.md
       - Pocket Internet Route Selection: part-01-first-principles/04-routing-tables.md
       - BIRD as a Route Manager: part-01-first-principles/05-bird-as-route-manager.md
@@ -86,7 +87,6 @@ nav:
       - Links, Tunnels, Underlays, and Overlays: part-01-first-principles/08-links-tunnels-underlays-overlays.md
       - Build and Verify a WireGuard Link: part-01-first-principles/09-wireguard-as-a-link.md
       - Run BGP Over WireGuard: part-01-first-principles/10-bgp-over-wireguard.md
-      - Local Link Discovery and Packet Observation: part-01-first-principles/11-local-link-observation.md
       - IPv6 and ULA Foundation: part-01-first-principles/12-ipv6-ula-foundation.md
       - Packet Filtering Foundation: part-01-first-principles/13-packet-filtering-foundation.md
       - DNS And Naming Foundation: part-01-first-principles/14-dns-and-naming-foundation.md

@@ -2,7 +2,7 @@
 
 ??? info "Maintainer metadata"
     ```yaml
-    chapter_id: part-01-11-local-link-observation
+    chapter_id: part-01-local-link-observation
     status: published-draft
     safety_level: local-lab
     lab_id: experiments/labs/local-link-observation
@@ -31,11 +31,11 @@
 
 This chapter assumes you know what a namespace, interface, address, prefix, connected route, route lookup, and local link are.
 
-You have already used this idea:
+You have already used this idea in the first two chapters:
 
 > If two addresses are on the same local link, Linux can send directly through the interface instead of sending to another router.
 
-Now we will slow down and look at what "send directly" actually means.
+Now, before Pocket Internet grows into a larger routed topology, we will slow down and look at what "send directly" actually means.
 
 ## New Terms
 

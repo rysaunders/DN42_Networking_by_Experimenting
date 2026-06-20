@@ -10,7 +10,7 @@
       - part-01-05-bird-route-manager
       - part-01-07-operate-service
       - part-01-09-wireguard-link
-      - part-01-11-local-link-observation
+      - part-01-local-link-observation
       - part-01-13-packet-filtering-foundation
       - part-01-14-dns-and-naming-foundation
     transcript: none
