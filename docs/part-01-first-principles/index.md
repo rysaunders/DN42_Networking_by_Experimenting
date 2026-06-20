@@ -39,7 +39,8 @@ By the end of this part, the reader should be able to:
 - Explain why BIRD and BGP are useful after static routes become tedious.
 - Operate a simple service inside the lab.
 - Explain how a WireGuard tunnel can behave like a point-to-point link.
+- Observe local-link discovery and packet movement without confusing those checks for full application success.
 
-The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, and WireGuard before any public DN42 state enters the picture.
+The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, WireGuard, and operational observation before any public DN42 state enters the picture.
 
 Chapter 05 teaches BIRD as a local route manager before Chapter 06 asks it to speak BGP. That sequence matters: first BIRD learns and exports routes locally, then BIRD exchanges reachability with other routers.

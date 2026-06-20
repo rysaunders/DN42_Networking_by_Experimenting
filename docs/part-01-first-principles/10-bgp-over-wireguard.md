@@ -915,7 +915,7 @@ Those belong in later border and DN42 chapters. Here, the point is narrower: a t
 
 ## Next We Need
 
-At this point, the Pocket Internet draft is functionally complete:
+At this point, the core Pocket Internet routing path is in place:
 
 - hosts and routers,
 - static routes,
@@ -924,7 +924,7 @@ At this point, the Pocket Internet draft is functionally complete:
 - services,
 - WireGuard as a link.
 
-The next phase is cleanup and then the DN42 border: how a lab-built routing model approaches a living routing community without leaking routes or treating DN42 as a sandbox.
+Before the DN42 border, the next phase fills operational foundations: observing packets, applying filtering policy, naming services, and troubleshooting without treating DN42 as a sandbox.
 
 ## References
 

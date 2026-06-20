@@ -18,6 +18,9 @@ Address space
 Application traffic
 : Traffic for a real program instead of a routing probe such as ping.
 
+ARP
+: Address Resolution Protocol. The IPv4 local-link discovery mechanism used to learn which link-layer address owns an IPv4 address on the same link.
+
 AllowedIPs
 : WireGuard's peer-selection and packet-allow list for tunnel traffic. In `wg-quick` and some real peer examples, AllowedIPs may also be used to install routes.
 
@@ -75,6 +78,9 @@ Host route
 HTTP
 : A simple request/response protocol used by web clients and servers.
 
+ICMP
+: Internet Control Message Protocol. The protocol family used by tools such as `ping` for echo requests and replies.
+
 Import filter
 : A rule that decides which routes may enter a BIRD table from a protocol. In BGP, that usually means deciding which received neighbor routes to accept.
 
@@ -86,6 +92,9 @@ Interface
 
 IPv6
 : The newer Internet Protocol address family. The current Pocket Internet labs are IPv4-only until IPv6 is intentionally introduced.
+
+MAC address
+: A link-layer address on an Ethernet-like interface.
 
 Listener
 : The address and port where a service waits for connections.
@@ -114,6 +123,12 @@ MTU
 Next hop
 : The next router a packet should be sent to.
 
+NDP
+: Neighbor Discovery Protocol. The IPv6 system for local-link neighbor discovery and related functions.
+
+Neighbor table
+: Linux's cache of local-link neighbor mappings, such as an IP address mapped to a MAC address on an interface.
+
 On-link
 : Reachable through a local interface without first sending the packet to another IP router.
 
@@ -122,6 +137,9 @@ Overlay
 
 Outer packet
 : The packet that carries a tunneled inner packet across the underlay.
+
+Packet capture
+: A record of packets observed at an interface or capture point.
 
 Port
 : A number identifying a service on an address.

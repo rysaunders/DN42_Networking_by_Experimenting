@@ -1,4 +1,5 @@
 *[AllowedIPs]: WireGuard's peer-selection and packet-allow list for tunnel traffic. Some tools also use it to install routes.
+*[ARP]: Address Resolution Protocol. IPv4's local-link discovery mechanism for mapping an IP address to a link-layer address.
 *[autonomous system]: One independently controlled network boundary. In real Internet routing, an autonomous system is identified by an ASN.
 *[BGP]: Border Gateway Protocol. Routers use BGP to exchange network reachability with other routers.
 *[BIRD]: A routing daemon that can learn, select, filter, and install routes.
@@ -7,10 +8,12 @@
 *[endpoint]: The underlay address and UDP port where a WireGuard peer receives tunnel packets.
 *[export filter]: A rule that decides which routes a router announces to a neighbor.
 *[handshake]: Evidence that WireGuard peers exchanged setup traffic.
+*[ICMP]: Internet Control Message Protocol. The protocol family used by tools such as ping for echo requests and replies.
 *[import filter]: A rule that decides which routes a router accepts from a neighbor.
 *[inner packet]: The packet the overlay network thinks it is sending before a tunnel wraps it.
 *[longest-prefix match]: The route lookup rule that the most-specific matching route wins.
 *[outer packet]: The packet that carries a tunneled inner packet across the underlay.
+*[NDP]: Neighbor Discovery Protocol. IPv6's local-link neighbor discovery system.
 *[overlay]: The logical network carried by an underlay.
 *[return path]: The route a reply packet uses to get back to the original sender.
 *[route advertisement]: Telling another router that you can carry traffic for a prefix.
