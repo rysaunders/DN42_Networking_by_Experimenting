@@ -365,3 +365,94 @@ issues:
       - Public DNS remains unaffected.
       - Resolver-specific behavior is marked by implementation.
       - Current DN42 resolver recommendations are source-reviewed.
+
+  # Post-review Pocket Internet hardening created from #61.
+  # These issues gate the DN42-facing draft issues above.
+  - title: "Fix Pocket Internet runbook and safety command correctness"
+    labels: ["chapter", "conceptual", "safety", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Fix correctness issues found during the Pocket Internet technical review in the observability runbook and safety command examples.
+
+      Acceptance criteria:
+      - No stale `pocket-v6-left` or `bgp_as2` remains.
+      - Pocket Internet BIRD examples include the correct `birdc -s /tmp/.../*.ctl` socket path.
+      - Safety examples clearly distinguish system-managed host commands from namespace-local lab commands.
+      - `uv run mkdocs build --strict` passes.
+
+  - title: "Move local-link observation earlier in Part 1"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Move or split local-link observation so beginners see packet movement and neighbor discovery earlier in Part 1.
+
+      Acceptance criteria:
+      - A first-time reader sees route lookup versus local-link delivery before the larger BGP/WireGuard labs depend on that distinction.
+      - Chapter ordering and nav reflect the new sequence.
+      - Early chapters no longer leave `/30`, connected route, or on-link behavior as unexplained magic for many chapters.
+      - `uv run mkdocs build --strict` passes.
+      - Beginner review is run or explicitly deferred with reason.
+
+  - title: "Standardize Part 1 lab requirements and checkpoint resume paths"
+    labels: ["chapter", "experiment", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Standardize Part 1 lab requirements and checkpoint/resume blocks so long labs remain manual-first without forcing repeated full rebuilds.
+
+      Acceptance criteria:
+      - Every Part 1 lab chapter has a clear preflight covering environment, root requirement, required tools, validation script, and transcript path where applicable.
+      - Dependent chapters state the exact checkpoint they require and how to verify it.
+      - Dependent chapters offer a repeatable resume path without undermining manual-first learning.
+      - `uv run mkdocs build --strict` passes.
+      - Beginner review checks whether the revised flow reduces rebuild friction.
+
+  - title: "Harden BIRD/BGP config teaching and lab policy caveats"
+    labels: ["chapter", "conceptual", "safety", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Harden the BIRD/BGP teaching path so configs are technically caveated and easier to reason about before DN42-facing chapters.
+
+      Acceptance criteria:
+      - `06-bgp-before-dn42.md` teaches the config shape before asking the reader to write the full config.
+      - Lab import/export filters are explicitly labeled as lab-only prefix allowlists.
+      - The chapter does not imply that Pocket Internet BGP policy is sufficient for DN42.
+      - `uv run mkdocs build --strict` passes.
+      - Beginner and technical review are run or explicitly deferred with reason.
+
+  - title: "Add BIRD/BGP and WireGuard state snapshots"
+    labels: ["chapter", "conceptual", "safety", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Add state snapshots and WireGuard failure-mode guidance to the BIRD/BGP and WireGuard chapters.
+
+      Acceptance criteria:
+      - BIRD/BGP chapters show state before BIRD, after local route learning, after BGP establishment, and after kernel export where useful.
+      - WireGuard chapters show underlay, overlay, BGP-over-overlay, and service-loopback traffic state where useful.
+      - `AllowedIPs` failure mode is stated clearly and technically.
+      - `uv run mkdocs build --strict` passes.
+      - Beginner review checks whether diagrams reduce mental load.
+
+  - title: "Run targeted Part 1 re-review after hardening fixes"
+    labels: ["chapter", "conceptual", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Run a targeted re-review after the immediate Pocket Internet hardening fixes land.
+
+      Acceptance criteria:
+      - Add a short review note under `research/notes/`.
+      - The note explicitly states whether Part 1 is ready to proceed into DN42-facing chapter drafting.
+      - Any remaining blocker becomes a new issue before this closes.
+      - `uv run mkdocs build --strict` passes if docs are changed.
+
+  - title: "Refresh DN42 sources before implementation chapters"
+    labels: ["research", "dn42-current", "needs-source-review", "source-refresh", "v0.1"]
+    milestone: "v0.1"
+    body: |
+      Refresh volatile DN42 sources and annotate DN42-facing issues before drafting implementation chapters.
+
+      Acceptance criteria:
+      - Relevant `research/sources.yml` entries have current `reviewed_on` dates or explicit rationale for retaining the prior review.
+      - DN42 registry, BIRD 2, WireGuard, network settings, and DNS/split-resolver guidance are covered by notes before implementation chapters proceed.
+      - #12, #13, #14, #15, and #20 are annotated with the source notes they must cite.
+      - `python3 scripts/validate_sources.py` passes.
+      - `uv run mkdocs build --strict` passes if docs are changed.
