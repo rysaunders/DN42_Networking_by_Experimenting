@@ -24,6 +24,9 @@ The first version of the site focuses on:
 - The Pocket Internet to DN42 border as the bridge from lab routing to a living network.
 - DN42 registry objects and first-peer chapters remain later-phase drafts until the lab foundation and border model are clear.
 
+!!! note "IPv4-only for now"
+    The current Pocket Internet labs are IPv4-only on purpose. That keeps the first routing model small enough to observe. Before any production-shaped DN42 chapter is treated as implementation-ready, the book must add IPv6 and ULA coverage instead of smuggling IPv6 assumptions into examples.
+
 ## Project Rules
 
 - Prefer tested local labs before public DN42 commands.

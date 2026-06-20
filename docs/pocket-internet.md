@@ -10,6 +10,9 @@ Pocket Internet answers that question in a controlled environment.
 
 The first version is simple: we build several small computers and routers inside one Linux machine. They get links between them, addresses on those links, and route tables that decide where packets go.
 
+!!! note "Teaching simplification"
+    Pocket Internet is IPv4-only in the current labs. That is a deliberate simplification, not a claim that real DN42 or public Internet routing can ignore IPv6. IPv6 and ULA belong on the path before real DN42 peering chapters become implementation-ready.
+
 Later chapters add the pieces one at a time:
 
 - BIRD, so route tables can be updated by a routing program,

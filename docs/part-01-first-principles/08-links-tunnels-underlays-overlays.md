@@ -198,6 +198,17 @@ Two peers do not need a physical cable between them. They need:
 
 Pocket Internet will use a local veth underlay first. Later, DN42 uses the same shape with a real underlay path.
 
+## Real Underlays Add More Checks
+
+The local underlay is intentionally forgiving. A real public Internet underlay adds details this chapter does not teach yet:
+
+- MTU: the tunnel wraps one packet inside another, so the outer packet can become too large for some paths.
+- NAT and keepalive: a peer behind NAT may need periodic traffic to keep the mapping open.
+- Firewall policy: UDP packets for WireGuard must be allowed without opening unrelated traffic.
+- Asymmetric routing and `rp_filter`: real networks may send replies back through a different path, and host filtering can reject that if configured too strictly.
+
+Those belong in the real DN42 WireGuard chapter after current-source refresh and technical review. This chapter only teaches the underlay/overlay mental model.
+
 ## What You Can Now Explain
 
 You can now explain:

@@ -462,11 +462,12 @@ It is okay if these are still fuzzy:
 - WireGuard carrying service-loopback traffic,
 - MTU sizing,
 - NAT traversal and persistent keepalive,
+- reverse-path filtering and asymmetric routing,
 - `wg-quick`,
 - host-to-lab access,
 - real DN42 peer expectations.
 
-The next chapter adds BGP back on top of the tunnel.
+The next chapter adds BGP back on top of the tunnel. Real DN42 WireGuard chapters must later measure or justify MTU, refresh `rp_filter` and asymmetric-routing guidance from current sources, and avoid host-wide sysctl advice unless it is reviewed, scoped, verified, and paired with rollback.
 
 ## Next We Need
 

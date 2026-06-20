@@ -876,11 +876,12 @@ It is okay if these are still fuzzy:
 
 - MTU sizing,
 - NAT traversal and persistent keepalive,
+- reverse-path filtering and asymmetric routing,
 - `wg-quick`,
 - host-to-lab access,
 - real DN42 peer expectations.
 
-Those belong in later border and DN42 chapters. Here, the point is narrower: a tunnel can replace a link without changing the routing mental model.
+Those belong in later border and DN42 chapters. Here, the point is narrower: a tunnel can replace a link without changing the routing mental model. Real DN42 chapters must handle MTU, `rp_filter`, asymmetric routing, and firewall behavior with current-source refresh and technical review before publishing commands.
 
 ## Next We Need
 

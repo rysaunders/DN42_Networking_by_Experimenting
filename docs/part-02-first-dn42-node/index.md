@@ -7,6 +7,8 @@ These chapters are later-phase drafts. They should follow the Pocket Internet fo
 
 Before any page in this section becomes an implementation chapter, it must satisfy the [mandatory border checklist](../pocket-internet-dn42-interconnect.md#mandatory-border-checklist).
 
+Before any page in this section uses IPv6 examples or assumes IPv6 behavior, it must teach the relevant IPv6 and ULA concepts first. The current Pocket Internet foundation is intentionally IPv4-only.
+
 The goal is still one safe public DN42 peer, but the reader should reach it after they can explain local route lookup, return path, WireGuard-as-link, BIRD, BGP, and export policy in the lab.
 
 By the end of this part, the reader should have:

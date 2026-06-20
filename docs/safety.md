@@ -32,6 +32,7 @@ These rules apply unless a chapter explicitly says otherwise and proves why the 
 - Do not leak DN42 or lab-only routes to public interfaces.
 - Do not provide public Internet egress through DN42 unless that is the deliberate, secured service being built.
 - Do not disable host firewalls globally to make a lab pass.
+- Do not apply host-wide sysctl changes from real-network examples to early local labs.
 - Do not publish private keys, home IP addresses, or personal contact data by accident.
 
 ## Before A Lab
@@ -156,6 +157,32 @@ The exact protocol name and expected output belong in the chapter. The important
 
 Rollback must be equally concrete. A BIRD chapter might disable the peer protocol while a WireGuard chapter might remove or bring down the tunnel. The published chapter must show the exact rollback for the state it changes.
 
+## IPv6 and ULA Readiness
+
+The current Pocket Internet labs are IPv4-only by design. That keeps early route lookup, forwarding, BIRD, BGP, and WireGuard behavior visible without teaching two address families at once.
+
+That simplification has a boundary:
+
+- Do not present the IPv4-only Pocket Internet labs as complete DN42 preparation.
+- Do not add half-correct IPv6 examples only to make a chapter look realistic.
+- Do not assume IPv6 knowledge in Part 2 until the book teaches it.
+- Do add IPv6 and ULA before real DN42 peering chapters become implementation-ready.
+
+When IPv6 is introduced, the chapter must explain what changes and what stays the same: address notation, prefix length, route lookup, neighbor discovery, BIRD configuration shape, and any DN42-specific expectations.
+
+## MTU, Reverse-Path Filtering, And Asymmetric Routing
+
+Real tunnels add operational issues the local Pocket Internet labs mostly avoid.
+
+Before a real DN42 WireGuard or BIRD chapter becomes implementation-ready, it must address:
+
+- MTU: tunnel overhead can make packets too large for the underlay path.
+- `rp_filter`: Linux reverse-path filtering can drop packets when the return path differs from the forward path.
+- Asymmetric routing: a request and reply may legitimately take different paths.
+- Firewall behavior: filtering rules must allow intended forwarding without opening unrelated traffic.
+
+These topics require current-source refresh and technical review before the book recommends commands. Early local labs should not recommend host-wide sysctl changes. If a later chapter needs a sysctl change, it must explain the exact scope, reason, verification, and rollback.
+
 ## Reusable Verification Checklist
 
 Use the parts that match the lab.
@@ -168,6 +195,8 @@ Use the parts that match the lab.
 - [ ] No unintended default route exists.
 - [ ] `ip route get 1.1.1.1` still uses normal public Internet routing when the lab touches WireGuard or DN42.
 - [ ] DN42-facing chapters satisfy the mandatory border checklist.
+- [ ] DN42-facing chapters that use tunnels address MTU, `rp_filter`, asymmetric routing, and firewall behavior.
+- [ ] Real-network sysctl guidance is technically reviewed and source-refreshed before publication.
 - [ ] BIRD imports only routes accepted by the current filter.
 - [ ] BIRD exports only expected and authorized prefixes.
 - [ ] Firewall rules allow required lab traffic without opening unrelated forwarding.

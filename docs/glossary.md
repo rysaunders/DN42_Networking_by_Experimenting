@@ -27,6 +27,9 @@ Autonomous system
 Authorized prefix
 : An address block a network is allowed to originate or announce. In DN42-facing chapters, authorization must come from the relevant registry objects and peer expectations, not from a lab example.
 
+Asymmetric routing
+: A path shape where request traffic and reply traffic do not use the same routers or links.
+
 Bind address
 : The local address a service attaches to when it starts listening.
 
@@ -81,6 +84,9 @@ Inner packet
 Interface
 : A place where packets enter or leave a network stack.
 
+IPv6
+: The newer Internet Protocol address family. The current Pocket Internet labs are IPv4-only until IPv6 is intentionally introduced.
+
 Listener
 : The address and port where a service waits for connections.
 
@@ -101,6 +107,9 @@ Network namespace
 
 Network stack
 : The part of an operating system that owns interfaces, addresses, routes, and packet handling.
+
+MTU
+: Maximum Transmission Unit. The largest packet size a link can carry without fragmentation at that layer.
 
 Next hop
 : The next router a packet should be sent to.
@@ -149,6 +158,9 @@ Route table
 
 Routing daemon
 : A background program that manages routes.
+
+Reverse-path filtering
+: A Linux source-validation check, often controlled by `rp_filter`, that can drop packets when the return route does not match what the kernel expects.
 
 Service
 : A program that listens for network connections and responds.

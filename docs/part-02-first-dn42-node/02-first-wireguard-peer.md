@@ -1,7 +1,7 @@
 # First WireGuard Peer
 
 !!! warning "Later draft - not implementation-ready"
-    This page is roadmap material. Current DN42 WireGuard peer expectations, MTU guidance, firewall behavior, and rollback checks must be refreshed before release.
+    This page is roadmap material. Current DN42 WireGuard peer expectations, MTU guidance, `rp_filter` behavior, asymmetric-routing caveats, firewall behavior, and rollback checks must be refreshed before release.
 
     Before this becomes an implementation chapter, it must satisfy the [mandatory border checklist](../pocket-internet-dn42-interconnect.md#mandatory-border-checklist).
 
@@ -27,6 +27,7 @@ Draft: configure one WireGuard peer from current peer-provided parameters.
 
 - Check keys, endpoint, listen port, NAT, firewall, and MTU.
 - Verify route lookup before testing with application traffic.
+- Verify `rp_filter`, asymmetric routing, and firewall behavior against current DN42 guidance before publishing commands. Do not copy host-wide sysctl changes from examples without technical review.
 
 ## How the Real Internet Does This
 

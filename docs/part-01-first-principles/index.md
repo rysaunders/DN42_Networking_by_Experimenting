@@ -2,6 +2,9 @@
 
 Part 1 builds the local model for Pocket Internet before any public DN42 state enters the picture.
 
+!!! note "IPv4-only foundation"
+    Part 1 uses IPv4 examples so the first route-lookup, forwarding, BIRD, BGP, and WireGuard labs stay observable. This is not the full real-network model. IPv6 and ULA must be taught before production-shaped DN42 chapters rely on them.
+
 By the end of this part, the reader should be able to:
 
 - Predict which interface a packet will leave.
