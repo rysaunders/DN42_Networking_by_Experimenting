@@ -15,6 +15,7 @@
 *[longest-prefix match]: The route lookup rule that the most-specific matching route wins.
 *[outer packet]: The packet that carries a tunneled inner packet across the underlay.
 *[NDP]: Neighbor Discovery Protocol. IPv6's local-link neighbor discovery system.
+*[nftables]: Linux's modern packet-filtering framework.
 *[overlay]: The logical network carried by an underlay.
 *[return path]: The route a reply packet uses to get back to the original sender.
 *[route advertisement]: Telling another router that you can carry traffic for a prefix.

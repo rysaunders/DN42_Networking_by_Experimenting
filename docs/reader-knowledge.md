@@ -401,6 +401,37 @@ Reader has not yet been taught:
 - DNS forwarding or delegation,
 - real DN42 registry objects.
 
+## After Part 1, Packet Filtering Foundation
+
+Introduced by `docs/part-01-first-principles/13-packet-filtering-foundation.md`.
+
+Reader has seen:
+
+- packet filter as a separate decision from route lookup,
+- nftables as the local packet-filtering tool used in the lab,
+- rule as one match-and-action instruction,
+- chain as an ordered list of packet-filtering rules,
+- policy as the default action when no rule decides first,
+- counter as evidence that a rule matched traffic,
+- input-chain filtering for packets entering a namespace,
+- intended service traffic allowed while unrelated ICMP traffic is dropped,
+- route lookup staying unchanged while filtering changes packet outcome,
+- rollback by deleting the namespace that owns the temporary filter.
+
+Reader has only been lightly introduced to:
+
+- nftables hooks and families,
+- production firewall design,
+- connection tracking.
+
+Reader has not yet been taught:
+
+- forwarding-chain packet filtering,
+- persistent firewall configuration,
+- DNS forwarding or delegation,
+- real DN42 service exposure policy,
+- real host firewall integration.
+
 ## After Pocket Internet to DN42 Border
 
 Introduced by `docs/pocket-internet-dn42-interconnect.md`.
@@ -428,7 +459,7 @@ Reader has not yet been taught:
 - real DN42 WireGuard peer setup,
 - real DN42 BIRD session setup,
 - detailed production IPv6 and ULA behavior,
-- firewall policy at a real border,
+- production firewall policy at a real border,
 - split DNS for `.dn42`,
 - monitoring or looking-glass operation,
 - abuse handling and operational responsibility.

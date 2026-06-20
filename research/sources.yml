@@ -197,6 +197,17 @@ sources:
     status: reviewed-for-planning
     notes: "Use for Linux route table and route lookup behavior."
 
+  - id: nftables-wiki
+    title: nftables Wiki
+    url: https://wiki.nftables.org/wiki-nftables/index.php/Main_Page
+    category: linux-networking
+    authority: official
+    volatility: medium
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for nftables concepts, tables, chains, rules, hooks, counters, and simple packet-filter examples."
+
   - id: rfc-4271
     title: "RFC 4271: A Border Gateway Protocol 4"
     url: https://www.rfc-editor.org/rfc/rfc4271

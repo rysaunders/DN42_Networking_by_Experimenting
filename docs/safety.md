@@ -183,6 +183,18 @@ Before a real DN42 WireGuard or BIRD chapter becomes implementation-ready, it mu
 
 These topics require current-source refresh and technical review before the book recommends commands. Early local labs should not recommend host-wide sysctl changes. If a later chapter needs a sysctl change, it must explain the exact scope, reason, verification, and rollback.
 
+## Firewall And Packet Filtering Readiness
+
+Packet filtering is taught locally in [Packet Filtering Foundation](part-01-first-principles/13-packet-filtering-foundation.md). Later DN42-facing chapters should build on that foundation instead of asking readers to disable host firewalls or copy permissive rules.
+
+Before a real-network chapter exposes a service, forwards traffic, or opens a tunnel, it must explain:
+
+- which traffic is intentionally allowed,
+- which unrelated traffic remains denied,
+- where the rule applies: host, namespace, router, tunnel interface, or service host,
+- how counters or packet tests prove the intended rule matched,
+- how rollback removes the rule.
+
 ## Reusable Verification Checklist
 
 Use the parts that match the lab.

@@ -36,6 +36,9 @@ Asymmetric routing
 Bind address
 : The local address a service attaches to when it starts listening.
 
+Chain
+: In nftables, an ordered list of packet-filtering rules attached to a packet-processing hook.
+
 BGP
 : Border Gateway Protocol. The inter-domain routing protocol used to exchange reachability information between autonomous systems.
 
@@ -50,6 +53,9 @@ Convergence
 
 Connected route
 : A route Linux creates automatically for a prefix assigned directly to an interface.
+
+Counter
+: A rule statistic showing how many packets or bytes matched a packet-filtering rule.
 
 Direct protocol
 : A BIRD protocol that learns routes from local interfaces.
@@ -135,6 +141,9 @@ NDP
 Neighbor table
 : Linux's cache of local-link neighbor mappings, such as an IP address mapped to a MAC address on an interface.
 
+nftables
+: Linux's modern packet-filtering framework.
+
 On-link
 : Reachable through a local interface without first sending the packet to another IP router.
 
@@ -146,6 +155,12 @@ Outer packet
 
 Packet capture
 : A record of packets observed at an interface or capture point.
+
+Packet filter
+: A rule system that inspects packets and decides whether to accept, drop, or otherwise handle them.
+
+Policy
+: The default decision a packet-filtering chain uses when no earlier rule decides the packet.
 
 Port
 : A number identifying a service on an address.
@@ -182,6 +197,9 @@ Route table
 
 Routing daemon
 : A background program that manages routes.
+
+Rule
+: One packet-filtering instruction that matches packet fields and applies an action such as accept or drop.
 
 Reverse-path filtering
 : A Linux source-validation check, often controlled by `rp_filter`, that can drop packets when the return route does not match what the kernel expects.

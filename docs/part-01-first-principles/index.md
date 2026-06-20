@@ -41,7 +41,8 @@ By the end of this part, the reader should be able to:
 - Explain how a WireGuard tunnel can behave like a point-to-point link.
 - Observe local-link discovery and packet movement without confusing those checks for full application success.
 - Explain the first IPv6/ULA routing differences before real DN42 examples appear.
+- Explain why packet-filtering policy can allow or deny traffic independently from route lookup.
 
-The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, WireGuard, operational observation, and a first IPv6/ULA pass before any public DN42 state enters the picture.
+The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, WireGuard, operational observation, a first IPv6/ULA pass, and packet filtering before any public DN42 state enters the picture.
 
 Chapter 05 teaches BIRD as a local route manager before Chapter 06 asks it to speak BGP. That sequence matters: first BIRD learns and exports routes locally, then BIRD exchanges reachability with other routers.
