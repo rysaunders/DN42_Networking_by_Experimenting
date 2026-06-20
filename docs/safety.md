@@ -53,17 +53,30 @@ ip route get 1.1.1.1
 ip link show
 ```
 
-If BIRD is involved:
+If BIRD is involved, match the command to how BIRD was started. A system-managed BIRD service usually has a default control socket:
 
 ```sh
 birdc show protocols
 birdc show route
 ```
 
-If WireGuard is involved:
+Pocket Internet labs start BIRD manually with lab-specific sockets, so use the socket path from that chapter:
+
+```sh
+ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols
+ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route
+```
+
+If WireGuard is involved, match the command to where the interface lives. A host-level tunnel can be inspected from the host:
 
 ```sh
 wg show
+```
+
+Pocket Internet WireGuard interfaces live inside namespaces:
+
+```sh
+ip netns exec pocket-as2 wg show
 ```
 
 Do not treat these commands as magic incantations. The point is to know what normal looked like before the lab changed anything.
@@ -153,7 +166,13 @@ For BIRD-based DN42 chapters, the route export inspection should use the equival
 birdc show route export <dn42_bgp_protocol_name>
 ```
 
-The exact protocol name and expected output belong in the chapter. The important rule is that export is inspected before it is trusted.
+If the BIRD process uses a non-default socket, include the socket path:
+
+```sh
+birdc -s <bird_control_socket> show route export <dn42_bgp_protocol_name>
+```
+
+The exact socket, protocol name, and expected output belong in the chapter. The important rule is that export is inspected before it is trusted.
 
 Rollback must be equally concrete. A BIRD chapter might disable the peer protocol while a WireGuard chapter might remove or bring down the tunnel. The published chapter must show the exact rollback for the state it changes.
 

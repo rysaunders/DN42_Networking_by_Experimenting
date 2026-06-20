@@ -160,7 +160,7 @@ Inspect the route table when route lookup surprises you:
 ```sh
 ip -n pocket-as1 route
 ip -n pocket-as1 route show 172.20.3.1
-ip -6 -n pocket-v6-left route
+ip -n pocket-v6-a -6 route
 ```
 
 What this proves:
@@ -193,15 +193,17 @@ Use BIRD checks when the question is:
 Common checks:
 
 ```sh
-ip netns exec pocket-as1 birdc show protocols
-ip netns exec pocket-as1 birdc show route
-ip netns exec pocket-as1 birdc show route 172.20.3.1/32
+ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols
+ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route
+ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.3.1/32
 ```
 
-For a specific BGP protocol, use the protocol name from the lab configuration:
+The `-s` option points `birdc` at the control socket for the BIRD process started by that lab. The socket path changes by lab, so copy it from the chapter you are troubleshooting.
+
+For a specific BGP protocol, use the protocol name from the lab configuration. Protocol names such as `to_as2` are local labels chosen in the BIRD config, not universal BIRD keywords:
 
 ```sh
-ip netns exec pocket-as1 birdc show protocols all bgp_as2
+ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show protocols all to_as2
 ```
 
 What this proves:
@@ -223,10 +225,10 @@ What this does not prove:
 For DN42-facing work, route export deserves its own check before trusting it:
 
 ```sh
-birdc show route export <dn42_bgp_protocol_name>
+birdc -s <bird_control_socket> show route export <dn42_bgp_protocol_name>
 ```
 
-That command shape belongs in later DN42 chapters with the real protocol name and expected output. The important habit starts here: inspect what you intend to announce before you rely on it.
+That command shape belongs in later DN42 chapters with the real socket path, protocol name, and expected output. The important habit starts here: inspect what you intend to announce before you rely on it.
 
 Introduced in:
 
@@ -390,10 +392,10 @@ Every lab should end by proving what it removed:
 ```sh
 ip netns list
 ip route
-wg show
+ip netns exec pocket-as2 wg show
 ```
 
-Use only the checks that match the lab. A local namespace lab usually needs namespace cleanup proof. A WireGuard lab needs tunnel cleanup proof. A BIRD lab needs process and route cleanup proof. A DN42-facing chapter will need stricter import, export, tunnel, route, resolver, service, and public-route sanity checks.
+Use only the checks that match the lab. A local namespace lab usually needs namespace cleanup proof. A namespace-local WireGuard lab needs `wg show` inside the namespace before cleanup and no matching namespace after cleanup. A BIRD lab needs process and route cleanup proof. A DN42-facing chapter will need stricter import, export, tunnel, route, resolver, service, and public-route sanity checks.
 
 What rollback proof proves:
 
@@ -438,9 +440,9 @@ This order is not law. It is a way to avoid guessing.
 | --- | --- | --- |
 | `ip route get` | Chosen route, interface, source address | Packet crossed, service is up, policy allows |
 | `ip route` | Current Linux forwarding table | BIRD reason, application health |
-| `birdc show protocols` | BIRD/BGP session state | Kernel route installed, packet crossed |
-| `birdc show route` | BIRD route knowledge and selection | Service reachability |
-| `wg show` | WireGuard peer, handshake, counters | BGP policy, DNS, service state |
+| `birdc show protocols` with the correct socket | BIRD/BGP session state | Kernel route installed, packet crossed |
+| `birdc show route` with the correct socket | BIRD route knowledge and selection | Service reachability |
+| `wg show` in the namespace or host where the interface lives | WireGuard peer, handshake, counters | BGP policy, DNS, service state |
 | `getent hosts` | Name-to-address result | Route exists, service is listening |
 | `ss -ltnp` | Listener address and port | Remote reachability |
 | `curl` | Application success or failure | Root cause by itself |
