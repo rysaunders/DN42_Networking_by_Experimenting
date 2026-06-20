@@ -68,14 +68,20 @@ If `pocket-as2` and `pocket-as3` have an underlay path, and each side has a Wire
 
 The underlay is the carrier path:
 
-```text
-pocket-as2 as2-underlay 192.0.2.1  <---- veth ---->  192.0.2.2 as3-underlay pocket-as3
+```mermaid
+flowchart LR
+  as2Underlay["pocket-as2<br/>as2-underlay<br/>192.0.2.1"]
+  as3Underlay["pocket-as3<br/>as3-underlay<br/>192.0.2.2"]
+  as2Underlay ---|"veth underlay carrier"| as3Underlay
 ```
 
 The overlay is the encrypted point-to-point link:
 
-```text
-pocket-as2 wg23 10.42.23.1  <==== WireGuard ====>  10.42.23.2 wg23 pocket-as3
+```mermaid
+flowchart LR
+  as2Overlay["pocket-as2<br/>wg23<br/>10.42.23.1"]
+  as3Overlay["pocket-as3<br/>wg23<br/>10.42.23.2"]
+  as2Overlay ===|"WireGuard overlay link"| as3Overlay
 ```
 
 When you ping `10.42.23.2`, Linux gives the inner packet to `wg23`. WireGuard wraps it, encrypts it, and sends an outer UDP packet to `192.0.2.2:51824` across the underlay.

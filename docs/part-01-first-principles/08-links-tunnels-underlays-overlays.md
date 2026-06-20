@@ -31,8 +31,11 @@
 
 You have already built Pocket Internet with visible links. A veth pair felt like a cable because it had two ends:
 
-```text
-pocket-as2 as2-as3  <---- veth ---->  as3-as2 pocket-as3
+```mermaid
+flowchart LR
+  as2["pocket-as2<br/>as2-as3"]
+  as3["pocket-as3<br/>as3-as2"]
+  as2 ---|"veth link"| as3
 ```
 
 You have also seen that BGP does not create links. BGP uses links that already exist. If two neighbors can reach each other, BGP can exchange routes across that path.
@@ -74,8 +77,11 @@ your router
 
 In Pocket Internet, we do not want to depend on the public Internet yet. So the lab uses a veth pair as the underneath path:
 
-```text
-pocket-as2 as2-underlay  <---- veth ---->  as3-underlay pocket-as3
+```mermaid
+flowchart LR
+  as2["pocket-as2<br/>as2-underlay"]
+  as3["pocket-as3<br/>as3-underlay"]
+  as2 ---|"veth underlay carrier"| as3
 ```
 
 That veth pair is not the link we want BGP to care about. It is the carrier path for the tunnel.
@@ -86,23 +92,29 @@ This is the confusing part, so slow down here.
 
 When we say "replace the AS2-AS3 veth link with WireGuard," we are replacing the routed Pocket Internet link:
 
-```text
-Before:
-pocket-as2 as2-as3 10.42.23.1  <---- veth ---->  10.42.23.2 as3-as2 pocket-as3
+```mermaid
+flowchart LR
+  as2Before["pocket-as2<br/>as2-as3<br/>10.42.23.1"]
+  as3Before["pocket-as3<br/>as3-as2<br/>10.42.23.2"]
+  as2Before ---|"before: routed veth link"| as3Before
 ```
 
 After the replacement, BGP should no longer use an `as2-as3` veth interface. BGP should use a WireGuard interface:
 
-```text
-After:
-pocket-as2 wg23 10.42.23.1  <==== WireGuard ====>  10.42.23.2 wg23 pocket-as3
+```mermaid
+flowchart LR
+  as2After["pocket-as2<br/>wg23<br/>10.42.23.1"]
+  as3After["pocket-as3<br/>wg23<br/>10.42.23.2"]
+  as2After ===|"after: WireGuard overlay link"| as3After
 ```
 
 But WireGuard itself still has to send encrypted packets somewhere. In the local lab, those encrypted packets cross a different veth pair:
 
-```text
-Carrier path:
-pocket-as2 as2-underlay 192.0.2.1  <---- veth ---->  192.0.2.2 as3-underlay pocket-as3
+```mermaid
+flowchart LR
+  as2Carrier["pocket-as2<br/>as2-underlay<br/>192.0.2.1"]
+  as3Carrier["pocket-as3<br/>as3-underlay<br/>192.0.2.2"]
+  as2Carrier ---|"carrier path: veth underlay"| as3Carrier
 ```
 
 So there are two layers:

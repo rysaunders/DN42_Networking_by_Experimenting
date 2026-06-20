@@ -35,6 +35,10 @@ plugins:
 
 extra_javascript:
   - https://unpkg.com/mermaid@11/dist/mermaid.min.js
+  - assets/javascripts/mermaid-init.js
+
+extra_css:
+  - assets/stylesheets/mermaid.css
 
 markdown_extensions:
   - abbr
@@ -104,6 +108,7 @@ nav:
   - Project:
       - Chapter Template: authoring-templates/chapter-template.md
       - Experiment Template: authoring-templates/experiment-template.md
+      - Diagram Conventions: authoring-templates/diagram-conventions.md
       - Research Note Template: authoring-templates/research-note-template.md
       - Beginner Review Loop: authoring-templates/review-loop.md
       - Internet Readiness Standard: authoring-templates/internet-readiness-standard.md

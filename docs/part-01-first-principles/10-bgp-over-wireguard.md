@@ -36,8 +36,11 @@ This chapter assumes you have completed the WireGuard link lab. You should know 
 
 You have already proven this small shape:
 
-```text
-pocket-as2 wg23 10.42.23.1  <==== WireGuard ====>  10.42.23.2 wg23 pocket-as3
+```mermaid
+flowchart LR
+  as2Overlay["pocket-as2<br/>wg23<br/>10.42.23.1"]
+  as3Overlay["pocket-as3<br/>wg23<br/>10.42.23.2"]
+  as2Overlay ===|"WireGuard overlay link"| as3Overlay
 ```
 
 Now you will put that link back into Pocket Internet and ask BGP to use it.
@@ -60,19 +63,31 @@ If service-loopback traffic crosses the AS2-AS3 link, WireGuard transfer counter
 
 The old AS2-AS3 routed link was direct:
 
-```text
-pocket-as2 as2-as3  <---- veth ---->  as3-as2 pocket-as3
-          10.42.23.1/30          10.42.23.2/30
+```mermaid
+flowchart LR
+  oldAs2["pocket-as2<br/>as2-as3<br/>10.42.23.1/30"]
+  oldAs3["pocket-as3<br/>as3-as2<br/>10.42.23.2/30"]
+  oldAs2 ---|"old routed veth link"| oldAs3
 ```
 
 The new shape uses WireGuard for that routed link:
 
-```text
-Underlay packet path:
-pocket-as2 as2-underlay 192.0.2.1  <---- veth ---->  192.0.2.2 as3-underlay pocket-as3
+```mermaid
+flowchart TB
+  subgraph Overlay["Overlay routed link"]
+    as2Wg["pocket-as2<br/>wg23<br/>10.42.23.1"]
+    as3Wg["pocket-as3<br/>wg23<br/>10.42.23.2"]
+    as2Wg ===|"WireGuard"| as3Wg
+  end
 
-Overlay routed link:
-pocket-as2 wg23 10.42.23.1  <==== WireGuard ====>  10.42.23.2 wg23 pocket-as3
+  subgraph Underlay["Underlay packet path"]
+    as2Under["pocket-as2<br/>as2-underlay<br/>192.0.2.1"]
+    as3Under["pocket-as3<br/>as3-underlay<br/>192.0.2.2"]
+    as2Under ---|"veth carrier"| as3Under
+  end
+
+  as2Wg -. "encrypted UDP packets" .-> as2Under
+  as3Under -. "decrypted packets" .-> as3Wg
 ```
 
 You should end the lab with this path available:

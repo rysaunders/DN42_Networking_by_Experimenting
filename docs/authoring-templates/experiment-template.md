@@ -74,7 +74,9 @@ Update `docs/reader-knowledge.md` for every term this experiment teaches for the
 
 ## Mental Model
 
-Describe the smallest useful model for the experiment. Include an ASCII or Mermaid diagram for topology, packet path, or state transitions.
+Describe the smallest useful model for the experiment.
+
+Follow `docs/authoring-templates/diagram-conventions.md`: use Mermaid for topology, packet path, or state transitions. Use text blocks only for commands, expected terminal output, config, or compact lab maps where the exact interface/address tuple is part of the exercise.
 
 ## Safety Boundaries
 

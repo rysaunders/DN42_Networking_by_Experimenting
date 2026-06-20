@@ -51,13 +51,11 @@ flowchart TB
 
 A veth pair is a virtual cable. Each end is an interface. Each end can live in a different namespace.
 
-```text
-namespace left                         namespace router
-+------------------+                  +---------------------+
-| left0            |                  | rtr-left0           |
-| 10.10.1.2/30     |<---- veth -----> | 10.10.1.1/30        |
-| route table      |                  | route table         |
-+------------------+                  +---------------------+
+```mermaid
+flowchart LR
+  left["namespace left<br/>interface left0<br/>10.10.1.2/30<br/>route table"]
+  router["namespace router<br/>interface rtr-left0<br/>10.10.1.1/30<br/>route table"]
+  left ---|"veth pair<br/>one local link"| router
 ```
 
 The veth pair moves a packet across one local link. A route lookup decides which outgoing interface, and possibly which next hop, should receive the packet from this stack.

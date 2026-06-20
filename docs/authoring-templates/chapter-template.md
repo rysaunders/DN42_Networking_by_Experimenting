@@ -71,6 +71,8 @@ Describe the smallest useful model the reader should hold in their head.
 
 Include a diagram when the chapter introduces a new topology, packet path, table, or control-plane/data-plane relationship.
 
+Follow `docs/authoring-templates/diagram-conventions.md`: use Mermaid for conceptual visuals, and keep text blocks for commands, config, terminal output, and compact command-adjacent lab maps.
+
 ```mermaid
 flowchart LR
   A["Known thing"] --> B["New thing"]
