@@ -28,7 +28,7 @@
 Part 1 builds the local model for Pocket Internet before any public DN42 state enters the picture.
 
 !!! note "IPv4-only foundation"
-    Part 1 uses IPv4 examples so the first route-lookup, forwarding, BIRD, BGP, and WireGuard labs stay observable. This is not the full real-network model. IPv6 and ULA must be taught before production-shaped DN42 chapters rely on them.
+    Most Part 1 labs use IPv4 examples so the first route-lookup, forwarding, BIRD, BGP, and WireGuard labs stay observable. The IPv6 and ULA foundation chapter then introduces the address-family differences before production-shaped DN42 chapters rely on them.
 
 By the end of this part, the reader should be able to:
 
@@ -40,7 +40,8 @@ By the end of this part, the reader should be able to:
 - Operate a simple service inside the lab.
 - Explain how a WireGuard tunnel can behave like a point-to-point link.
 - Observe local-link discovery and packet movement without confusing those checks for full application success.
+- Explain the first IPv6/ULA routing differences before real DN42 examples appear.
 
-The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, WireGuard, and operational observation before any public DN42 state enters the picture.
+The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, WireGuard, operational observation, and a first IPv6/ULA pass before any public DN42 state enters the picture.
 
 Chapter 05 teaches BIRD as a local route manager before Chapter 06 asks it to speak BGP. That sequence matters: first BIRD learns and exports routes locally, then BIRD exchanges reachability with other routers.

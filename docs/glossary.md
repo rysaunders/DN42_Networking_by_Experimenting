@@ -81,6 +81,9 @@ HTTP
 ICMP
 : Internet Control Message Protocol. The protocol family used by tools such as `ping` for echo requests and replies.
 
+ICMPv6
+: Internet Control Message Protocol for IPv6. IPv6 ping and NDP use ICMPv6 messages.
+
 Import filter
 : A rule that decides which routes may enter a BIRD table from a protocol. In BGP, that usually means deciding which received neighbor routes to accept.
 
@@ -91,7 +94,10 @@ Interface
 : A place where packets enter or leave a network stack.
 
 IPv6
-: The newer Internet Protocol address family. The current Pocket Internet labs are IPv4-only until IPv6 is intentionally introduced.
+: The newer Internet Protocol address family. IPv6 addresses are 128-bit addresses written in hexadecimal groups separated by colons.
+
+IPv6 route table
+: The Linux route table view used for IPv6 packets, inspected with commands such as `ip -6 route`.
 
 MAC address
 : A link-layer address on an Ethernet-like interface.
@@ -215,6 +221,9 @@ ROA
 
 ULA
 : Unique Local Address. IPv6 private addressing defined by RFC 4193.
+
+`::` compression
+: IPv6 shorthand that replaces one run of zero groups inside an address.
 
 WireGuard
 : A VPN protocol commonly used to create DN42 tunnel links over the public Internet.

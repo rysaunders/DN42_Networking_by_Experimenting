@@ -367,6 +367,40 @@ Reader has not yet been taught:
 - DNS forwarding or delegation,
 - real DN42 registry objects.
 
+## After Part 1, IPv6 and ULA Foundation
+
+Introduced by `docs/part-01-first-principles/12-ipv6-ula-foundation.md`.
+
+Reader has seen:
+
+- IPv6 address notation with hexadecimal groups,
+- `::` compression as shorthand for one run of zero groups,
+- IPv6 prefix lengths using the same slash habit as IPv4,
+- `/128` as one exact IPv6 address,
+- `/64` as the normal local-link size used in this lab,
+- ULA as IPv6 private address space, not public Internet or DN42 authorization,
+- ICMPv6 as the protocol family used by IPv6 ping and NDP,
+- IPv6 route lookup with `ip -6 route get`,
+- IPv6 route-table inspection with `ip -6 route`,
+- NDP as the local-link discovery system used instead of ARP,
+- IPv4 and IPv6 route tables as separate views,
+- an explicit IPv6 host route to a ULA service loopback.
+
+Reader has only been lightly introduced to:
+
+- BIRD needing deliberate IPv4 and IPv6 configuration shapes,
+- real DN42 IPv6 authorization and filtering requirements.
+
+Reader has not yet been taught:
+
+- detailed IPv6 subnet math,
+- link-local IPv6 behavior,
+- router advertisements,
+- BIRD IPv6 channel syntax,
+- firewall rules around services,
+- DNS forwarding or delegation,
+- real DN42 registry objects.
+
 ## After Pocket Internet to DN42 Border
 
 Introduced by `docs/pocket-internet-dn42-interconnect.md`.
@@ -393,7 +427,7 @@ Reader has not yet been taught:
 - real DN42 registry objects,
 - real DN42 WireGuard peer setup,
 - real DN42 BIRD session setup,
-- IPv6 and ULA behavior,
+- detailed production IPv6 and ULA behavior,
 - firewall policy at a real border,
 - split DNS for `.dn42`,
 - monitoring or looking-glass operation,

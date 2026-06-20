@@ -9,6 +9,7 @@
 *[export filter]: A rule that decides which routes a router announces to a neighbor.
 *[handshake]: Evidence that WireGuard peers exchanged setup traffic.
 *[ICMP]: Internet Control Message Protocol. The protocol family used by tools such as ping for echo requests and replies.
+*[ICMPv6]: Internet Control Message Protocol for IPv6. IPv6 ping and NDP use ICMPv6 messages.
 *[import filter]: A rule that decides which routes a router accepts from a neighbor.
 *[inner packet]: The packet the overlay network thinks it is sending before a tunnel wraps it.
 *[longest-prefix match]: The route lookup rule that the most-specific matching route wins.
@@ -19,5 +20,6 @@
 *[route advertisement]: Telling another router that you can carry traffic for a prefix.
 *[route leak]: Accidentally announcing or accepting routes that should not cross a routing boundary.
 *[underlay]: The network that carries an overlay tunnel.
+*[ULA]: Unique Local Address. IPv6 private addressing intended for local networks.
 *[VPN]: A tool that creates a private-looking network path across another network.
 *[WireGuard]: A VPN protocol commonly used to create encrypted tunnel links.

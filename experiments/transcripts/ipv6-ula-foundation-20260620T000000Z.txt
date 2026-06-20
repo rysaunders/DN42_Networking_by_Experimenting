@@ -1,0 +1,182 @@
+
+## Environment
+
+$ uname -a
+Linux pocket-ipv6-lab-0620 7.0.11-orbstack-00360-gc9bc4d96ac70 #1 SMP PREEMPT Thu Jun  4 16:40:25 UTC 2026 aarch64 aarch64 aarch64 GNU/Linux
+
+$ ip -V
+ip utility, iproute2-6.1.0, libbpf 1.3.0
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+
+$ tcpdump --version
+tcpdump version 4.99.4
+libpcap version 1.10.4 (with TPACKET_V3)
+OpenSSL 3.0.13 30 Jan 2024
+
+Transcript: experiments/transcripts/ipv6-ula-foundation-20260620T000000Z.txt
+
+## Rollback before setup
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(pocket-v6-a\|pocket-v6-b\)\(\ \|\$\)\'\ \|\|\ true
+
+## Create namespaces and link
+
+$ ip netns add pocket-v6-a
+
+$ ip netns add pocket-v6-b
+
+$ ip link add v6a0 type veth peer name v6b0
+
+$ ip link set v6a0 netns pocket-v6-a
+
+$ ip link set v6b0 netns pocket-v6-b
+
+## Reduce address setup noise
+
+$ ip netns exec pocket-v6-a sysctl -w net.ipv6.conf.all.accept_dad=0
+net.ipv6.conf.all.accept_dad = 0
+
+$ ip netns exec pocket-v6-a sysctl -w net.ipv6.conf.default.accept_dad=0
+net.ipv6.conf.default.accept_dad = 0
+
+$ ip netns exec pocket-v6-a sysctl -w net.ipv6.conf.v6a0.accept_dad=0
+net.ipv6.conf.v6a0.accept_dad = 0
+
+$ ip netns exec pocket-v6-b sysctl -w net.ipv6.conf.all.accept_dad=0
+net.ipv6.conf.all.accept_dad = 0
+
+$ ip netns exec pocket-v6-b sysctl -w net.ipv6.conf.default.accept_dad=0
+net.ipv6.conf.default.accept_dad = 0
+
+$ ip netns exec pocket-v6-b sysctl -w net.ipv6.conf.v6b0.accept_dad=0
+net.ipv6.conf.v6b0.accept_dad = 0
+
+## Add IPv6 addresses
+
+$ ip -n pocket-v6-a addr add fd42:4242:100::1/64 dev v6a0
+
+$ ip -n pocket-v6-b addr add fd42:4242:100::2/64 dev v6b0
+
+$ ip -n pocket-v6-b link add service0 type dummy
+
+$ ip netns exec pocket-v6-b sysctl -w net.ipv6.conf.service0.accept_dad=0
+net.ipv6.conf.service0.accept_dad = 0
+
+$ ip -n pocket-v6-b addr add fd42:4242:200::1/128 dev service0
+
+## Bring interfaces up
+
+$ ip -n pocket-v6-a link set lo up
+
+$ ip -n pocket-v6-a link set v6a0 up
+
+$ ip -n pocket-v6-b link set lo up
+
+$ ip -n pocket-v6-b link set v6b0 up
+
+$ ip -n pocket-v6-b link set service0 up
+
+## Inspect IPv6 addresses and connected routes
+
+$ ip -n pocket-v6-a -6 addr show dev v6a0
+6: v6a0@if5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000 link-netns pocket-v6-b
+    inet6 fd42:4242:100::1/64 scope global 
+       valid_lft forever preferred_lft forever
+    inet6 fe80::4868:daff:fe05:b992/64 scope link 
+       valid_lft forever preferred_lft forever
+
+$ ip -n pocket-v6-b -6 addr show dev v6b0
+5: v6b0@if6: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000 link-netns pocket-v6-a
+    inet6 fd42:4242:100::2/64 scope global 
+       valid_lft forever preferred_lft forever
+    inet6 fe80::b0ab:c3ff:fe94:1f62/64 scope link 
+       valid_lft forever preferred_lft forever
+
+$ ip -n pocket-v6-b -6 addr show dev service0
+2: service0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+    inet6 fd42:4242:200::1/128 scope global 
+       valid_lft forever preferred_lft forever
+    inet6 fe80::c15:bbff:fe9e:380d/64 scope link 
+       valid_lft forever preferred_lft forever
+
+$ ip -n pocket-v6-a -6 route
+fd42:4242:100::/64 dev v6a0 proto kernel metric 256 pref medium
+fe80::/64 dev v6a0 proto kernel metric 256 pref medium
+
+$ ip -n pocket-v6-b -6 route
+fd42:4242:100::/64 dev v6b0 proto kernel metric 256 pref medium
+fd42:4242:200::1 dev service0 proto kernel metric 256 pref medium
+fe80::/64 dev v6b0 proto kernel metric 256 pref medium
+fe80::/64 dev service0 proto kernel metric 256 pref medium
+
+## Inspect route lookup on the local link
+
+$ ip -n pocket-v6-a -6 route get fd42:4242:100::2
+fd42:4242:100::2 dev v6a0 proto kernel src fd42:4242:100::1 metric 256 pref medium
+
+$ ip -n pocket-v6-a -6 neigh show
+
+## Capture first IPv6 neighbor discovery
+
+$ mkdir -p /tmp/ipv6-ula-foundation
+
+$ ip netns exec pocket-v6-b timeout 8 tcpdump -n -e -i v6b0 -c 4 icmp6 -l -U -w /tmp/ipv6-ula-foundation/first-v6-ping.pcap
+tcpdump: listening on v6b0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+$ ip netns exec pocket-v6-a ping -6 -c 1 -W 2 fd42:4242:100::2
+PING fd42:4242:100::2 (fd42:4242:100::2) 56 data bytes
+64 bytes from fd42:4242:100::2: icmp_seq=1 ttl=64 time=0.114 ms
+
+--- fd42:4242:100::2 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.114/0.114/0.114/0.000 ms
+4 packets captured
+4 packets received by filter
+0 packets dropped by kernel
+
+$ ip netns exec pocket-v6-b tcpdump -n -e -r /tmp/ipv6-ula-foundation/first-v6-ping.pcap
+reading from file /tmp/ipv6-ula-foundation/first-v6-ping.pcap, link-type EN10MB (Ethernet), snapshot length 262144
+08:52:07.398683 4a:68:da:05:b9:92 > 33:33:ff:00:00:02, ethertype IPv6 (0x86dd), length 86: fd42:4242:100::1 > ff02::1:ff00:2: ICMP6, neighbor solicitation, who has fd42:4242:100::2, length 32
+08:52:07.398714 b2:ab:c3:94:1f:62 > 4a:68:da:05:b9:92, ethertype IPv6 (0x86dd), length 86: fd42:4242:100::2 > fd42:4242:100::1: ICMP6, neighbor advertisement, tgt is fd42:4242:100::2, length 32
+08:52:07.398723 4a:68:da:05:b9:92 > b2:ab:c3:94:1f:62, ethertype IPv6 (0x86dd), length 118: fd42:4242:100::1 > fd42:4242:100::2: ICMP6, echo request, id 2473, seq 1, length 64
+08:52:07.398734 b2:ab:c3:94:1f:62 > 4a:68:da:05:b9:92, ethertype IPv6 (0x86dd), length 118: fd42:4242:100::2 > fd42:4242:100::1: ICMP6, echo reply, id 2473, seq 1, length 64
+
+$ ip -n pocket-v6-a -6 neigh show
+fd42:4242:100::2 dev v6a0 lladdr b2:ab:c3:94:1f:62 REACHABLE 
+
+$ ip -n pocket-v6-b -6 neigh show
+fd42:4242:100::1 dev v6b0 lladdr 4a:68:da:05:b9:92 DELAY 
+
+## Add and inspect a ULA service-loopback route
+
+$ ip -n pocket-v6-a -6 route add fd42:4242:200::1/128 via fd42:4242:100::2 dev v6a0
+
+$ ip -n pocket-v6-a -6 route get fd42:4242:200::1
+fd42:4242:200::1 via fd42:4242:100::2 dev v6a0 src fd42:4242:100::1 metric 1024 pref medium
+
+$ ip netns exec pocket-v6-a ping -6 -c 1 -W 2 fd42:4242:200::1
+PING fd42:4242:200::1 (fd42:4242:200::1) 56 data bytes
+64 bytes from fd42:4242:200::1: icmp_seq=1 ttl=64 time=0.045 ms
+
+--- fd42:4242:200::1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.045/0.045/0.045/0.000 ms
+
+## Show that the route is IPv6-specific
+
+$ ip -n pocket-v6-a route
+
+$ ip -n pocket-v6-a -6 route
+fd42:4242:100::/64 dev v6a0 proto kernel metric 256 pref medium
+fd42:4242:200::1 via fd42:4242:100::2 dev v6a0 metric 1024 pref medium
+fe80::/64 dev v6a0 proto kernel metric 256 pref medium
+
+## Rollback
+
+$ bash -c ip\ netns\ list\ \|\ grep\ -E\ \'\^\(pocket-v6-a\|pocket-v6-b\)\(\ \|\$\)\'\ \|\|\ true
+
+## Result
+Lab complete. Temporary namespaces and capture files removed.
+Transcript saved to: experiments/transcripts/ipv6-ula-foundation-20260620T000000Z.txt
