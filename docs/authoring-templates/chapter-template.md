@@ -117,6 +117,19 @@ Use commands only after they have been tested or clearly marked as research requ
 
 Labs should be manual-first. Show the reader the commands that build the state step by step. Scripts are allowed as repeatable validation and transcript capture, but they should not be the primary learning path unless the setup is too large or unsafe to type manually.
 
+### Lab Requirements
+
+Every hands-on chapter should include a `Lab Requirements` section before the first state-changing command. Include:
+
+- the execution environment,
+- root requirement,
+- required tools with check commands such as `id`, `ip -V`, `bird --version`, `wg --version`, `python3 --version`, `curl --version`, or `nft --version`,
+- expected observations for those checks,
+- validation script path,
+- tracked transcript path.
+
+If the lab depends on earlier state, add a `Checkpoint Required` section with the exact commands that prove the starting state exists. If a script can restore or validate the full lab state, add a `Resume Path` section that says the first learning path remains manual and the script is for repeat work.
+
 ### Code Block Conventions
 
 Use MkDocs Material code block features when they reduce reader confusion:

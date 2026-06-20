@@ -155,7 +155,7 @@ This is the mental model for the lab:
 
 The dummy interface is not a real Wi-Fi network or switch. It is a controlled way to make Linux believe a tiny local neighborhood exists so we can study route selection.
 
-## Lab
+## Lab Requirements
 
 Build this lab by typing the commands yourself. The repeated typing is part of the lesson: routes become easier to reason about when you have created the namespace, interfaces, addresses, and route entries by hand.
 
@@ -166,6 +166,34 @@ orb
 ```
 
 Then run the commands from that Linux shell as root, or prefix them with `sudo`.
+
+Check the required tools before building the lab:
+
+```sh
+id
+ip -V
+```
+
+Expected observations:
+
+- `id` should show `uid=0(root)` if you are using a root lab shell.
+- `ip -V` should print the installed `iproute2` version.
+
+The repeatable validation script lives at:
+
+```text
+experiments/labs/addresses-longest-match/run.sh
+```
+
+The validated transcript for this experiment is:
+
+```text
+experiments/transcripts/addresses-longest-match-20260616T124649Z.txt
+```
+
+## Lab Continuity Note
+
+This chapter is self-contained. It creates one temporary namespace and does not require a checkpoint from an earlier lab.
 
 ## What You Will Build
 

@@ -149,6 +149,7 @@ getent --help >/dev/null && echo "getent is available"
 Expected observations:
 
 - `id` should show `uid=0(root)`. If it does not, enter a root lab shell before continuing.
+- `ip -V` should print the installed `iproute2` version.
 - `dnsmasq --version` should print the dnsmasq version.
 - `python3 --version` and `curl --version` should print installed versions.
 - `command -v pkill` should print a path to `pkill`, which the rollback step uses to stop the HTTP listener inside the namespace.

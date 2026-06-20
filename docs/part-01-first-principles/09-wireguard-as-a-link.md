@@ -132,6 +132,7 @@ wg --version
 Expected observations:
 
 - `id` should show `uid=0(root)`. If it does not, enter a root lab shell before continuing.
+- `ip -V` should print the installed `iproute2` version.
 - `wg --version` should print the WireGuard tools version.
 - If `wg` is missing, install `wireguard-tools` in the Linux lab environment.
 - If `ip -n pocket-as2 link add wg23 type wireguard` later fails with `Operation not supported`, the environment has the tools but not usable WireGuard kernel support.

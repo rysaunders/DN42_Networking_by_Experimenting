@@ -148,6 +148,7 @@ wg --version
 Expected observations:
 
 - `id` should show `uid=0(root)`. If it does not, enter a root lab shell before continuing.
+- `ip -V` should print the installed `iproute2` version.
 - `bird --version` should report BIRD 2.
 - `command -v birdc` should print a path.
 - `wg --version` should print the WireGuard tools version.

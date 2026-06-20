@@ -129,7 +129,7 @@ ip route get 1.1.1.1
 
 After rollback, the namespace list should not contain `birdlab`.
 
-## Lab
+## Lab Requirements
 
 Build this lab manually. The validation script exists so you can rerun the experiment later, but the learning path is the manual path.
 
@@ -141,12 +141,21 @@ orb
 
 Then run the commands from that Linux shell as root, or prefix them with `sudo`.
 
-You also need BIRD 2 installed:
+Check the required tools before building the lab:
 
 ```sh
+id
+ip -V
 bird --version
 command -v birdc
 ```
+
+Expected observations:
+
+- `id` should show `uid=0(root)` if you are using a root lab shell.
+- `ip -V` should print the installed `iproute2` version.
+- `bird --version` should report BIRD 2.
+- `command -v birdc` should print a path.
 
 On Ubuntu:
 
@@ -166,6 +175,10 @@ The checked validation transcript is:
 ```text
 experiments/transcripts/bird-route-manager-20260619T144400Z.txt
 ```
+
+## Lab Continuity Note
+
+This chapter is self-contained. It creates one temporary BIRD namespace and does not require a checkpoint from an earlier lab.
 
 ## Step 1: Clean Up Any Previous Run
 

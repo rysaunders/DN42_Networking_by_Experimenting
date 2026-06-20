@@ -114,7 +114,42 @@ ip netns list
 ip route get 1.1.1.1
 ```
 
-## Lab
+## Lab Requirements
+
+Run this chapter inside the Linux lab environment from a root shell. The commands below are written without `sudo` so they stay readable and match the validation transcript.
+
+Check the required tools before continuing:
+
+```sh
+id
+ip -V
+bird --version
+command -v birdc
+python3 --version
+curl --version
+```
+
+Expected observations:
+
+- `id` should show `uid=0(root)` if you are using a root lab shell.
+- `ip -V` should print the installed `iproute2` version.
+- `bird --version` should report BIRD 2.
+- `command -v birdc` should print a path.
+- `python3 --version` and `curl --version` should print installed versions.
+
+The repeatable validation script is standalone and builds the whole service lab from scratch:
+
+```text
+experiments/labs/pocket-internet-service/run.sh
+```
+
+The validated transcript for this experiment is:
+
+```text
+experiments/transcripts/pocket-internet-service-20260618T103858Z.txt
+```
+
+## Checkpoint Required
 
 This lab is a dependent extension of the BGP Pocket Internet from the previous chapter, with one service added inside `pocket-as3`.
 
@@ -134,19 +169,19 @@ Expected observations:
 - `route show` includes `proto bird`,
 - `route get` sends traffic through one of `pocket-as1`'s neighbors.
 
-If those commands do not show a BGP-learned route, rebuild the BGP Pocket Internet before continuing.
+If those commands do not show a BGP-learned route, rebuild the BGP Pocket Internet before continuing manually.
 
-The repeatable validation script is standalone and builds the whole lab from scratch:
+## Resume Path
 
-```text
-experiments/labs/pocket-internet-service/run.sh
+Use this path only after you have built the BGP lab manually at least once. The learning path is still to build the route-exchange machinery yourself before adding a service.
+
+To restore the full service-lab state in one repeatable run, use the validation script:
+
+```sh
+bash experiments/labs/pocket-internet-service/run.sh
 ```
 
-The validated transcript for this experiment is:
-
-```text
-experiments/transcripts/pocket-internet-service-20260618T103858Z.txt
-```
+That script creates the BGP topology and service, validates the expected observations, then rolls everything back. It is useful for repeat validation, not a substitute for the first manual build.
 
 ## What You Will Build
 

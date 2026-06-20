@@ -133,7 +133,7 @@ ip route get 1.1.1.1
 
 The public route check should still point through your normal Internet connection after the lab.
 
-## Lab
+## Lab Requirements
 
 Build this lab manually. The validation script exists so you can rerun the experiment later, but the learning path is the manual path.
 
@@ -145,12 +145,21 @@ orb
 
 Then run the commands from that Linux shell as root, or prefix them with `sudo`.
 
-You also need BIRD 2 installed inside the Linux environment:
+Check the required tools before building the lab:
 
 ```sh
+id
+ip -V
 bird --version
 command -v birdc
 ```
+
+Expected observations:
+
+- `id` should show `uid=0(root)` if you are using a root lab shell.
+- `ip -V` should print the installed `iproute2` version.
+- `bird --version` should report BIRD 2.
+- `command -v birdc` should print a path.
 
 On Ubuntu, the package is usually:
 
@@ -170,6 +179,10 @@ The validated transcript for this experiment is:
 ```text
 experiments/transcripts/pocket-internet-bgp-20260617T191953Z.txt
 ```
+
+## Lab Continuity Note
+
+This chapter is self-contained. It rebuilds the four-AS Pocket Internet topology from scratch and does not require a checkpoint from an earlier lab.
 
 ## What You Will Build
 

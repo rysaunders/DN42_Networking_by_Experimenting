@@ -103,7 +103,7 @@ If you can predict that decision from `ip route`, dynamic routing becomes much l
 - The lab does not change the real host's route table or default route.
 - Rollback deletes the namespace, interfaces, and routes.
 
-## Lab
+## Lab Requirements
 
 Build this lab by typing the commands yourself. The validation script exists so you can rerun the experiment later, but the learning path is the manual path.
 
@@ -114,6 +114,18 @@ orb
 ```
 
 Then run the commands from that Linux shell as root, or prefix them with `sudo`.
+
+Check the required tools before building the lab:
+
+```sh
+id
+ip -V
+```
+
+Expected observations:
+
+- `id` should show `uid=0(root)` if you are using a root lab shell.
+- `ip -V` should print the installed `iproute2` version.
 
 The repeatable validation script lives at:
 
@@ -126,6 +138,10 @@ The validated transcript for this chapter is:
 ```text
 experiments/transcripts/pocket-internet-route-selection-20260616T185554Z.txt
 ```
+
+## Lab Continuity Note
+
+This chapter is self-contained. It creates one temporary route-selection namespace and does not require a checkpoint from an earlier lab.
 
 ## What You Will Build
 

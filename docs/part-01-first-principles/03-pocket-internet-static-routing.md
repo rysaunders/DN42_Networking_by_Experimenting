@@ -111,7 +111,7 @@ This is the first important Pocket Internet lesson:
 - The lab does not touch public DN42 peers.
 - Rollback deletes the namespaces, which also removes the veth links and routes inside them.
 
-## Lab
+## Lab Requirements
 
 Build this lab manually. The repeated typing is intentional: you are teaching your hands and eyes how namespaces, veth links, loopbacks, route tables, and forwarding fit together.
 
@@ -122,6 +122,18 @@ orb
 ```
 
 Then run the commands from that Linux shell as root, or prefix them with `sudo`.
+
+Check the required tools before building the lab:
+
+```sh
+id
+ip -V
+```
+
+Expected observations:
+
+- `id` should show `uid=0(root)` if you are using a root lab shell.
+- `ip -V` should print the installed `iproute2` version.
 
 The repeatable validation script lives at:
 
@@ -134,6 +146,10 @@ The validated transcript for this experiment is:
 ```text
 experiments/transcripts/pocket-internet-static-routing-20260616T192307Z.txt
 ```
+
+## Lab Continuity Note
+
+This chapter is self-contained. It rebuilds the four-AS Pocket Internet topology from scratch and does not require a checkpoint from an earlier lab.
 
 ## What You Will Build
 

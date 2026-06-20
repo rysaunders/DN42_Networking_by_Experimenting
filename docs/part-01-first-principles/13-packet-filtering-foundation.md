@@ -138,6 +138,7 @@ curl --version
 Expected observations:
 
 - `id` should show `uid=0(root)`. If it does not, enter a root lab shell before continuing.
+- `ip -V` should print the installed `iproute2` version.
 - `nft --version` should print the nftables command version.
 - `python3 --version` and `curl --version` should print installed versions.
 

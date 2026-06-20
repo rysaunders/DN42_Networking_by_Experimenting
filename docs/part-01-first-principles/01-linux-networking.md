@@ -148,7 +148,7 @@ When something breaks, you need to know which layer failed:
 
 This lab teaches those checks before any DN42-specific tooling is involved.
 
-## Lab
+## Lab Requirements
 
 Build this lab manually. The script is useful for validation and repeat runs, but the lesson is in creating each piece of network state yourself.
 
@@ -161,6 +161,34 @@ orb
 ```
 
 Then run the commands from that Linux shell as root, or prefix them with `sudo`.
+
+Check the required tools before building the lab:
+
+```sh
+id
+ip -V
+```
+
+Expected observations:
+
+- `id` should show `uid=0(root)` if you are using a root lab shell.
+- `ip -V` should print the installed `iproute2` version.
+
+The repeatable validation script lives at:
+
+```text
+experiments/labs/pocket-internet-linux-router/run.sh
+```
+
+The validated transcript for this experiment is:
+
+```text
+experiments/transcripts/pocket-internet-linux-router-20260617T183713Z.txt
+```
+
+## Lab Continuity Note
+
+This chapter is self-contained. It creates and removes its own namespaces, so it does not require a checkpoint from an earlier lab.
 
 ## Step 1: Create Three Isolated Network Stacks
 
