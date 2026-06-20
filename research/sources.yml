@@ -60,10 +60,10 @@ sources:
     category: dn42
     authority: community
     volatility: high
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: tracked-small-snapshot-allowed
-    status: research-required
-    notes: "Use for registry object overview and workflow questions; revalidate before publishing commands."
+    status: reviewed-for-planning
+    notes: "Use for registry object overview, route object requirement, privacy warning, and first-peer workflow; revalidate before live allocation examples."
 
   - id: dn42-registry
     title: DN42 Registry
@@ -71,10 +71,10 @@ sources:
     category: dn42
     authority: community
     volatility: high
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for registry README, schema, validation scripts, and PR workflow. Reviewed checkout c88548aa5369fefcea8cc484567aa89575dad57f."
+    status: reviewed-for-planning
+    notes: "Use for registry README, object directories, validation scripts, and PR workflow. Reviewed checkout eaa6af80248778d7e30677dd6aac62500600592c."
 
   - id: dn42-registry-authentication
     title: DN42 Registry Authentication
@@ -82,10 +82,10 @@ sources:
     category: dn42
     authority: community
     volatility: high
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for maintainer auth methods, signed commits, and PR authentication workflow."
+    status: reviewed-for-planning
+    notes: "Use for maintainer auth methods, signed commits, and PR authentication workflow; verify chosen SSH or PGP path before commands."
 
   - id: dn42-bird2
     title: DN42 Bird 2
@@ -93,10 +93,10 @@ sources:
     category: routing
     authority: community
     volatility: high
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for DN42-specific BIRD 2 import/export filters, ROA table setup, peer templates, and stale example warnings."
+    status: reviewed-for-planning
+    notes: "Use for DN42-specific BIRD 2 import/export filters, ROA table setup, peer templates, and import limits; validate full configs before publication."
 
   - id: dn42-rpki
     title: DN42 RPKI
@@ -104,10 +104,10 @@ sources:
     category: rpki
     authority: community
     volatility: high
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for DN42 RPKI/RTR service guidance and validator options."
+    status: reviewed-for-planning
+    notes: "Use for DN42 RPKI/RTR service guidance, static ROA sources, public RTR bootstrap options, and validator tradeoffs."
 
   - id: dn42-network-settings
     title: DN42 Network Settings
@@ -115,10 +115,10 @@ sources:
     category: linux-networking
     authority: community
     volatility: high
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for router forwarding, reverse path filtering, and asymmetric routing warnings."
+    status: reviewed-for-planning
+    notes: "Use for forwarding, reverse-path filtering, asymmetric routing, and conntrack-invalid caveats on DN42 routers."
 
   - id: dn42-historical-bird
     title: DN42 Historical Bird
@@ -137,10 +137,10 @@ sources:
     category: routing
     authority: official
     volatility: medium
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for BIRD 2 syntax, protocols, filters, and kernel export behavior."
+    status: reviewed-for-planning
+    notes: "Use for BIRD syntax, protocols, filters, kernel export behavior, and current release context; choose BIRD 2/3 syntax deliberately."
 
   - id: wireguard-quickstart
     title: WireGuard Quick Start
@@ -148,7 +148,7 @@ sources:
     category: tunnel
     authority: official
     volatility: low
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
     status: reviewed-for-planning
     notes: "Use for WireGuard interface, key, peer, and keepalive concepts."
@@ -159,10 +159,10 @@ sources:
     category: tunnel
     authority: community
     volatility: high
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for DN42-specific WireGuard peer expectations, AllowedIPs, wg-quick caveats, MTU probing, and systemd-networkd examples."
+    status: reviewed-for-planning
+    notes: "Use for DN42-specific WireGuard peer expectations, broad AllowedIPs caveats, Table=off guidance, MTU probing, and one-interface-per-peer model."
 
   - id: wireguard-wgquick
     title: wg-quick(8) Linux Manual Page
@@ -170,10 +170,10 @@ sources:
     category: tunnel
     authority: manual
     volatility: medium
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
-    status: research-required
-    notes: "Use for wg-quick routing, Table, Address, MTU, and hook behavior."
+    status: reviewed-for-planning
+    notes: "Use for wg-quick route inference from AllowedIPs, Table=off, Address, MTU, DNS, and hook behavior."
 
   - id: wireguard-netns
     title: WireGuard Routing and Network Namespace Integration
@@ -181,10 +181,43 @@ sources:
     category: tunnel
     authority: official
     volatility: medium
-    reviewed_on: 2026-06-15
+    reviewed_on: 2026-06-20
     cache_policy: ignored-raw-cache
     status: reviewed-for-planning
     notes: "Use for advanced WireGuard route and namespace behavior, not first-node examples."
+
+  - id: dn42-dns
+    title: DN42 DNS
+    url: https://dn42.cc/wiki/services/dns/
+    category: dns
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for DN42 recursive resolver recommendations, anycast resolver addresses, split-horizon overview, and DNS architecture links."
+
+  - id: dn42-dns-configuration
+    title: DN42 DNS Configuration
+    url: https://dn42.cc/wiki/services/dns/configuration
+    category: dns
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for resolver-specific split DNS examples, reverse zones, DNSSEC caveats, and redundancy guidance."
+
+  - id: dn42-new-dns
+    title: DN42 New DNS
+    url: https://dn42.cc/wiki/services/dns/new-dns
+    category: dns
+    authority: community
+    volatility: high
+    reviewed_on: 2026-06-20
+    cache_policy: ignored-raw-cache
+    status: reviewed-for-planning
+    notes: "Use for DN42 DNS architecture, recursive/delegation server roles, DNSSEC posture, and resolver trust warnings."
 
   - id: linux-ip-route
     title: Linux ip-route(8)

@@ -10,5 +10,6 @@ Initial source groups:
 - DN42: `dn42-getting-started`, `dn42-registry`, `dn42-registry-authentication`, `dn42-bird2`, `dn42-rpki`.
 - Routing: `bird-docs`, `rfc-4271`, `linux-ip-route`, `dn42-historical-bird`.
 - Tunnels: `wireguard-quickstart`, `dn42-wireguard`, `wireguard-wgquick`, `wireguard-netns`.
+- DNS: `dn42-dns`, `dn42-dns-configuration`, `dn42-new-dns`, `rfc-1034`, `rfc-1035`, `rfc-6761`, `dnsmasq-docs`.
 - Addressing and validation: `rfc-4193`, `rfc-6811`, `ripe-roa`, `dn42-network-settings`.
 - Anycast: `rfc-3258`.
