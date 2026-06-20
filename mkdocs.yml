@@ -86,6 +86,7 @@ nav:
       - IPv6 and ULA Foundation: part-01-first-principles/12-ipv6-ula-foundation.md
       - Packet Filtering Foundation: part-01-first-principles/13-packet-filtering-foundation.md
       - DNS And Naming Foundation: part-01-first-principles/14-dns-and-naming-foundation.md
+      - Observability And Troubleshooting Foundation: part-01-first-principles/15-observability-and-troubleshooting.md
   - Later Draft - DN42 Node:
       - Overview: part-02-first-dn42-node/index.md
       - Registry Objects: part-02-first-dn42-node/01-registry-objects.md

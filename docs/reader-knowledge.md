@@ -464,6 +464,35 @@ Reader has not yet been taught:
 - real DN42 resolver choices,
 - production recursive resolver operation.
 
+## After Part 1, Observability And Troubleshooting Foundation
+
+Introduced by `docs/part-01-first-principles/15-observability-and-troubleshooting.md`.
+
+Reader has seen:
+
+- observability as the habit of using system evidence to understand what is happening,
+- runbook as a reusable troubleshooting path,
+- control plane as the system that decides or communicates reachability,
+- data plane as the system that forwards packets,
+- symptom as the visible failure that starts an investigation,
+- rollback proof as evidence that cleanup removed lab state,
+- a troubleshooting map that separates naming, routing, BIRD/BGP, WireGuard, packet movement, packet filtering, service state, logs, and rollback,
+- the idea that every command proves something specific and fails to prove other things,
+- public Internet route sanity checks as a DN42-facing safety habit.
+
+Reader has only been lightly introduced to:
+
+- production monitoring,
+- metrics and alerting,
+- route export inspection as a later DN42 operational habit.
+
+Reader has not yet been taught:
+
+- DN42 looking-glass operation,
+- route collectors,
+- real peer incident handling,
+- long-term service monitoring.
+
 ## After Pocket Internet to DN42 Border
 
 Introduced by `docs/pocket-internet-dn42-interconnect.md`.

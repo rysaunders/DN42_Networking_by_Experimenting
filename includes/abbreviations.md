@@ -3,7 +3,9 @@
 *[autonomous system]: One independently controlled network boundary. In real Internet routing, an autonomous system is identified by an ASN.
 *[BGP]: Border Gateway Protocol. Routers use BGP to exchange network reachability with other routers.
 *[BIRD]: A routing daemon that can learn, select, filter, and install routes.
+*[control plane]: The system that decides or communicates reachability, such as BIRD and BGP.
 *[convergence]: The network settling on usable routes after a routing change or failure.
+*[data plane]: The system that actually forwards packets, such as Linux route lookup, interfaces, tunnels, and packet filters.
 *[DNS]: Domain Name System. The naming system that maps names to data such as IP addresses.
 *[DN42]: A community overlay network used for learning and experimenting with routing, DNS, and network services.
 *[endpoint]: The underlay address and UDP port where a WireGuard peer receives tunnel packets.
@@ -17,8 +19,10 @@
 *[outer packet]: The packet that carries a tunneled inner packet across the underlay.
 *[NDP]: Neighbor Discovery Protocol. IPv6's local-link neighbor discovery system.
 *[nftables]: Linux's modern packet-filtering framework.
+*[observability]: The habit of using system evidence to understand what is happening.
 *[overlay]: The logical network carried by an underlay.
 *[return path]: The route a reply packet uses to get back to the original sender.
+*[rollback proof]: Evidence that cleanup removed the state a lab created.
 *[route advertisement]: Telling another router that you can carry traffic for a prefix.
 *[route leak]: Accidentally announcing or accepting routes that should not cross a routing boundary.
 *[split DNS]: Using different DNS resolvers or answers depending on where a query is made.

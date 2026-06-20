@@ -57,8 +57,14 @@ Convergence
 Connected route
 : A route Linux creates automatically for a prefix assigned directly to an interface.
 
+Control plane
+: The system that decides or communicates reachability, such as BIRD and BGP.
+
 Counter
 : A rule statistic showing how many packets or bytes matched a packet-filtering rule.
+
+Data plane
+: The system that actually forwards packets, such as Linux route lookup, interfaces, tunnels, and packet filters.
 
 Direct protocol
 : A BIRD protocol that learns routes from local interfaces.
@@ -156,6 +162,9 @@ Neighbor table
 nftables
 : Linux's modern packet-filtering framework.
 
+Observability
+: The habit of using system evidence to understand what is happening.
+
 On-link
 : Reachable through a local interface without first sending the packet to another IP router.
 
@@ -213,8 +222,14 @@ Route lookup
 Route table
 : A list of routes used by a routing component. Linux has route tables for packet forwarding; BIRD has its own route table before selected routes are exported to Linux.
 
+Rollback proof
+: Evidence that cleanup removed the state a lab created.
+
 Routing daemon
 : A background program that manages routes.
+
+Runbook
+: A reusable troubleshooting path.
 
 Rule
 : One packet-filtering instruction that matches packet fields and applies an action such as accept or drop.
@@ -236,6 +251,9 @@ Split DNS
 
 Static protocol
 : A BIRD protocol that creates configured routes inside BIRD.
+
+Symptom
+: The visible failure that starts an investigation.
 
 Tunnel
 : A logical link carried inside another network path.

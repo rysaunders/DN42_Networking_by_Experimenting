@@ -43,7 +43,8 @@ By the end of this part, the reader should be able to:
 - Explain the first IPv6/ULA routing differences before real DN42 examples appear.
 - Explain why packet-filtering policy can allow or deny traffic independently from route lookup.
 - Explain why name resolution can fail independently from routing and service listeners.
+- Use a reusable troubleshooting map that separates naming, routing, control plane, tunnel state, packet movement, policy, service state, and rollback.
 
-The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, WireGuard, operational observation, a first IPv6/ULA pass, packet filtering, and DNS naming before any public DN42 state enters the picture.
+The labs are local and disposable. They start with Linux routing, then add BIRD, BGP, services, WireGuard, operational observation, a first IPv6/ULA pass, packet filtering, DNS naming, and a troubleshooting runbook before any public DN42 state enters the picture.
 
 Chapter 05 teaches BIRD as a local route manager before Chapter 06 asks it to speak BGP. That sequence matters: first BIRD learns and exports routes locally, then BIRD exchanges reachability with other routers.
