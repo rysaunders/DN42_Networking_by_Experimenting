@@ -20,7 +20,7 @@
       wireguard_tools: not used
     beginner_review:
       status: complete
-      note: Beginner-review pass completed when drafted; config-anatomy flow reviewed again during issue #65 hardening.
+      note: Beginner-review pass completed when drafted; config-anatomy flow reviewed again during issue #65 hardening; issue #66 added state snapshots.
     technical_review:
       required: true
       status: deferred
@@ -406,6 +406,9 @@ Expected result:
 
 This is exactly where the earlier static-routing lab became tedious. This time, do not add static routes.
 
+!!! info "State snapshot: topology exists, service routes do not"
+    The four namespaces, links, and service loopbacks exist. Linux has connected routes for local links and local loopbacks, but it has no route from AS1 to AS3's service loopback. No BIRD process is running yet.
+
 ## Step 3: Create the Lab BIRD Directory
 
 Create a temporary directory for BIRD config, sockets, and PID files:
@@ -701,6 +704,21 @@ ip netns exec pocket-as4 bird \
 
 The `-s` option gives each namespace a separate control socket. That lets `birdc` talk to the right BIRD process.
 
+Before checking neighbor sessions, prove one local BIRD instance can see its own service loopback:
+
+```sh title="Inspect local route learning before relying on BGP"
+ip netns exec pocket-as1 birdc -s /tmp/pocket-internet-bgp/pocket-as1.ctl show route 172.20.1.1/32 all
+```
+
+Expected observation:
+
+- the route exists in BIRD,
+- the route came from `direct_loopbacks`,
+- this proves local route learning before neighbor route exchange.
+
+!!! info "State snapshot: BIRD has local routes"
+    BIRD is running and can learn the namespace's own service loopback through `protocol direct`. Neighbor sessions may still be coming up, and remote service loopbacks are not the point of this check.
+
 ## Step 9: Watch BGP Sessions Establish
 
 Ask `pocket-as1` what its protocols are doing:
@@ -731,6 +749,9 @@ ip netns exec pocket-as4 birdc -s /tmp/pocket-internet-bgp/pocket-as4.ctl show p
 ```
 
 If a session is not established yet, wait a few seconds and run the command again. BGP is a conversation, not a one-shot route command.
+
+!!! info "State snapshot: BGP sessions are up"
+    The routers can now exchange reachability. This does not yet prove Linux can forward to every service loopback. It proves the control-plane conversations are established.
 
 ## Step 10: Observe Routes in BIRD
 
@@ -798,6 +819,9 @@ That `proto bird` marker is the proof that the route in Linux came from BIRD. Th
 
 !!! success "What this proves"
     BIRD exported a selected route into Linux, and Linux has a forwarding decision for the destination.
+
+!!! info "State snapshot: BIRD-selected route is now a Linux route"
+    The route has crossed both boundaries: it entered BIRD through BGP, and then `protocol kernel` exported the selected route into Linux. `proto bird` is the visible marker at the Linux boundary.
 
 !!! warning "What this does not prove"
     It does not prove an application is reachable. It proves route installation and route lookup, not service behavior.

@@ -20,7 +20,7 @@
       wireguard_tools: not used
     beginner_review:
       status: complete
-      note: Beginner-review pass incorporated in the BIRD chapter hardening sequence.
+      note: Beginner-review pass incorporated in the BIRD chapter hardening sequence; issue #66 added state snapshots for mental-model checkpoints.
     technical_review:
       required: true
       status: deferred
@@ -241,6 +241,9 @@ Expected result:
 
 That destination is not special yet. Linux has no instruction for it.
 
+!!! info "State snapshot: Linux only"
+    At this point, only the Linux route table is involved. `svc0` exists, but BIRD is not running. Linux has no route for `172.20.99.0/24`, so Linux cannot forward packets for that destination.
+
 ## Step 4: Write a BIRD Config That Does Not Export to Linux
 
 Create the first config:
@@ -339,6 +342,9 @@ Expected result:
 
 - Linux still shows no route for `172.20.99.0/24`,
 - `route get` still says the network is unreachable.
+
+!!! info "State snapshot: BIRD knows, Linux does not"
+    BIRD has learned `172.20.50.1/32` from `svc0` and created `172.20.99.0/24` from `protocol static`. The kernel protocol still says `export none`, so Linux has not learned the static route.
 
 !!! success "What this proves"
     BIRD can know a route that Linux is not using for forwarding.
@@ -456,6 +462,9 @@ ip -n birdlab route get 172.20.99.1
 ```
 
 Because this is a blackhole route, Linux may answer with an error such as `Invalid argument`. That is fine. The interesting change is not successful delivery. The interesting change is that Linux now has a matching route installed by BIRD.
+
+!!! info "State snapshot: route crossed the kernel boundary"
+    BIRD still owns the route decision, but Linux now has a matching `proto bird` route. That is the first time packet forwarding could be affected by BIRD in this chapter.
 
 !!! success "What this proves"
     A route can move from BIRD's route table into Linux only when the kernel protocol exports it.

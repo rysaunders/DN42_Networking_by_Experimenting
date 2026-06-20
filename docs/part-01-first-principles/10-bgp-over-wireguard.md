@@ -23,7 +23,7 @@
       wireguard_tools: recorded in transcript
     beginner_review:
       status: complete
-      note: Beginner-review pass recorded for the chapter before publication.
+      note: Beginner-review pass recorded for the chapter before publication; issue #66 added state snapshots for underlay, overlay, BGP-over-overlay, and service traffic.
     technical_review:
       required: true
       status: deferred
@@ -330,6 +330,9 @@ ip netns exec pocket-as2 ping -c 1 -W 1 192.0.2.2
 
 If this fails, WireGuard has nowhere to send encrypted packets.
 
+!!! info "State snapshot: underlay carrier exists"
+    AS2 and AS3 can reach each other at `192.0.2.1/30` and `192.0.2.2/30` over the local veth underlay. The routed AS2-AS3 Pocket Internet link does not exist yet; `10.42.23.0/30` will appear on WireGuard, not on this veth pair.
+
 ## Step 4: Build The WireGuard Overlay
 
 Generate keys:
@@ -403,6 +406,9 @@ That does not create BGP routes. BGP still learns reachability and installs rout
 
 That statement is specific to this raw `wg set` lab. Later tools such as `wg-quick`, and many real peer examples, may also install routes from `AllowedIPs`. Here, BGP and the kernel routing table remain separate from WireGuard's peer-selection rule so you can see each layer clearly.
 
+!!! warning "AllowedIPs failure mode"
+    Linux can choose `wg23` for a destination that WireGuard refuses to carry. In this lab, if AS2 has a BGP route to `172.20.3.1` via `10.42.23.2 dev wg23`, but AS2's WireGuard peer does not include `172.20.3.1/32` in `AllowedIPs`, the route lookup can look correct while the encrypted tunnel drops the inner packet. The routing table selects an interface; WireGuard still checks whether the inner destination is allowed for that peer.
+
 Verify the overlay neighbor:
 
 ```sh title="Compare AS2 underlay and overlay route lookups"
@@ -417,6 +423,9 @@ ip netns exec pocket-as2 wg show wg23
 
 !!! warning "What this does not prove"
     It does not prove BGP has learned service-loopback routes yet. This is the link layer for the lab path, not the routing control plane.
+
+!!! info "State snapshot: overlay link exists"
+    `wg23` now carries the routed AS2-AS3 link address pair `10.42.23.1/30` and `10.42.23.2/30`. BIRD has not started yet, so service-loopback routes still have not been exchanged over this overlay.
 
 ## Step 5: Start BIRD Over The New Link
 
@@ -762,6 +771,9 @@ to_as2  BGP  ...  Established
 
 If those sessions establish, BGP is running over WireGuard.
 
+!!! info "State snapshot: BGP rides the overlay"
+    The AS2-AS3 BGP session uses `10.42.23.1` and `10.42.23.2`, which live on `wg23`. BGP does not see the underlay address pair directly; WireGuard hides that transport detail behind the overlay interface.
+
 ## Step 7: Prove Existing Routing Still Works
 
 From AS1, ask how to reach AS3's service loopback:
@@ -812,6 +824,9 @@ The transfer counters should be larger than before. That is evidence that Pocket
 
 !!! success "What this proves"
     The BGP-maintained service-loopback traffic can cross the WireGuard-replaced link.
+
+!!! info "State snapshot: service traffic crosses the tunnel"
+    At this point, all four layers line up: the underlay reaches the WireGuard endpoints, the overlay carries the AS2-AS3 link, BGP exchanges service-loopback reachability over that link, and Linux forwards selected service traffic through `wg23`.
 
 !!! warning "What this does not prove"
     It does not prove WireGuard alone provided reachability. BGP route exchange and Linux route lookup still decide which packets use the tunnel.
@@ -867,6 +882,15 @@ Check WireGuard `AllowedIPs`.
 If AS2 will forward packets to `172.20.3.1`, AS2's WireGuard peer for AS3 must allow `172.20.3.1/32`.
 
 This is different from BGP import/export policy. BGP decides which routes are learned. WireGuard decides which peer is allowed to carry matching inner packets.
+
+The confusing failure looks like this:
+
+- `birdc show route 172.20.3.1/32 all` shows a selected BGP route,
+- `ip -n pocket-as2 route get 172.20.3.1 from 172.20.2.1` points at `wg23`,
+- `wg show wg23` has a handshake,
+- the ping still fails because the inner destination is missing from the peer's `AllowedIPs`.
+
+When that happens, do not rewrite BGP first. Fix the WireGuard peer-selection rule so the inner destination is allowed through the peer that represents the next hop.
 
 ## Rollback
 

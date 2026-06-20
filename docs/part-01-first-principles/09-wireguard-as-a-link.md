@@ -21,7 +21,7 @@
       wireguard_tools: recorded in transcript
     beginner_review:
       status: complete
-      note: Reader feedback on VPN, underlay, and overlay confusion incorporated.
+      note: Reader feedback on VPN, underlay, and overlay confusion incorporated; issue #66 added state snapshots for underlay and overlay transitions.
     technical_review:
       required: true
       status: deferred
@@ -253,6 +253,9 @@ If this fails, stop here. WireGuard has nowhere to send encrypted packets.
 !!! warning "What this does not prove"
     It does not prove WireGuard is working yet. At this point, only the network that will carry encrypted packets has been tested.
 
+!!! info "State snapshot: underlay only"
+    AS2 and AS3 can reach each other at `192.0.2.1/30` and `192.0.2.2/30` on `as2-underlay` and `as3-underlay`. The WireGuard interface exists nowhere yet, so there is no `wg23` overlay link.
+
 ## Step 4: Generate WireGuard Keys
 
 Each side gets a private key and a public key:
@@ -369,6 +372,9 @@ Those two lookups are the whole model:
 | `192.0.2.2` | underlay endpoint | `as2-underlay` |
 | `10.42.23.2` | overlay neighbor | `wg23` |
 
+!!! info "State snapshot: two paths, two jobs"
+    The underlay route gets encrypted WireGuard UDP packets to the peer endpoint. The overlay route sends the lab's inner packet into `wg23`. The same two namespaces are involved, but Linux chooses different interfaces because the destinations belong to different layers.
+
 ## Step 8: Prove The WireGuard Link Works
 
 Ping the overlay neighbor:
@@ -397,6 +403,9 @@ A handshake says the peers exchanged WireGuard setup traffic. The transfer count
 
 !!! warning "What this does not prove"
     It does not prove BGP or service-loopback routing is working. This step proves the tunnel link, not the whole Pocket Internet.
+
+!!! info "State snapshot: overlay link works"
+    The overlay neighbor address is reachable through `wg23`, and WireGuard counters moved. That is enough to use this tunnel as a point-to-point link in the next BGP lab, but it is not yet carrying service-loopback traffic.
 
 Inspect AS3 too:
 
